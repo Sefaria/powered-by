@@ -39,9 +39,9 @@ As of 2026-07-21 this returns 36 project objects. Relevant fields per project
 ### Known data quality issue: `project_category`
 
 This field is **not a clean single value**. It is a concatenation of one or more
-of the six known category labels, with an inconsistent (sometimes absent)
-delimiter, and can include free-text tags not in the standard set (e.g.
-`"Other: Davening Toolkit"`). Observed real examples:
+known category labels joined by a plain space (no delimiter of its own), and can
+include a free-text tag not in the standard set (e.g. `"Other: Davening
+Toolkit"`). Observed real examples:
 
 ```
 "Learning & Study Tools"
@@ -49,22 +49,33 @@ delimiter, and can include free-text tags not in the standard set (e.g.
 "Learning & Study Tools AI Projects, Apps, & Other Tools Other: Davening Toolkit"
 ```
 
-The six known category labels (matching developers.sefaria.org):
+**Correction from an earlier draft of this spec:** the known label set is
+*not* the 6 categories listed on developers.sefaria.org. Verified directly
+against the live API response (all 36 entries decompose cleanly against this
+set, with zero unmatched leftover text), the actual submission-form category
+labels are:
 
-1. AI Projects
-2. Learning & Study Tools
-3. Apps & Other Tools
-4. Visualization & Data Analysis
-5. Community, Interaction, & Social
-6. Extensions and API Integrations
+1. `AI Projects, Apps, & Other Tools` (one combined label — the docs site
+   splits this into two separate categories, the API does not)
+2. `Learning & Study Tools`
+3. `Community, Interaction, & Social`
+4. `Visualization & Data Analysis`
+5. `Extensions, API Integrations, & GitHub Code` (one older entry uses the
+   legacy wording `Extensions and API Integrations` for the same category —
+   normalize this variant to the label above)
+
+Plus free-text `Other: <anything>`, which does not map to a fixed label.
 
 **Handling:** since the field can't be reliably split on a delimiter, derive one
-**primary category** per project by scanning `project_category` for whichever of
-the six known labels occurs at the earliest string position. That primary
-category is what's displayed on the card and what the category filter matches
-against. (Decision: a project is only ever categorized under this one primary
-category, even if it self-described multiple — see Open Questions if this needs
-revisiting later.)
+**primary category** per project by scanning `project_category` for whichever
+of the five known labels (treating the legacy variant as equivalent to label 5)
+occurs at the earliest string position. That primary category is what's
+displayed on the card and what the category filter matches against. A project
+whose `project_category` is empty or matches none of the five (e.g. only
+`"Other: ..."`) has no primary category and is labeled `"Uncategorized"` for
+display/filter purposes. (Decision: a project is only ever categorized under
+this one primary category, even if it self-described multiple — see Open
+Questions if this needs revisiting later.)
 
 ### Defensive filtering
 
@@ -100,9 +111,9 @@ App
     source.
   - Passes the visible list and count down to `Controls` and `ProjectGrid`.
 - **`Controls`** — presentational. Search `<input>`, category `<select>`
-  (options: "All" + the 6 known categories), and a "`N` projects" count
-  display. Calls `onSearchChange`/`onCategoryChange` callbacks passed as props;
-  owns no state itself.
+  (options: "All" + the 5 known category labels + "Uncategorized"), and a
+  "`N` projects" count display. Calls `onSearchChange`/`onCategoryChange`
+  callbacks passed as props; owns no state itself.
 - **`ProjectGrid`** — presentational. Given the visible projects array, renders
   one `ProjectCard` per item in a responsive grid (per the approved Card Grid
   mockup). If the array is empty, renders a "No projects match your search"
