@@ -175,6 +175,7 @@ code {
 }
 
 .project-card-desc {
+  /* 5 lines x 1.45 line-height; em-relative so it stays 5 lines at any root font-size */
   height: 7.25em;
   overflow-y: auto;
 }

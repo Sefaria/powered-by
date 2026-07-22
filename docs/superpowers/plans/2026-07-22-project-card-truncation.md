@@ -1,5 +1,7 @@
 # ProjectCard Description Truncation Implementation Plan
 
+> **Superseded:** the design this plan implements was replaced by [`2026-07-22-project-card-description-scroll-design.md`](../specs/2026-07-22-project-card-description-scroll-design.md). Kept as a historical record — Tasks 1-2 below were completed and then reverted on the same branch.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Clamp `ProjectCard` descriptions to 3 lines with a "view more"/"view less" toggle, shown only when the description actually overflows, so all cards in the grid stay roughly the same height.
