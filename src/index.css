@@ -174,21 +174,7 @@ code {
   color: var(--text);
 }
 
-.clamped {
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.project-card-toggle {
-  align-self: flex-start;
-  font: inherit;
-  font-size: 14px;
-  color: var(--accent);
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  text-decoration: underline;
+.project-card-desc {
+  height: 7.25em;
+  overflow-y: auto;
 }
