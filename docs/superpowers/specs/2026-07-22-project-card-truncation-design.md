@@ -1,5 +1,7 @@
 # ProjectCard Description Truncation — Design
 
+> **Superseded by [`2026-07-22-project-card-description-scroll-design.md`](2026-07-22-project-card-description-scroll-design.md).** Kept as a historical record of the toggle-button approach that was tried first and then replaced.
+
 **Goal:** Long project descriptions currently stretch `ProjectCard` to arbitrary heights, making the grid visually uneven. Descriptions should be clamped to a fixed number of lines with a "view more" / "view less" toggle, so all cards stay roughly the same height.
 
 **Scope:** `src/components/ProjectCard.jsx` and `src/index.css` only. No other component changes.
