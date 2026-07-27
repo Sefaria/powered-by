@@ -179,3 +179,49 @@ code {
   height: 7.25em;
   overflow-y: auto;
 }
+
+.app-body {
+  display: flex;
+  flex: 1;
+  align-items: stretch;
+  text-align: left;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 180px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+}
+
+.sidebar-tab {
+  font: inherit;
+  text-align: left;
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.sidebar-tab:hover {
+  background: var(--accent-bg);
+}
+
+.sidebar-tab.active {
+  color: var(--accent);
+  background: var(--accent-bg);
+  font-weight: 600;
+}
+
+.tab-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.charts-and-analytics {
+  padding: 48px 24px;
+  color: var(--text);
+}
