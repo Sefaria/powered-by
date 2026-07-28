@@ -10,6 +10,7 @@ function Controls({
     <div className="dashboard-controls">
       <input
         type="text"
+        className="search-input"
         placeholder="Search projects..."
         value={searchText}
         onChange={(event) => onSearchChange(event.target.value)}
