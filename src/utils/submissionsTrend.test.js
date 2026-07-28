@@ -42,13 +42,24 @@ test('getSubmissionsTrendByExperience buckets each level independently per month
   ])
 })
 
-test('getSubmissionsTrendByExperience excludes unspecified experience from counts but keeps the month', () => {
+test('getSubmissionsTrendByExperience returns [] when every parseable project has unspecified experience', () => {
   const projects = [
     { tags: ['July 2026'], technical_experience: '' },
   ]
   const result = getSubmissionsTrendByExperience(projects, referenceDate)
 
+  assert.deepEqual(result, [])
+})
+
+test('getSubmissionsTrendByExperience ignores unspecified-experience months when finding the earliest month', () => {
+  const projects = [
+    // Unspecified experience, earlier date — should NOT push the chart's start back.
+    { tags: ['January 2026'], technical_experience: '' },
+    { tags: ['July 2026'], technical_experience: 'None' },
+  ]
+  const result = getSubmissionsTrendByExperience(projects, referenceDate)
+
   assert.deepEqual(result, [
-    { month: 'Jul 2026', 'No Experience': 0, Beginner: 0, Intermediate: 0, Advanced: 0 },
+    { month: 'Jul 2026', 'No Experience': 1, Beginner: 0, Intermediate: 0, Advanced: 0 },
   ])
 })

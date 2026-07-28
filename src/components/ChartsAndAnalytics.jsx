@@ -41,6 +41,9 @@ function ChartsAndAnalytics() {
 
   if (error) return <p className="charts-and-analytics">Couldn't load chart data right now.</p>
   if (!trend || !keywordCounts || !experienceTrend) return <p className="charts-and-analytics">Loading chart…</p>
+  if (experienceTrend.length === 0) {
+    return <p className="charts-and-analytics">No experience-level data available yet.</p>
+  }
 
   return (
     <div className="charts-and-analytics">
@@ -72,7 +75,7 @@ function ChartsAndAnalytics() {
 
       <h2>Submissions by experience level</h2>
       <ResponsiveContainer width="100%" height={360}>
-        <LineChart data={experienceTrend} margin={{ right: 80 }}>
+        <LineChart data={experienceTrend} margin={{ right: 100 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="month" />
           <YAxis allowDecimals={false} />
@@ -87,6 +90,10 @@ function ChartsAndAnalytics() {
               stroke={EXPERIENCE_COLORS[level]}
               strokeWidth={2}
               dot={{ r: 3 }}
+              // recharts 3.x gates the custom `label` render-prop behind an internal
+              // isAnimating flag cleared via onAnimationEnd, which doesn't fire
+              // reliably in this dev environment — without this, the end-of-line
+              // labels below silently never render (no test/lint failure to catch it).
               isAnimationActive={false}
               label={(props) =>
                 props.index === experienceTrend.length - 1 ? (
@@ -94,7 +101,7 @@ function ChartsAndAnalytics() {
                     x={props.x + 6}
                     y={props.y}
                     dy={4}
-                    fill={EXPERIENCE_COLORS[level]}
+                    fill="var(--text-h)"
                     fontSize={12}
                   >
                     {level}
