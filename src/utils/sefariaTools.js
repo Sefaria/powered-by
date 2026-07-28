@@ -40,7 +40,9 @@ export function getToolUsageCounts(projects) {
   const counts = new Map()
 
   for (const project of projects) {
-    const normalized = new Set((project.sefaria_tools_used ?? []).map(normalizeEndpoint))
+    const normalized = new Set(
+      (project.sefaria_tools_used ?? []).filter((tool) => typeof tool === 'string').map(normalizeEndpoint),
+    )
     for (const endpoint of normalized) {
       counts.set(endpoint, (counts.get(endpoint) ?? 0) + 1)
     }
