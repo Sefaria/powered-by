@@ -23,7 +23,7 @@
 **Files:**
 - Create: `src/utils/experience.js`
 - Test: `src/utils/experience.test.js`
-- Modify: `package.json` (add `"test": "node --test src"` script)
+- Modify: `package.json` (add `"test": "node --test"` script)
 
 **Interfaces:**
 - Produces: `EXPERIENCE_LEVELS` (array of 4 strings, fixed order: `['No Experience', 'Beginner', 'Intermediate', 'Advanced']`) and `getExperienceLevel(rawExperience: string | undefined): string | null` — both consumed by Task 2.
@@ -33,8 +33,12 @@
 Edit `package.json`, in `"scripts"`, add:
 
 ```json
-"test": "node --test src"
+"test": "node --test"
 ```
+
+(`node --test src` errors on Node v24 by treating `src` as a script path
+rather than a discovery path — bare `node --test` recurses and picks up
+`*.test.js` files automatically.)
 
 - [ ] **Step 2: Write the failing test**
 
