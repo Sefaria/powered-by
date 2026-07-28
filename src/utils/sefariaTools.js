@@ -33,3 +33,28 @@ export function normalizeEndpoint(raw) {
 
   return knownMatch ?? withoutTrailingSlash
 }
+
+const TOP_ENDPOINT_LIMIT = 6
+
+export function getToolUsageCounts(projects) {
+  const counts = new Map()
+
+  for (const project of projects) {
+    const normalized = new Set((project.sefaria_tools_used ?? []).map(normalizeEndpoint))
+    for (const endpoint of normalized) {
+      counts.set(endpoint, (counts.get(endpoint) ?? 0) + 1)
+    }
+  }
+
+  const sorted = [...counts.entries()]
+    .map(([endpoint, count]) => ({ endpoint, count }))
+    .sort((a, b) => b.count - a.count)
+
+  const top = sorted.slice(0, TOP_ENDPOINT_LIMIT)
+  const rest = sorted.slice(TOP_ENDPOINT_LIMIT)
+
+  if (rest.length === 0) return top
+
+  const otherCount = rest.reduce((sum, entry) => sum + entry.count, 0)
+  return [...top, { endpoint: 'Other', count: otherCount }]
+}
