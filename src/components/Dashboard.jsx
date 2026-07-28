@@ -38,7 +38,7 @@ function Dashboard() {
         project.project_category.toLowerCase().includes(search)
 
       const matchesCategory =
-        selectedCategory === 'All' || project.primaryCategory === selectedCategory
+        selectedCategory === 'All' || project.categories.includes(selectedCategory)
 
       return matchesSearch && matchesCategory
     })
