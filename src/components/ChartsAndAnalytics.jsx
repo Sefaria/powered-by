@@ -224,7 +224,7 @@ function ChartsAndAnalytics() {
           >
             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
             <XAxis type="number" allowDecimals={false} />
-            <YAxis type="category" dataKey="label" width={140} />
+            <YAxis type="category" dataKey="label" width={180} interval={0} />
             <Tooltip />
             <Bar dataKey="count" name="Projects" fill="var(--accent)" />
           </BarChart>
