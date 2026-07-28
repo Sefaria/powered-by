@@ -55,6 +55,15 @@ test('getToolUsageCounts sorts descending by count', () => {
   ])
 })
 
+test('getToolUsageCounts skips non-string entries instead of throwing', () => {
+  const projects = [
+    { sefaria_tools_used: [null, 42, '/api/index'] },
+    { sefaria_tools_used: ['/api/index'] },
+  ]
+  assert.doesNotThrow(() => getToolUsageCounts(projects))
+  assert.deepEqual(getToolUsageCounts(projects), [{ endpoint: '/api/index', count: 2 }])
+})
+
 test('getToolUsageCounts does not add an Other bucket at exactly 6 distinct endpoints', () => {
   const endpoints = ['/api/index', '/api/texts', '/api/calendars', '/api/words', '/api/name', '/api/related']
   const projects = endpoints.map((endpoint) => ({ sefaria_tools_used: [endpoint] }))
