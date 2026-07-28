@@ -1,6 +1,11 @@
 function ProjectCard({ project }) {
   return (
-    <div className="project-card">
+    <a
+      className="project-card"
+      href={project.project_link}
+      target="_blank"
+      rel="noreferrer"
+    >
       {project.image_url && (
         <img
           className="project-card-image"
@@ -9,12 +14,15 @@ function ProjectCard({ project }) {
         />
       )}
       <h3>{project.project_name}</h3>
-      <span className="project-card-category">{project.primaryCategory}</span>
+      <div className="project-card-categories">
+        {project.categories.map((category) => (
+          <span key={category} className="project-card-category">
+            {category}
+          </span>
+        ))}
+      </div>
       <p className="project-card-desc">{project.project_desc}</p>
-      <a href={project.project_link} target="_blank" rel="noreferrer">
-        Visit project
-      </a>
-    </div>
+    </a>
   )
 }
 

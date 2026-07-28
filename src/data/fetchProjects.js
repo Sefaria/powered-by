@@ -1,4 +1,4 @@
-import { getPrimaryCategory } from '../utils/categories.js'
+import { getCategories } from '../utils/categories.js'
 
 const API_URL = 'https://www.sefaria.org/api/powered-by'
 
@@ -15,6 +15,6 @@ export async function fetchProjects() {
     .filter((project) => project.is_published && project.consent_to_display)
     .map((project) => ({
       ...project,
-      primaryCategory: getPrimaryCategory(project.project_category),
+      categories: getCategories(project.project_category),
     }))
 }

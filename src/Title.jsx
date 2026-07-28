@@ -2,11 +2,10 @@ import developersLogo from './assets/developers_logo.png'
 
 function Title() {
   return (
-    <header>
+    <header style={{ textAlign: 'center' }}>
       <h1>Powered by Sefaria Dashboard</h1>
-      <img src={developersLogo} alt="Sefaria Developers logo" />
       <a href="https://developers.sefaria.org" target="_blank" rel="noreferrer">
-        developers.sefaria.org
+        <img src={developersLogo} alt="Sefaria Developers logo" />
       </a>
     </header>
   )
