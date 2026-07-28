@@ -72,7 +72,7 @@ function ChartsAndAnalytics() {
 
       <h2>Submissions by experience level</h2>
       <ResponsiveContainer width="100%" height={360}>
-        <LineChart data={experienceTrend}>
+        <LineChart data={experienceTrend} margin={{ right: 80 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="month" />
           <YAxis allowDecimals={false} />
@@ -87,6 +87,7 @@ function ChartsAndAnalytics() {
               stroke={EXPERIENCE_COLORS[level]}
               strokeWidth={2}
               dot={{ r: 3 }}
+              isAnimationActive={false}
               label={(props) =>
                 props.index === experienceTrend.length - 1 ? (
                   <text
