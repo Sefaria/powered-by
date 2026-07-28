@@ -23,6 +23,7 @@ import {
 } from '../utils/submissionsTrend.js'
 import { getKeywordCounts } from '../utils/keywords.js'
 import { getToolUsageCounts } from '../utils/sefariaTools.js'
+import { getTechCounts } from '../utils/techUsed.js'
 import { EXPERIENCE_LEVELS } from '../utils/experience.js'
 
 const EXPERIENCE_COLORS = {
@@ -52,6 +53,7 @@ function ChartsAndAnalytics() {
   const [experienceTrend, setExperienceTrend] = useState(null)
   const [toolUsage, setToolUsage] = useState(null)
   const [vibeCodedTrend, setVibeCodedTrend] = useState(null)
+  const [techCounts, setTechCounts] = useState(null)
   const [error, setError] = useState(null)
 
   useEffect(() => {
@@ -62,12 +64,13 @@ function ChartsAndAnalytics() {
         setExperienceTrend(getSubmissionsTrendByExperience(projects))
         setToolUsage(getToolUsageCounts(projects))
         setVibeCodedTrend(getSubmissionsTrendByVibeCoded(projects))
+        setTechCounts(getTechCounts(projects))
       })
       .catch((err) => setError(err.message))
   }, [])
 
   if (error) return <p className="charts-and-analytics">Couldn't load chart data right now.</p>
-  if (!trend || !keywordCounts || !experienceTrend || !toolUsage || !vibeCodedTrend) {
+  if (!trend || !keywordCounts || !experienceTrend || !toolUsage || !vibeCodedTrend || !techCounts) {
     return <p className="charts-and-analytics">Loading chart…</p>
   }
   return (
@@ -208,6 +211,25 @@ function ChartsAndAnalytics() {
           ))}
         </LineChart>
       </ResponsiveContainer>
+
+      <h2>Technologies used</h2>
+      {techCounts.length === 0 ? (
+        <p>No technology data available yet.</p>
+      ) : (
+        <ResponsiveContainer width="100%" height={techCounts.length * 28 + 40}>
+          <BarChart
+            data={techCounts}
+            layout="vertical"
+            margin={{ left: 24 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+            <XAxis type="number" allowDecimals={false} />
+            <YAxis type="category" dataKey="label" width={140} />
+            <Tooltip />
+            <Bar dataKey="count" name="Projects" fill="var(--accent)" />
+          </BarChart>
+        </ResponsiveContainer>
+      )}
     </div>
   )
 }
