@@ -1,3 +1,5 @@
+import { getCategoryColor } from '../utils/categories.js'
+
 function ProjectCard({ project }) {
   return (
     <a
@@ -16,7 +18,11 @@ function ProjectCard({ project }) {
       <h3>{project.project_name}</h3>
       <div className="project-card-categories">
         {project.categories.map((category) => (
-          <span key={category} className="project-card-category">
+          <span
+            key={category}
+            className="project-card-category"
+            style={{ '--category-color': getCategoryColor(category) }}
+          >
             {category}
           </span>
         ))}
