@@ -111,3 +111,31 @@ export function getSubmissionsTrendByExperience(projects, referenceDate = new Da
     ...counts.get(monthKey(year, monthIndex)),
   }))
 }
+
+export function getSubmissionsTrendByVibeCoded(projects, referenceDate = new Date()) {
+  const months = last12Months(referenceDate)
+
+  const counts = new Map(
+    months.map(({ year, monthIndex }) => [
+      monthKey(year, monthIndex),
+      { 'Vibe-coded': 0, 'Not vibe-coded': 0 },
+    ]),
+  )
+
+  for (const project of projects) {
+    const [rawDate] = project.tags ?? []
+    const parsed = parseTagMonth(rawDate)
+    if (!parsed) continue
+
+    const key = monthKey(parsed.year, parsed.monthIndex)
+    if (!counts.has(key)) continue
+
+    const series = project.vibe_coded ? 'Vibe-coded' : 'Not vibe-coded'
+    counts.get(key)[series] += 1
+  }
+
+  return months.map(({ year, monthIndex }) => ({
+    month: `${MONTH_NAMES[monthIndex].slice(0, 3)} ${year}`,
+    ...counts.get(monthKey(year, monthIndex)),
+  }))
+}
