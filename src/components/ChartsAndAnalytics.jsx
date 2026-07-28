@@ -15,7 +15,11 @@ import {
   YAxis,
 } from 'recharts'
 import { fetchProjects } from '../data/fetchProjects.js'
-import { getSubmissionsMonthlyTrend, getSubmissionsTrendByExperience } from '../utils/submissionsTrend.js'
+import {
+  getSubmissionsMonthlyTrend,
+  getSubmissionsTrendByExperience,
+  getSubmissionsTrendByVibeCoded,
+} from '../utils/submissionsTrend.js'
 import { getKeywordCounts } from '../utils/keywords.js'
 import { getToolUsageCounts } from '../utils/sefariaTools.js'
 import { EXPERIENCE_LEVELS } from '../utils/experience.js'
@@ -36,11 +40,18 @@ function colorForToolSlice(endpoint, index) {
   return endpoint === 'Other' ? OTHER_SLICE_COLOR : TOOL_SLICE_COLORS[index]
 }
 
+const VIBE_CODED_SERIES = ['Not vibe-coded', 'Vibe-coded']
+const VIBE_CODED_COLORS = {
+  'Not vibe-coded': '#2a78d6',
+  'Vibe-coded': '#eb6834',
+}
+
 function ChartsAndAnalytics() {
   const [trend, setTrend] = useState(null)
   const [keywordCounts, setKeywordCounts] = useState(null)
   const [experienceTrend, setExperienceTrend] = useState(null)
   const [toolUsage, setToolUsage] = useState(null)
+  const [vibeCodedTrend, setVibeCodedTrend] = useState(null)
   const [error, setError] = useState(null)
 
   useEffect(() => {
@@ -50,12 +61,13 @@ function ChartsAndAnalytics() {
         setKeywordCounts(getKeywordCounts(projects))
         setExperienceTrend(getSubmissionsTrendByExperience(projects))
         setToolUsage(getToolUsageCounts(projects))
+        setVibeCodedTrend(getSubmissionsTrendByVibeCoded(projects))
       })
       .catch((err) => setError(err.message))
   }, [])
 
   if (error) return <p className="charts-and-analytics">Couldn't load chart data right now.</p>
-  if (!trend || !keywordCounts || !experienceTrend || !toolUsage) {
+  if (!trend || !keywordCounts || !experienceTrend || !toolUsage || !vibeCodedTrend) {
     return <p className="charts-and-analytics">Loading chart…</p>
   }
   return (
@@ -154,6 +166,45 @@ function ChartsAndAnalytics() {
           </PieChart>
         </ResponsiveContainer>
       )}
+
+      <h2>Vibe-coded vs. not, past 12 months</h2>
+      <ResponsiveContainer width="100%" height={360}>
+        <LineChart data={vibeCodedTrend} margin={{ right: 100 }}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="month" />
+          <YAxis allowDecimals={false} />
+          <Tooltip />
+          <Legend />
+          {VIBE_CODED_SERIES.map((series) => (
+            <Line
+              key={series}
+              type="monotone"
+              dataKey={series}
+              name={series}
+              stroke={VIBE_CODED_COLORS[series]}
+              strokeWidth={2}
+              dot={{ r: 3 }}
+              // Same recharts 3.x animation-gating workaround as the
+              // experience-level chart above — without this, the
+              // end-of-line labels below silently never render.
+              isAnimationActive={false}
+              label={(props) =>
+                props.index === vibeCodedTrend.length - 1 ? (
+                  <text
+                    x={props.x + 6}
+                    y={props.y}
+                    dy={4}
+                    fill="var(--text-h)"
+                    fontSize={12}
+                  >
+                    {series}
+                  </text>
+                ) : null
+              }
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   )
 }
