@@ -3,9 +3,12 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Legend,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -14,6 +17,7 @@ import {
 import { fetchProjects } from '../data/fetchProjects.js'
 import { getSubmissionsMonthlyTrend, getSubmissionsTrendByExperience } from '../utils/submissionsTrend.js'
 import { getKeywordCounts } from '../utils/keywords.js'
+import { getToolUsageCounts } from '../utils/sefariaTools.js'
 import { EXPERIENCE_LEVELS } from '../utils/experience.js'
 
 const EXPERIENCE_COLORS = {
@@ -23,10 +27,20 @@ const EXPERIENCE_COLORS = {
   Advanced: '#4a3aa7',
 }
 
+// Fixed-order categorical hues; gray is reserved for the "Other" bucket and
+// is never one of the 6 identity colors.
+const TOOL_SLICE_COLORS = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300']
+const OTHER_SLICE_COLOR = '#9a9a94'
+
+function colorForToolSlice(endpoint, index) {
+  return endpoint === 'Other' ? OTHER_SLICE_COLOR : TOOL_SLICE_COLORS[index]
+}
+
 function ChartsAndAnalytics() {
   const [trend, setTrend] = useState(null)
   const [keywordCounts, setKeywordCounts] = useState(null)
   const [experienceTrend, setExperienceTrend] = useState(null)
+  const [toolUsage, setToolUsage] = useState(null)
   const [error, setError] = useState(null)
 
   useEffect(() => {
@@ -35,12 +49,15 @@ function ChartsAndAnalytics() {
         setTrend(getSubmissionsMonthlyTrend(projects))
         setKeywordCounts(getKeywordCounts(projects))
         setExperienceTrend(getSubmissionsTrendByExperience(projects))
+        setToolUsage(getToolUsageCounts(projects))
       })
       .catch((err) => setError(err.message))
   }, [])
 
   if (error) return <p className="charts-and-analytics">Couldn't load chart data right now.</p>
-  if (!trend || !keywordCounts || !experienceTrend) return <p className="charts-and-analytics">Loading chart…</p>
+  if (!trend || !keywordCounts || !experienceTrend || !toolUsage) {
+    return <p className="charts-and-analytics">Loading chart…</p>
+  }
   if (experienceTrend.length === 0) {
     return <p className="charts-and-analytics">No experience-level data available yet.</p>
   }
@@ -112,6 +129,31 @@ function ChartsAndAnalytics() {
           ))}
         </LineChart>
       </ResponsiveContainer>
+
+      <h2>Most-used Sefaria API endpoints</h2>
+      {toolUsage.length === 0 ? (
+        <p>No endpoint data available yet.</p>
+      ) : (
+        <ResponsiveContainer width="100%" height={360}>
+          <PieChart>
+            <Pie
+              data={toolUsage}
+              dataKey="count"
+              nameKey="endpoint"
+              cx="50%"
+              cy="50%"
+              outerRadius={120}
+              label={false}
+            >
+              {toolUsage.map((entry, index) => (
+                <Cell key={entry.endpoint} fill={colorForToolSlice(entry.endpoint, index)} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      )}
     </div>
   )
 }
