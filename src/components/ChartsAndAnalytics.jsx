@@ -19,6 +19,7 @@ import {
   getSubmissionsMonthlyTrend,
   getSubmissionsTrendByExperience,
   getSubmissionsTrendByVibeCoded,
+  VIBE_CODED_SERIES,
 } from '../utils/submissionsTrend.js'
 import { getKeywordCounts } from '../utils/keywords.js'
 import { getToolUsageCounts } from '../utils/sefariaTools.js'
@@ -40,7 +41,6 @@ function colorForToolSlice(endpoint, index) {
   return endpoint === 'Other' ? OTHER_SLICE_COLOR : TOOL_SLICE_COLORS[index]
 }
 
-const VIBE_CODED_SERIES = ['Not vibe-coded', 'Vibe-coded']
 const VIBE_CODED_COLORS = {
   'Not vibe-coded': '#2a78d6',
   'Vibe-coded': '#eb6834',
@@ -168,6 +168,9 @@ function ChartsAndAnalytics() {
       )}
 
       <h2>Vibe-coded vs. not, past 12 months</h2>
+      <p>
+        "Vibe-coded" is a newly-tracked field, so earlier months may be undercounted or unreported rather than confirmed non-vibe-coded.
+      </p>
       <ResponsiveContainer width="100%" height={360}>
         <LineChart data={vibeCodedTrend} margin={{ right: 100 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />

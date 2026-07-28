@@ -1,5 +1,7 @@
 import { EXPERIENCE_LEVELS, getExperienceLevel } from './experience.js'
 
+export const VIBE_CODED_SERIES = ['Not vibe-coded', 'Vibe-coded']
+
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
@@ -118,7 +120,7 @@ export function getSubmissionsTrendByVibeCoded(projects, referenceDate = new Dat
   const counts = new Map(
     months.map(({ year, monthIndex }) => [
       monthKey(year, monthIndex),
-      { 'Vibe-coded': 0, 'Not vibe-coded': 0 },
+      Object.fromEntries(VIBE_CODED_SERIES.map((series) => [series, 0])),
     ]),
   )
 
