@@ -77,10 +77,16 @@ export function getSubmissionsTrendByExperience(projects, referenceDate = new Da
 
   if (parsed.length === 0) return []
 
-  const earliest = parsed.reduce((earliestSoFar, entry) => {
+  // Only consider entries with a known experience level when finding the
+  // earliest month — otherwise leading months with unspecified experience
+  // (but no actual experience data) stretch the chart with dead flat-zero lines.
+  const withLevel = parsed.filter((entry) => entry.level !== null)
+  if (withLevel.length === 0) return []
+
+  const earliest = withLevel.reduce((earliestSoFar, entry) => {
     const key = monthKey(entry.month.year, entry.month.monthIndex)
     return key < monthKey(earliestSoFar.year, earliestSoFar.monthIndex) ? entry.month : earliestSoFar
-  }, parsed[0].month)
+  }, withLevel[0].month)
 
   const end = { year: referenceDate.getFullYear(), monthIndex: referenceDate.getMonth() }
   const months = monthsBetween(earliest, end)
