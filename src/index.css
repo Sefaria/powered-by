@@ -150,6 +150,18 @@ code {
   transform: rotateY(180deg);
 }
 
+.project-card-inner.flipped .project-card-front {
+  pointer-events: none;
+}
+
+.project-card-back {
+  pointer-events: none;
+}
+
+.project-card-inner.flipped .project-card-back {
+  pointer-events: auto;
+}
+
 .project-card-front,
 .project-card-back {
   position: absolute;
@@ -197,6 +209,12 @@ code {
   text-decoration: none;
   font-size: 1.4em;
   font-weight: 600;
+  transition: color 0.15s;
+}
+
+.project-card-title:hover {
+  color: var(--accent);
+  text-decoration: none;
 }
 
 .project-card-back {
