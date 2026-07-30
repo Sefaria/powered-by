@@ -6,8 +6,13 @@ function ProjectCard({ project }) {
   const [flipped, setFlipped] = useState(false)
   const screenshotUrl = getScreenshotUrl(project.id)
 
+  function handleCardClick() {
+    if (window.getSelection().toString()) return
+    setFlipped((current) => !current)
+  }
+
   return (
-    <div className="project-card" onClick={() => setFlipped((current) => !current)}>
+    <div className="project-card" onClick={handleCardClick}>
       <div className={`project-card-inner${flipped ? ' flipped' : ''}`}>
         <div
           className={`project-card-front${screenshotUrl ? ' has-screenshot' : ''}`}

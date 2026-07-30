@@ -132,7 +132,6 @@ code {
 }
 
 .project-card {
-  position: relative;
   perspective: 1000px;
   aspect-ratio: 1 / 1;
   cursor: pointer;
@@ -152,6 +151,7 @@ code {
 
 .project-card-inner.flipped .project-card-front {
   pointer-events: none;
+  visibility: hidden;
 }
 
 .project-card-back {
@@ -252,7 +252,7 @@ code {
 }
 
 .project-card-desc {
-  /* fills whatever vertical space the square card leaves after image/title/category/link */
+  /* fills whatever vertical space the back face leaves after the category tags */
   flex: 1;
   min-height: 0;
   overflow-y: auto;
