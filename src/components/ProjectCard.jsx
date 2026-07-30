@@ -1,40 +1,44 @@
+import { useState } from 'react'
 import { getCategoryColor } from '../utils/categories.js'
 import { getScreenshotUrl } from '../utils/screenshots.js'
 
 function ProjectCard({ project }) {
+  const [flipped, setFlipped] = useState(false)
   const screenshotUrl = getScreenshotUrl(project.id)
 
   return (
-    <a
-      className={`project-card${screenshotUrl ? ' has-screenshot' : ''}`}
-      href={project.project_link}
-      target="_blank"
-      rel="noreferrer"
-      style={screenshotUrl ? { backgroundImage: `url(${screenshotUrl})` } : undefined}
-    >
-      <div className="project-card-content">
-        {project.image_url && (
-          <img
-            className="project-card-image"
-            src={project.image_url}
-            alt={`${project.project_name} logo`}
-          />
-        )}
-        <h3>{project.project_name}</h3>
-        <div className="project-card-categories">
-          {project.categories.map((category) => (
-            <span
-              key={category}
-              className="project-card-category"
-              style={{ '--category-color': getCategoryColor(category) }}
-            >
-              {category}
-            </span>
-          ))}
+    <div className="project-card" onClick={() => setFlipped((current) => !current)}>
+      <div className={`project-card-inner${flipped ? ' flipped' : ''}`}>
+        <div
+          className={`project-card-front${screenshotUrl ? ' has-screenshot' : ''}`}
+          style={screenshotUrl ? { backgroundImage: `url(${screenshotUrl})` } : undefined}
+        >
+          <a
+            className="project-card-title"
+            href={project.project_link}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {project.project_name}
+          </a>
         </div>
-        <p className="project-card-desc">{project.project_desc}</p>
+        <div className="project-card-back">
+          <div className="project-card-categories">
+            {project.categories.map((category) => (
+              <span
+                key={category}
+                className="project-card-category"
+                style={{ '--category-color': getCategoryColor(category) }}
+              >
+                {category}
+              </span>
+            ))}
+          </div>
+          <p className="project-card-desc">{project.project_desc}</p>
+        </div>
       </div>
-    </a>
+    </div>
   )
 }
 
