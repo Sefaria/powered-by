@@ -158,6 +158,10 @@ code {
   z-index: 0;
 }
 
+.project-card.has-screenshot:hover::before {
+  background: linear-gradient(var(--accent-bg), var(--accent-bg)), var(--bg);
+}
+
 .project-card-content {
   position: relative;
   z-index: 1;

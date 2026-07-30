@@ -20,7 +20,26 @@ async function fetchPublishedProjects() {
   )
 }
 
+function isSafeUrl(rawUrl) {
+  let url
+  try {
+    url = new URL(rawUrl)
+  } catch {
+    return false
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return false
+  if (/^(localhost|127\.|0\.|10\.|192\.168\.|169\.254\.|\[::1\])/.test(url.hostname)) return false
+  return true
+}
+
 async function screenshotProject(browser, project) {
+  if (!isSafeUrl(project.project_link)) {
+    console.warn(
+      `Skipping ${project.project_name} (${project.project_link}): unsafe or invalid URL`,
+    )
+    return { id: project.id, ok: false }
+  }
+
   const page = await browser.newPage()
   try {
     await page.setViewport(VIEWPORT)
