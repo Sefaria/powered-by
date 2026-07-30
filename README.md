@@ -42,6 +42,7 @@ Other scripts:
 - `npm run build` — production build
 - `npm run preview` — preview the production build locally
 - `npm run lint` — run ESLint
+- `npm run screenshots` — regenerate the faint website-screenshot backgrounds shown on project cards. Fetches the current published project list, captures a screenshot of each project's site with headless Chrome, and writes the results to `public/screenshots/` + `src/data/screenshotManifest.json`. Run this manually whenever you want to pick up newly-added projects or refresh existing screenshots — it is **not** run automatically on build or deploy. Takes roughly 1–2 minutes for the current project count; sites that fail to load are skipped and logged, not treated as errors.
 
 ## Troubleshooting
 
