@@ -1,5 +1,8 @@
 import PieChart from './types/PieChart.jsx'
 
+// Fixed-order categorical hues, pulled from the brand palette defined in
+// index.css; gray is reserved for the "Other" bucket and is never one of
+// the 6 identity colors.
 const TOOL_SLICE_COLORS = [
   'var(--chart-blue)',
   'var(--chart-orange)',
