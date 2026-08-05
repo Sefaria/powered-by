@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { getCategoryColor } from '../utils/categories.js'
-import { getScreenshotUrl } from '../utils/screenshots.js'
 
 function ProjectCard({ project }) {
   const [flipped, setFlipped] = useState(false)
-  const screenshotUrl = getScreenshotUrl(project.id)
 
   function handleCardClick() {
     if (window.getSelection().toString()) return
@@ -14,10 +12,7 @@ function ProjectCard({ project }) {
   return (
     <div className="project-card" onClick={handleCardClick}>
       <div className={`project-card-inner${flipped ? ' flipped' : ''}`}>
-        <div
-          className={`project-card-front${screenshotUrl ? ' has-screenshot' : ''}`}
-          style={screenshotUrl ? { backgroundImage: `url(${screenshotUrl})` } : undefined}
-        >
+        <div className="project-card-front">
           <a
             className="project-card-title"
             href={project.project_link}
