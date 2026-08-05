@@ -13,6 +13,7 @@ dist-ssr
 *.local
 .superpowers/
 docs/superpowers/
+.worktrees/
 
 # Raw local data dumps (may contain sensitive info, never commit)
 data/
