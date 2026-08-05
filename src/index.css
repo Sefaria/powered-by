@@ -14,15 +14,15 @@
      (OKLab CVD ΔE >= 8 on adjacent pairs); assign in this order, never cycle
      or reorder per-chart. --chart-neutral is reserved for "Other"/Uncategorized
      and is never one of the identity colors. */
-  --chart-blue: #2a78d6;
-  --chart-orange: #eb6834;
-  --chart-aqua: #1baf7a;
-  --chart-yellow: #eda100;
-  --chart-magenta: #e87ba4;
-  --chart-green: #008300;
-  --chart-violet: #4a3aa7;
-  --chart-red: #e34948;
-  --chart-neutral: #9a9a94;
+  --chart-blue: #4B71B7;
+  --chart-orange: #D4896C;
+  --chart-aqua: #004E5F;
+  --chart-yellow: #CCB479;
+  --chart-magenta: #CB6158;
+  --chart-green: #00827F;
+  --chart-violet: #594176;
+  --chart-red: #802F3E;
+  --chart-neutral: #6f6f6f;
 
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;

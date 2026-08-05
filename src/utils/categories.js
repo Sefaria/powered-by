@@ -8,16 +8,16 @@ export const KNOWN_CATEGORIES = [
 
 export const UNCATEGORIZED = 'Uncategorized'
 
-// Fixed-order categorical hues, matching the palette already used elsewhere
-// in the dashboard's charts; gray is reserved for Uncategorized (and any
-// unrecognized label) and is never one of the known-category colors.
+// Fixed-order categorical hues, pulled from the brand palette defined in
+// index.css; gray is reserved for Uncategorized (and any unrecognized label)
+// and is never one of the known-category colors.
 const CATEGORY_COLORS = {
-  'AI Projects, Apps, & Other Tools': '#2a78d6',
-  'Learning & Study Tools': '#eb6834',
-  'Community, Interaction, & Social': '#1baf7a',
-  'Visualization & Data Analysis': '#4a3aa7',
-  'Extensions, API Integrations, & GitHub Code': '#e87ba4',
-  [UNCATEGORIZED]: '#9a9a94',
+  'AI Projects, Apps, & Other Tools': 'var(--chart-blue)',
+  'Learning & Study Tools': 'var(--chart-orange)',
+  'Community, Interaction, & Social': 'var(--chart-aqua)',
+  'Visualization & Data Analysis': 'var(--chart-violet)',
+  'Extensions, API Integrations, & GitHub Code': 'var(--chart-magenta)',
+  [UNCATEGORIZED]: 'var(--chart-neutral)',
 }
 
 export function getCategoryColor(category) {
