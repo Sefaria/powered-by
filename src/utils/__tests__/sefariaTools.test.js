@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { normalizeEndpoint, getToolUsageCounts } from './sefariaTools.js'
+import { normalizeEndpoint, getToolUsageCounts } from '../sefariaTools.js'
 
 test('normalizeEndpoint strips a trailing slash', () => {
   assert.equal(normalizeEndpoint('/api/texts/'), '/api/texts')

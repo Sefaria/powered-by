@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { getTechCounts } from './techUsed.js'
+import { getTechCounts } from '../techUsed.js'
 
 test('getTechCounts counts a known technology mentioned by one project', () => {
   const projects = [{ tech_used_raw: 'Next.js, Supabase, Vercel' }]
