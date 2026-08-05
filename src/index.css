@@ -196,25 +196,10 @@ code {
   justify-content: center;
   padding: 16px;
   text-align: center;
-  background-size: cover;
-  background-position: center;
 }
 
 .project-card-front:hover {
   background-color: var(--accent-bg);
-}
-
-.project-card-front.has-screenshot::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--bg);
-  opacity: 0.88;
-  z-index: 0;
-}
-
-.project-card-front.has-screenshot:hover::before {
-  background: linear-gradient(var(--accent-bg), var(--accent-bg)), var(--bg);
 }
 
 .project-card-title {
