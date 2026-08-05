@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { EXPERIENCE_LEVELS, getExperienceLevel } from './experience.js'
+import { EXPERIENCE_LEVELS, getExperienceLevel } from '../experience.js'
 
 test('EXPERIENCE_LEVELS is the fixed four-level order', () => {
   assert.deepEqual(EXPERIENCE_LEVELS, ['No Experience', 'Beginner', 'Intermediate', 'Advanced'])
