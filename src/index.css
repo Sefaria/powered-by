@@ -132,28 +132,102 @@ code {
 }
 
 .project-card {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  perspective: 1000px;
   aspect-ratio: 1 / 1;
-  overflow: hidden;
-  color: inherit;
-  text-decoration: none;
-  transition: background-color 0.15s;
+  cursor: pointer;
 }
 
-.project-card:hover {
+.project-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.project-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.project-card-inner.flipped .project-card-front {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.project-card-back {
+  pointer-events: none;
+}
+
+.project-card-inner.flipped .project-card-back {
+  pointer-events: auto;
+}
+
+.project-card-front,
+.project-card-back {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  backface-visibility: hidden;
+  transition: background-color 0.15s;
+  box-sizing: border-box;
+}
+
+.project-card-front {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  background-size: cover;
+  background-position: center;
+}
+
+.project-card-front:hover {
   background-color: var(--accent-bg);
 }
 
-.project-card-image {
-  width: 100%;
-  max-height: 120px;
-  object-fit: contain;
+.project-card-front.has-screenshot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  opacity: 0.88;
+  z-index: 0;
+}
+
+.project-card-front.has-screenshot:hover::before {
+  background: linear-gradient(var(--accent-bg), var(--accent-bg)), var(--bg);
+}
+
+.project-card-title {
+  position: relative;
+  z-index: 1;
+  color: inherit;
+  text-decoration: none;
+  font-size: 1.4em;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.project-card-title:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.project-card-back {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--bg);
+}
+
+.project-card-back:hover {
+  background-color: var(--accent-bg);
 }
 
 .project-card-categories {
@@ -178,7 +252,7 @@ code {
 }
 
 .project-card-desc {
-  /* fills whatever vertical space the square card leaves after image/title/category/link */
+  /* fills whatever vertical space the back face leaves after the category tags */
   flex: 1;
   min-height: 0;
   overflow-y: auto;
