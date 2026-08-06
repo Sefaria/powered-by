@@ -8,6 +8,22 @@ export const KNOWN_CATEGORIES = [
 
 export const UNCATEGORIZED = 'Uncategorized'
 
+// Fixed-order categorical hues, pulled from the brand palette defined in
+// index.css; gray is reserved for Uncategorized (and any unrecognized label)
+// and is never one of the known-category colors.
+const CATEGORY_COLORS = {
+  'AI Projects, Apps, & Other Tools': 'var(--chart-blue)',
+  'Learning & Study Tools': 'var(--chart-orange)',
+  'Community, Interaction, & Social': 'var(--chart-aqua)',
+  'Visualization & Data Analysis': 'var(--chart-violet)',
+  'Extensions, API Integrations, & GitHub Code': 'var(--chart-magenta)',
+  [UNCATEGORIZED]: 'var(--chart-neutral)',
+}
+
+export function getCategoryColor(category) {
+  return CATEGORY_COLORS[category] ?? CATEGORY_COLORS[UNCATEGORIZED]
+}
+
 // Some older submissions used this wording for category 5; treat it as the same category.
 const LEGACY_LABEL_MAP = {
   'Extensions and API Integrations': 'Extensions, API Integrations, & GitHub Code',

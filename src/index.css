@@ -9,6 +9,21 @@
   --accent-bg: rgba(72, 113, 191, 0.1);
   --accent-border: rgba(72, 113, 191, 0.5);
   --social-bg: rgba(237, 237, 236, 0.5);
+
+  /* Categorical chart/pill palette. Fixed hue order — validated colorblind-safe
+     (OKLab CVD ΔE >= 8 on adjacent pairs); assign in this order, never cycle
+     or reorder per-chart. --chart-neutral is reserved for "Other"/Uncategorized
+     and is never one of the identity colors. */
+  --chart-blue: #4B71B7;
+  --chart-orange: #D4896C;
+  --chart-aqua: #004E5F;
+  --chart-yellow: #CCB479;
+  --chart-magenta: #CB6158;
+  --chart-green: #00827F;
+  --chart-violet: #594176;
+  --chart-red: #802F3E;
+  --chart-neutral: #6f6f6f;
+
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
@@ -92,9 +107,16 @@ code {
   display: flex;
   gap: 12px;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
   margin: 24px 0;
+  /* Anchors the row's left edge under the Developers logo's left edge.
+     The logo (646px, centered in the full-width header) and this row (inside
+     the sidebar-offset tab-content) live in different coordinate spaces, so
+     matching them means re-deriving the logo's position here: half the
+     leftover viewport width outside the logo, minus the sidebar's full
+     rendered width (220px content + 24px padding + 1px border-right). */
+  margin-left: max(0px, calc((100vw - 646px) / 2 - 245px));
 }
 
 .dashboard-controls input,
@@ -105,6 +127,10 @@ code {
   border-radius: 6px;
   background: var(--bg);
   color: var(--text-h);
+}
+
+.search-input {
+  width: 280px;
 }
 
 .project-count {
@@ -121,28 +147,87 @@ code {
 }
 
 .project-card {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  perspective: 1000px;
   aspect-ratio: 1 / 1;
-  overflow: hidden;
-  color: inherit;
-  text-decoration: none;
-  transition: background-color 0.15s;
+  cursor: pointer;
 }
 
-.project-card:hover {
+.project-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.project-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.project-card-inner.flipped .project-card-front {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.project-card-back {
+  pointer-events: none;
+}
+
+.project-card-inner.flipped .project-card-back {
+  pointer-events: auto;
+}
+
+.project-card-front,
+.project-card-back {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  backface-visibility: hidden;
+  transition: background-color 0.15s;
+  box-sizing: border-box;
+}
+
+.project-card-front {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+}
+
+.project-card-front:hover {
   background-color: var(--accent-bg);
 }
 
-.project-card-image {
-  width: 100%;
-  max-height: 120px;
-  object-fit: contain;
+.project-card-title {
+  position: relative;
+  z-index: 1;
+  color: inherit;
+  text-decoration: none;
+  font-size: 1.4em;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.project-card-title:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.project-card-back {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--bg);
+}
+
+.project-card-back:hover {
+  background-color: var(--accent-bg);
 }
 
 .project-card-categories {
@@ -156,9 +241,9 @@ code {
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 4px;
-  background: var(--accent-bg);
-  color: var(--accent);
-  border: 1px solid var(--accent-border);
+  background: color-mix(in srgb, var(--category-color, var(--accent)) 14%, var(--bg));
+  color: color-mix(in srgb, var(--category-color, var(--accent)) 70%, var(--text-h));
+  border: 1px solid color-mix(in srgb, var(--category-color, var(--accent)) 40%, var(--bg));
 }
 
 .empty-state {
@@ -167,7 +252,7 @@ code {
 }
 
 .project-card-desc {
-  /* fills whatever vertical space the square card leaves after image/title/category/link */
+  /* fills whatever vertical space the back face leaves after the category tags */
   flex: 1;
   min-height: 0;
   overflow-y: auto;
