@@ -14,7 +14,11 @@ function LineChart({ data, series, title, description, height = 360 }) {
             <XAxis dataKey="month" />
             <YAxis allowDecimals={false} />
             <Tooltip />
-            <Legend />
+            {/* Legend's default itemSorter is 'value', which alphabetizes entries by
+                name — overriding the order series/<Line> below are declared in (e.g.
+                "Not vibe-coded" would sort before "Vibe-coded"). Disable it to keep
+                declaration order instead. */}
+            <Legend itemSorter={null} />
             {series.map(({ key, name, color }) => (
               <Line
                 key={key}

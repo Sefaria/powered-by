@@ -88,6 +88,33 @@ p {
   margin: 0;
 }
 
+.app-header {
+  text-align: center;
+}
+
+.app-subheader-block {
+  margin-top: 40px;
+  padding: 24px;
+  background: var(--accent-bg);
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.app-subheader {
+  font-family: 'Cardo', var(--heading);
+  font-size: 28px;
+  color: var(--text-h);
+  margin: 0 0 8px;
+}
+
+.app-subheader-desc {
+  margin: 0 auto;
+  color: var(--text);
+  font-size: 20px;
+  line-height: 145%;
+  white-space: nowrap;
+}
+
 code,
 .counter {
   font-family: var(--mono);
@@ -105,22 +132,21 @@ code {
 
 .dashboard-controls {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 24px 0;
+  padding: 0 24px;
+}
+
+.dashboard-controls-row {
+  display: flex;
   gap: 12px;
   align-items: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  margin: 24px 0;
-  /* Anchors the row's left edge under the Developers logo's left edge.
-     The logo (646px, centered in the full-width header) and this row (inside
-     the sidebar-offset tab-content) live in different coordinate spaces, so
-     matching them means re-deriving the logo's position here: half the
-     leftover viewport width outside the logo, minus the sidebar's full
-     rendered width (220px content + 24px padding + 1px border-right). */
-  margin-left: max(0px, calc((100vw - 646px) / 2 - 245px));
 }
 
 .dashboard-controls input,
 .dashboard-controls select {
+  flex: 1;
   font: inherit;
   padding: 8px 12px;
   border: 1px solid var(--border);
@@ -129,13 +155,18 @@ code {
   color: var(--text-h);
 }
 
-.search-input {
-  width: 280px;
+.dashboard-controls select {
+  appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23555' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
 }
 
 .project-count {
   color: var(--text);
   font-size: 14px;
+  margin-left: 6px;
 }
 
 .project-grid {
@@ -242,7 +273,7 @@ code {
   padding: 2px 8px;
   border-radius: 4px;
   background: color-mix(in srgb, var(--category-color, var(--accent)) 14%, var(--bg));
-  color: color-mix(in srgb, var(--category-color, var(--accent)) 70%, var(--text-h));
+  color: #000;
   border: 1px solid color-mix(in srgb, var(--category-color, var(--accent)) 40%, var(--bg));
 }
 
@@ -255,7 +286,22 @@ code {
   /* fills whatever vertical space the back face leaves after the category tags */
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  overflow-y: scroll;
+  scrollbar-color: color-mix(in srgb, var(--text) 55%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+.project-card-desc::-webkit-scrollbar {
+  width: 8px;
+}
+
+.project-card-desc::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--text) 55%, transparent);
+  border-radius: 4px;
+}
+
+.project-card-desc::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .app-body {
@@ -309,4 +355,8 @@ code {
   display: flex;
   flex-direction: column;
   gap: 48px;
+}
+
+.pie-chart .recharts-legend-item {
+  margin-right: 20px !important;
 }
