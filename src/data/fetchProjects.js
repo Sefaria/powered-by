@@ -1,6 +1,5 @@
 import { getCategories } from '../utils/categories.js'
 
-const LOCAL_API_URL = 'http://localhost:8000/api/powered-by'
 const PROD_API_URL = 'https://www.sefaria.org/api/powered-by'
 
 async function fetchProjectList(url) {
@@ -15,18 +14,9 @@ async function fetchProjectList(url) {
 }
 
 export async function fetchProjects() {
-  const [localProjects, prodProjects] = await Promise.all([
-    fetchProjectList(LOCAL_API_URL),
-    fetchProjectList(PROD_API_URL),
-  ])
+  const projects = await fetchProjectList(PROD_API_URL)
 
-  // later entries win ties, so prod overwrites local on matching project_name
-  const byName = new Map()
-  for (const project of [...localProjects, ...prodProjects]) {
-    byName.set(project.project_name, project)
-  }
-
-  return [...byName.values()]
+  return projects
     .filter((project) => project.is_published && project.consent_to_display)
     .map((project) => ({
       ...project,
