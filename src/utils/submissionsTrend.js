@@ -12,14 +12,16 @@ const MONTH_NAMES = [
 
 // submission_date is an ISO timestamp like "2026-07-19T14:54:00+00:00", or
 // null for projects that don't have one. Turns it into a { year, monthIndex }
-// object in local time, or null when there's nothing to parse.
+// object in UTC, or null when there's nothing to parse. Uses UTC (not local
+// time) so a project's month bucket doesn't shift depending on the viewer's
+// timezone.
 function parseSubmissionMonth(submissionDate) {
   if (!submissionDate) return null
 
   const date = new Date(submissionDate)
   if (Number.isNaN(date.getTime())) return null
 
-  return { year: date.getFullYear(), monthIndex: date.getMonth() }
+  return { year: date.getUTCFullYear(), monthIndex: date.getUTCMonth() }
 }
 
 // Turns { year, monthIndex } into a string like "2026-07" — used as a Map
@@ -44,8 +46,8 @@ function last12Months(end) {
 // August, this returns July, since August itself isn't over yet and its
 // submission count is still incomplete.
 function mostRecentCompletedMonth(referenceDate) {
-  const d = new Date(referenceDate.getFullYear(), referenceDate.getMonth() - 1, 1)
-  return { year: d.getFullYear(), monthIndex: d.getMonth() }
+  const d = new Date(Date.UTC(referenceDate.getUTCFullYear(), referenceDate.getUTCMonth() - 1, 1))
+  return { year: d.getUTCFullYear(), monthIndex: d.getUTCMonth() }
 }
 
 // Builds the data for SubmissionsTrendChart: total submission count per

@@ -112,7 +112,6 @@ p {
   color: var(--text);
   font-size: 20px;
   line-height: 145%;
-  white-space: nowrap;
 }
 
 code,

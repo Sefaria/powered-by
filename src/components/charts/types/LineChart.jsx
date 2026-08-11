@@ -16,9 +16,17 @@ function LineChart({ data, series, title, description, height = 360 }) {
             <Tooltip />
             {/* Legend's default itemSorter is 'value', which alphabetizes entries by
                 name — overriding the order series/<Line> below are declared in (e.g.
-                "Not vibe-coded" would sort before "Vibe-coded"). Disable it to keep
-                declaration order instead. */}
-            <Legend itemSorter={null} />
+                "Not vibe-coded" would sort before "Vibe-coded"). itemSorter must be a
+                function (or a string key) — Recharts calls it unconditionally, so
+                passing null risks breaking rather than disabling the sort. Sort by
+                each item's index in `series` instead, to preserve declaration order;
+                unmatched items (shouldn't normally happen) go last. */}
+            <Legend
+              itemSorter={(item) => {
+                const index = series.findIndex(({ name }) => name === item.value)
+                return index === -1 ? series.length : index
+              }}
+            />
             {series.map(({ key, name, color }) => (
               <Line
                 key={key}
