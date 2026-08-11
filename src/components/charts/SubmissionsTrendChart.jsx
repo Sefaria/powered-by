@@ -4,7 +4,7 @@ function SubmissionsTrendChart({ data }) {
   return (
     <BarChart
       data={data}
-      title="Submissions, past 12 months"
+      title="Submissions since August 2025"
       dataKey="count"
       categoryKey="month"
       barName="Submissions"

@@ -15,9 +15,6 @@ dist-ssr
 docs/superpowers/
 .worktrees/
 
-# Raw local data dumps (may contain sensitive info, never commit)
-data/
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -28,3 +25,4 @@ data/
 *.njsproj
 *.sln
 *.sw?
+/data/

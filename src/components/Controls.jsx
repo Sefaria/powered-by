@@ -8,24 +8,26 @@ function Controls({
 }) {
   return (
     <div className="dashboard-controls">
-      <input
-        type="text"
-        className="search-input"
-        placeholder="Search projects..."
-        value={searchText}
-        onChange={(event) => onSearchChange(event.target.value)}
-      />
-      <select
-        value={selectedCategory}
-        onChange={(event) => onCategoryChange(event.target.value)}
-      >
-        <option value="All">All categories</option>
-        {categories.map((category) => (
-          <option key={category} value={category}>
-            {category}
-          </option>
-        ))}
-      </select>
+      <div className="dashboard-controls-row">
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search by project or description"
+          value={searchText}
+          onChange={(event) => onSearchChange(event.target.value)}
+        />
+        <select
+          value={selectedCategory}
+          onChange={(event) => onCategoryChange(event.target.value)}
+        >
+          <option value="All">All categories</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
       <span className="project-count">{count} projects</span>
     </div>
   )

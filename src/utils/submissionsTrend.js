@@ -3,25 +3,25 @@ import { EXPERIENCE_LEVELS, getExperienceLevel } from './experience.js'
 // The two series names used by the vibe-coded trend chart. Exported so the
 // chart component can build its <Line> for each series without hardcoding
 // the strings itself (keeps the "source of truth" for series names here).
-export const VIBE_CODED_SERIES = ['Not vibe-coded', 'Vibe-coded']
+export const VIBE_CODED_SERIES = ['Vibe-coded', 'Not vibe-coded']
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ]
 
-// Tag dates look like "July 2026" or "Date unspecified".
-// Turns that raw string into a { year, monthIndex } object, or null if it
-// doesn't match the expected "Month Year" shape (covers "Date unspecified",
-// missing tags, typos, etc. — anything we can't confidently parse).
-function parseTagMonth(rawDate) {
-  const match = /^([A-Za-z]+) (\d{4})$/.exec(rawDate ?? '')
-  if (!match) return null
+// submission_date is an ISO timestamp like "2026-07-19T14:54:00+00:00", or
+// null for projects that don't have one. Turns it into a { year, monthIndex }
+// object in UTC, or null when there's nothing to parse. Uses UTC (not local
+// time) so a project's month bucket doesn't shift depending on the viewer's
+// timezone.
+function parseSubmissionMonth(submissionDate) {
+  if (!submissionDate) return null
 
-  const monthIndex = MONTH_NAMES.indexOf(match[1])
-  if (monthIndex === -1) return null
+  const date = new Date(submissionDate)
+  if (Number.isNaN(date.getTime())) return null
 
-  return { year: Number(match[2]), monthIndex }
+  return { year: date.getUTCFullYear(), monthIndex: date.getUTCMonth() }
 }
 
 // Turns { year, monthIndex } into a string like "2026-07" — used as a Map
@@ -31,30 +31,38 @@ function monthKey(year, monthIndex) {
   return `${year}-${String(monthIndex + 1).padStart(2, '0')}`
 }
 
-// Builds the 12 calendar months ending with referenceDate's month, oldest first.
-function last12Months(referenceDate) {
+// Builds the 12 calendar months ending with `end`, oldest first.
+function last12Months(end) {
   const months = []
   for (let i = 11; i >= 0; i--) {
-    const d = new Date(referenceDate.getFullYear(), referenceDate.getMonth() - i, 1)
+    const d = new Date(end.year, end.monthIndex - i, 1)
     months.push({ year: d.getFullYear(), monthIndex: d.getMonth() })
   }
   return months
 }
 
+// Returns the most recently *completed* calendar month before referenceDate,
+// as a { year, monthIndex } pair — e.g. if referenceDate is any day in
+// August, this returns July, since August itself isn't over yet and its
+// submission count is still incomplete.
+function mostRecentCompletedMonth(referenceDate) {
+  const d = new Date(Date.UTC(referenceDate.getUTCFullYear(), referenceDate.getUTCMonth() - 1, 1))
+  return { year: d.getUTCFullYear(), monthIndex: d.getUTCMonth() }
+}
+
 // Builds the data for SubmissionsTrendChart: total submission count per
-// month, for the trailing 12 months ending at referenceDate.
+// month, for the trailing 12 months ending at the most recently completed
+// month before referenceDate.
 export function getSubmissionsMonthlyTrend(projects, referenceDate = new Date()) {
-  const months = last12Months(referenceDate)
+  const months = last12Months(mostRecentCompletedMonth(referenceDate))
 
   // Start every month at 0 so months with no submissions still show up in
   // the chart instead of being skipped entirely.
   const counts = new Map(months.map(({ year, monthIndex }) => [monthKey(year, monthIndex), 0]))
 
   for (const project of projects) {
-    const [rawDate] = project.tags ?? []
-
-    const parsed = parseTagMonth(rawDate)
-    if (!parsed) continue // unparseable/missing date — skip this project
+    const parsed = parseSubmissionMonth(project.submission_date)
+    if (!parsed) continue // no submission_date — skip this project
 
     const key = monthKey(parsed.year, parsed.monthIndex)
     if (counts.has(key)) {
@@ -95,7 +103,7 @@ function monthsBetween(start, end) {
 export function getSubmissionsTrendByExperience(projects, referenceDate = new Date()) {
   const parsed = projects
     .map((project) => ({
-      month: parseTagMonth(project.tags?.[0]),
+      month: parseSubmissionMonth(project.submission_date),
       level: getExperienceLevel(project.technical_experience),
     }))
     .filter((entry) => entry.month !== null) // drop projects with no usable date
@@ -116,7 +124,7 @@ export function getSubmissionsTrendByExperience(projects, referenceDate = new Da
     return key < monthKey(earliestSoFar.year, earliestSoFar.monthIndex) ? entry.month : earliestSoFar
   }, withLevel[0].month)
 
-  const end = { year: referenceDate.getFullYear(), monthIndex: referenceDate.getMonth() }
+  const end = mostRecentCompletedMonth(referenceDate)
   const months = monthsBetween(earliest, end)
 
   // Each month starts with every experience level at 0, e.g.
@@ -146,11 +154,12 @@ export function getSubmissionsTrendByExperience(projects, referenceDate = new Da
 
 // Builds the data for VibeCodedTrendChart: one row per month, with a
 // submission count for each of the 2 series ("Vibe-coded" / "Not
-// vibe-coded") in that month. Always covers the trailing 12 months —
-// unlike getSubmissionsTrendByExperience above, it doesn't hunt for an
-// earliest-data month, so it can't return [] the way that one can.
+// vibe-coded") in that month. Always covers the trailing 12 months ending
+// at the most recently completed month — unlike getSubmissionsTrendByExperience
+// above, it doesn't hunt for an earliest-data month, so it can't return []
+// the way that one can.
 export function getSubmissionsTrendByVibeCoded(projects, referenceDate = new Date()) {
-  const months = last12Months(referenceDate)
+  const months = last12Months(mostRecentCompletedMonth(referenceDate))
 
   // Each month starts with both series at 0.
   const counts = new Map(
@@ -161,9 +170,8 @@ export function getSubmissionsTrendByVibeCoded(projects, referenceDate = new Dat
   )
 
   for (const project of projects) {
-    const [rawDate] = project.tags ?? []
-    const parsed = parseTagMonth(rawDate)
-    if (!parsed) continue // unparseable/missing date — skip this project
+    const parsed = parseSubmissionMonth(project.submission_date)
+    if (!parsed) continue // no submission_date — skip this project
 
     const key = monthKey(parsed.year, parsed.monthIndex)
     if (!counts.has(key)) continue // outside the trailing-12-months window

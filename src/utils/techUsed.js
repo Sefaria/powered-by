@@ -10,7 +10,7 @@ export const KNOWN_TECHNOLOGIES = [
   { label: 'Next.js', patterns: ['next.js', 'nextjs'] },
   { label: 'Vercel', patterns: ['vercel'] },
   { label: 'Python', patterns: ['python'] },
-  { label: 'MCP', patterns: ['mcp'] },
+  { label: 'Sefaria MCP', patterns: ['mcp'] },
   { label: 'Supabase', patterns: ['supabase'] },
   { label: 'Deepgram', patterns: ['deepgram'] },
   { label: '.NET', patterns: ['.net'] },
