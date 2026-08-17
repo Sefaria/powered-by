@@ -388,3 +388,37 @@ code {
   color: var(--text);
   font-size: 14px;
 }
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+}
+
+.pagination button {
+  font: inherit;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: var(--accent-bg);
+}
+
+.pagination button:disabled {
+  color: var(--text);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination-status {
+  color: var(--text);
+  font-size: 14px;
+}

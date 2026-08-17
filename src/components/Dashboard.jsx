@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { fetchProjects } from '../data/fetchProjects.js'
 import { KNOWN_CATEGORIES, UNCATEGORIZED } from '../utils/categories.js'
+import { paginate } from '../utils/pagination.js'
 import Controls from './Controls.jsx'
 import ProjectGrid from './ProjectGrid.jsx'
+import Pagination from './Pagination.jsx'
 
 const FILTER_CATEGORIES = [...KNOWN_CATEGORIES, UNCATEGORIZED]
+const PAGE_SIZE = 24
 
 function Dashboard() {
   const [projects, setProjects] = useState([])
@@ -12,6 +15,7 @@ function Dashboard() {
   const [error, setError] = useState(null)
   const [searchText, setSearchText] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     fetchProjects()
@@ -44,6 +48,18 @@ function Dashboard() {
     })
     .sort((a, b) => a.project_name.localeCompare(b.project_name))
 
+  const { pageItems, totalPages } = paginate(visibleProjects, currentPage, PAGE_SIZE)
+
+  function handleSearchChange(value) {
+    setSearchText(value)
+    setCurrentPage(1)
+  }
+
+  function handleCategoryChange(value) {
+    setSelectedCategory(value)
+    setCurrentPage(1)
+  }
+
   return (
     <>
       <Controls
@@ -51,10 +67,11 @@ function Dashboard() {
         selectedCategory={selectedCategory}
         categories={FILTER_CATEGORIES}
         count={visibleProjects.length}
-        onSearchChange={setSearchText}
-        onCategoryChange={setSelectedCategory}
+        onSearchChange={handleSearchChange}
+        onCategoryChange={handleCategoryChange}
       />
-      <ProjectGrid projects={visibleProjects} />
+      <ProjectGrid projects={pageItems} />
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </>
   )
 }
