@@ -1,8 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { getCategoryColor } from '../utils/categories.js'
-import { formatDate, hasValue } from '../utils/projectDetail.js'
+import { formatDate, hasValue, isSafeUrl } from '../utils/projectDetail.js'
 
 function ProjectDetailModal({ project, onClose }) {
+  const modalRef = useRef(null)
+
   useEffect(() => {
     function handleKeyDown(event) {
       if (event.key === 'Escape') onClose()
@@ -10,6 +12,17 @@ function ProjectDetailModal({ project, onClose }) {
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
+
+  useEffect(() => {
+    const previouslyFocused = document.activeElement
+    modalRef.current?.focus()
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previousOverflow
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus()
+    }
+  }, [])
 
   function handleBackdropClick(event) {
     if (event.target === event.currentTarget) onClose()
@@ -32,7 +45,14 @@ function ProjectDetailModal({ project, onClose }) {
 
   return (
     <div className="project-modal-backdrop" onClick={handleBackdropClick}>
-      <div className="project-modal" role="dialog" aria-modal="true" aria-label={project.project_name}>
+      <div
+        className="project-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={project.project_name}
+        tabIndex={-1}
+        ref={modalRef}
+      >
         <button type="button" className="project-modal-close" onClick={onClose} aria-label="Close">
           ×
         </button>
@@ -47,7 +67,7 @@ function ProjectDetailModal({ project, onClose }) {
 
         <h2 className="project-modal-title">{project.project_name}</h2>
 
-        {project.categories.length > 0 && (
+        {hasValue(project.categories) && (
           <div className="project-card-categories">
             {project.categories.map((category) => (
               <span
@@ -61,15 +81,17 @@ function ProjectDetailModal({ project, onClose }) {
           </div>
         )}
 
-        <div className="project-modal-section">
-          {hasValue(project.project_desc) && <p>{project.project_desc}</p>}
-          {hasValue(project.project_why) && (
-            <p>
-              <strong>Why this project: </strong>
-              {project.project_why}
-            </p>
-          )}
-        </div>
+        {(hasValue(project.project_desc) || hasValue(project.project_why)) && (
+          <div className="project-modal-section">
+            {hasValue(project.project_desc) && <p>{project.project_desc}</p>}
+            {hasValue(project.project_why) && (
+              <p>
+                <strong>Why this project: </strong>
+                {project.project_why}
+              </p>
+            )}
+          </div>
+        )}
 
         {showDetails && (
           <div className="project-modal-section">
@@ -81,11 +103,13 @@ function ProjectDetailModal({ project, onClose }) {
             )}
             {hasValue(project.sefaria_tools_used) && (
               <div className="project-modal-tags">
-                {project.sefaria_tools_used.map((tool) => (
-                  <span key={tool} className="project-card-category">
-                    {tool}
-                  </span>
-                ))}
+                {project.sefaria_tools_used
+                  .filter((tool) => typeof tool === 'string')
+                  .map((tool) => (
+                    <span key={tool} className="project-card-category">
+                      {tool}
+                    </span>
+                  ))}
               </div>
             )}
             {hasValue(project.technical_experience) && (
@@ -116,18 +140,20 @@ function ProjectDetailModal({ project, onClose }) {
 
         {metaParts.length > 0 && <p className="project-modal-meta">{metaParts.join(' · ')}</p>}
 
-        <div className="project-modal-links">
-          {hasValue(project.project_link) && (
-            <a href={project.project_link} target="_blank" rel="noreferrer">
-              Visit project
-            </a>
-          )}
-          {hasValue(project.project_source_code) && (
-            <a href={project.project_source_code} target="_blank" rel="noreferrer">
-              Source code
-            </a>
-          )}
-        </div>
+        {(isSafeUrl(project.project_link) || isSafeUrl(project.project_source_code)) && (
+          <div className="project-modal-links">
+            {isSafeUrl(project.project_link) && (
+              <a href={project.project_link} target="_blank" rel="noreferrer">
+                Visit project
+              </a>
+            )}
+            {isSafeUrl(project.project_source_code) && (
+              <a href={project.project_source_code} target="_blank" rel="noreferrer">
+                Source code
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

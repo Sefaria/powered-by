@@ -9,9 +9,22 @@ function ProjectCard({ project }) {
     setIsOpen(true)
   }
 
+  function handleCardKeyDown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleCardClick()
+    }
+  }
+
   return (
     <>
-      <div className="project-card" onClick={handleCardClick}>
+      <div
+        className="project-card"
+        role="button"
+        tabIndex={0}
+        onClick={handleCardClick}
+        onKeyDown={handleCardKeyDown}
+      >
         <h3 className="project-card-title">{project.project_name}</h3>
         <p className="project-card-snippet">{project.project_desc}</p>
       </div>
