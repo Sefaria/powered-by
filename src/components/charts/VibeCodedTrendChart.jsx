@@ -2,8 +2,8 @@ import LineChart from './types/LineChart.jsx'
 import { VIBE_CODED_SERIES } from '../../utils/submissionsTrend.js'
 
 const VIBE_CODED_COLORS = {
-  'Not vibe-coded': 'var(--chart-blue)',
   'Vibe-coded': 'var(--chart-orange)',
+  'Not vibe-coded': 'var(--chart-blue)',
 }
 
 function VibeCodedTrendChart({ data }) {

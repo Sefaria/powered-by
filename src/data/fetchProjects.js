@@ -1,17 +1,22 @@
 import { getCategories } from '../utils/categories.js'
 
-const API_URL = 'https://www.sefaria.org/api/powered-by'
+const PROD_API_URL = 'https://www.sefaria.org/api/powered-by'
 
-export async function fetchProjects() {
-  const response = await fetch(API_URL)
+async function fetchProjectList(url) {
+  const response = await fetch(url)
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch projects: ${response.status}`)
+    throw new Error(`Failed to fetch projects from ${url}: ${response.status}`)
   }
 
   const data = await response.json()
-
   return data.projects
+}
+
+export async function fetchProjects() {
+  const projects = await fetchProjectList(PROD_API_URL)
+
+  return projects
     .filter((project) => project.is_published && project.consent_to_display)
     .map((project) => ({
       ...project,

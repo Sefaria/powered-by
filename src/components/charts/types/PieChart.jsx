@@ -7,7 +7,7 @@ function PieChart({ data, dataKey, nameKey, title, colorForSlice, height = 360, 
       {data.length === 0 ? (
         <p>Data unavailable.</p>
       ) : (
-        <ResponsiveContainer width="100%" height={height}>
+        <ResponsiveContainer width="100%" height={height} className="pie-chart">
           <RechartsPieChart>
             <Pie
               data={data}

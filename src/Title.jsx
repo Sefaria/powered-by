@@ -1,12 +1,16 @@
-import developersLogo from './assets/developers_logo.png'
-
 function Title() {
   return (
-    <header style={{ textAlign: 'center' }}>
+    <header className="app-header">
       <h1>Powered by Sefaria Dashboard</h1>
-      <a href="https://developers.sefaria.org" target="_blank" rel="noreferrer">
-        <img src={developersLogo} alt="Sefaria Developers logo" />
-      </a>
+      <div className="app-subheader-block">
+        <p className="app-subheader" lang="he" dir="rtl">
+          "אי אפשר לבית מדרש בלא חידוש"
+        </p>
+        <p className="app-subheader-desc">
+          The center of all projects, websites, and apps created using Sefaria's open-source data and
+          technology
+        </p>
+      </div>
     </header>
   )
 }
