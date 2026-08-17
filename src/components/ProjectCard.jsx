@@ -1,44 +1,22 @@
 import { useState } from 'react'
-import { getCategoryColor } from '../utils/categories.js'
+import ProjectDetailModal from './ProjectDetailModal.jsx'
 
 function ProjectCard({ project }) {
-  const [flipped, setFlipped] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
   function handleCardClick() {
     if (window.getSelection().toString()) return
-    setFlipped((current) => !current)
+    setIsOpen(true)
   }
 
   return (
-    <div className="project-card" onClick={handleCardClick}>
-      <div className={`project-card-inner${flipped ? ' flipped' : ''}`}>
-        <div className="project-card-front">
-          <a
-            className="project-card-title"
-            href={project.project_link}
-            target="_blank"
-            rel="noreferrer"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {project.project_name}
-          </a>
-        </div>
-        <div className="project-card-back">
-          <div className="project-card-categories">
-            {project.categories.map((category) => (
-              <span
-                key={category}
-                className="project-card-category"
-                style={{ '--category-color': getCategoryColor(category) }}
-              >
-                {category}
-              </span>
-            ))}
-          </div>
-          <p className="project-card-desc">{project.project_desc}</p>
-        </div>
+    <>
+      <div className="project-card" onClick={handleCardClick}>
+        <h3 className="project-card-title">{project.project_name}</h3>
+        <p className="project-card-snippet">{project.project_desc}</p>
       </div>
-    </div>
+      {isOpen && <ProjectDetailModal project={project} onClose={() => setIsOpen(false)} />}
+    </>
   )
 }
 
