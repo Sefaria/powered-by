@@ -33,6 +33,21 @@ test('getPreviewUrl returns null for an unparseable project_link', () => {
   assert.equal(getPreviewUrl(project), null)
 })
 
+test('getPreviewUrl returns null for a javascript: URL', () => {
+  const project = { project_link: 'javascript:alert(1)', is_buggy: false }
+  assert.equal(getPreviewUrl(project), null)
+})
+
+test('getPreviewUrl returns null for a www.github.com link', () => {
+  const project = { project_link: 'https://www.github.com/someuser/somerepo', is_buggy: false }
+  assert.equal(getPreviewUrl(project), null)
+})
+
+test('getPreviewUrl returns null for a gist.github.com link', () => {
+  const project = { project_link: 'https://gist.github.com/someuser/somegist', is_buggy: false }
+  assert.equal(getPreviewUrl(project), null)
+})
+
 test('getPreviewUrl treats a missing is_buggy as not buggy', () => {
   const project = { project_link: 'https://example.com/' }
   assert.equal(getPreviewUrl(project), 'https://example.com/')

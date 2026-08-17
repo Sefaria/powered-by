@@ -179,7 +179,6 @@ function ProjectDetailModal({ project, onClose }) {
                 src={previewUrl}
                 title={`Live preview of ${project.project_name}`}
                 sandbox="allow-scripts allow-same-origin allow-forms"
-                loading="lazy"
                 referrerPolicy="no-referrer"
                 onLoad={handlePreviewLoad}
               />
