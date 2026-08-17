@@ -1,10 +1,14 @@
+import SortDropdown from './SortDropdown.jsx'
+
 function Controls({
   searchText,
   selectedCategory,
   categories,
+  sortOption,
   count,
   onSearchChange,
   onCategoryChange,
+  onSortChange,
 }) {
   return (
     <div className="dashboard-controls">
@@ -27,6 +31,7 @@ function Controls({
             </option>
           ))}
         </select>
+        <SortDropdown sortOption={sortOption} onSortChange={onSortChange} />
       </div>
       <span className="project-count">{count} projects</span>
     </div>

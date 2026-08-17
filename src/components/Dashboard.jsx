@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { fetchProjects } from '../data/fetchProjects.js'
 import { KNOWN_CATEGORIES, UNCATEGORIZED } from '../utils/categories.js'
 import { paginate } from '../utils/pagination.js'
+import { sortProjects } from '../utils/sortProjects.js'
 import Controls from './Controls.jsx'
 import ProjectGrid from './ProjectGrid.jsx'
 import Pagination from './Pagination.jsx'
@@ -15,6 +16,7 @@ function Dashboard() {
   const [error, setError] = useState(null)
   const [searchText, setSearchText] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
+  const [sortOption, setSortOption] = useState('alphabetical')
   const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
@@ -34,19 +36,19 @@ function Dashboard() {
 
   const search = searchText.toLowerCase()
 
-  const visibleProjects = projects
-    .filter((project) => {
-      const matchesSearch =
-        project.project_name.toLowerCase().includes(search) ||
-        project.project_desc.toLowerCase().includes(search) ||
-        project.project_category.toLowerCase().includes(search)
+  const filteredProjects = projects.filter((project) => {
+    const matchesSearch =
+      project.project_name.toLowerCase().includes(search) ||
+      project.project_desc.toLowerCase().includes(search) ||
+      project.project_category.toLowerCase().includes(search)
 
-      const matchesCategory =
-        selectedCategory === 'All' || project.categories.includes(selectedCategory)
+    const matchesCategory =
+      selectedCategory === 'All' || project.categories.includes(selectedCategory)
 
-      return matchesSearch && matchesCategory
-    })
-    .sort((a, b) => a.project_name.localeCompare(b.project_name))
+    return matchesSearch && matchesCategory
+  })
+
+  const visibleProjects = sortProjects(filteredProjects, sortOption)
 
   const { pageItems, totalPages } = paginate(visibleProjects, currentPage, PAGE_SIZE)
 
@@ -60,15 +62,22 @@ function Dashboard() {
     setCurrentPage(1)
   }
 
+  function handleSortChange(value) {
+    setSortOption(value)
+    setCurrentPage(1)
+  }
+
   return (
     <>
       <Controls
         searchText={searchText}
         selectedCategory={selectedCategory}
         categories={FILTER_CATEGORIES}
+        sortOption={sortOption}
         count={visibleProjects.length}
         onSearchChange={handleSearchChange}
         onCategoryChange={handleCategoryChange}
+        onSortChange={handleSortChange}
       />
       <ProjectGrid projects={pageItems} />
       <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
