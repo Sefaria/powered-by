@@ -485,7 +485,7 @@ code {
 .sort-dropdown-panel {
   position: absolute;
   top: calc(100% + 4px);
-  left: 0;
+  right: 0;
   z-index: 10;
   min-width: 220px;
   background: var(--bg);
