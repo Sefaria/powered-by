@@ -2,25 +2,25 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
   if (totalPages <= 1) return null
 
   return (
-    <div className="pagination">
+    <nav className="pagination" aria-label="Project pages">
       <button
         type="button"
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
+        onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
+        aria-disabled={currentPage === 1}
       >
         Previous
       </button>
-      <span className="pagination-status">
+      <span className="pagination-status" aria-live="polite">
         Page {currentPage} of {totalPages}
       </span>
       <button
         type="button"
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
+        onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
+        aria-disabled={currentPage === totalPages}
       >
         Next
       </button>
-    </div>
+    </nav>
   )
 }
 
