@@ -146,6 +146,7 @@ code {
 .dashboard-controls input,
 .dashboard-controls select {
   flex: 1;
+  min-width: 0;
   font: inherit;
   padding: 8px 12px;
   border: 1px solid var(--border);
@@ -222,7 +223,7 @@ code {
   padding: 2px 8px;
   border-radius: 4px;
   background: color-mix(in srgb, var(--category-color, var(--accent)) 14%, var(--bg));
-  color: #000;
+  color: color-mix(in srgb, var(--category-color, var(--accent)) 70%, var(--text-h));
   border: 1px solid color-mix(in srgb, var(--category-color, var(--accent)) 40%, var(--bg));
 }
 
@@ -459,6 +460,7 @@ code {
 
 .sort-dropdown {
   position: relative;
+  flex-shrink: 0;
 }
 
 .sort-dropdown-button {
@@ -473,6 +475,7 @@ code {
   color: var(--text-h);
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sort-dropdown-button:hover {

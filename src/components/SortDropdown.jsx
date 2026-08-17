@@ -19,11 +19,21 @@ function SortDropdown({ sortOption, onSortChange }) {
       }
     }
 
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        setIsOpen(false)
+      }
+    }
+
     document.addEventListener('mousedown', handleOutsideClick)
-    return () => document.removeEventListener('mousedown', handleOutsideClick)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
   }, [isOpen])
 
-  const activeOption = SORT_OPTIONS.find((option) => option.value === sortOption)
+  const activeOption = SORT_OPTIONS.find((option) => option.value === sortOption) ?? SORT_OPTIONS[0]
 
   function handleOptionClick(value) {
     onSortChange(value)
@@ -36,6 +46,8 @@ function SortDropdown({ sortOption, onSortChange }) {
         type="button"
         className="sort-dropdown-button"
         onClick={() => setIsOpen((current) => !current)}
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
       >
         <span aria-hidden="true">↕</span>
         {activeOption.label}
