@@ -1,9 +1,24 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getCategoryColor } from '../utils/categories.js'
 import { formatDate, hasValue, isSafeUrl } from '../utils/projectDetail.js'
+import { getPreviewUrl } from '../utils/projectPreview.js'
 
 function ProjectDetailModal({ project, onClose }) {
   const modalRef = useRef(null)
+  const previewUrl = getPreviewUrl(project)
+  const [previewState, setPreviewState] = useState('loading')
+
+  useEffect(() => {
+    if (!previewUrl) return
+    const timer = setTimeout(() => {
+      setPreviewState((current) => (current === 'loading' ? 'failed' : current))
+    }, 6000)
+    return () => clearTimeout(timer)
+  }, [previewUrl])
+
+  function handlePreviewLoad() {
+    setPreviewState('loaded')
+  }
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -151,6 +166,29 @@ function ProjectDetailModal({ project, onClose }) {
               <a href={project.project_source_code} target="_blank" rel="noreferrer">
                 Source code
               </a>
+            )}
+          </div>
+        )}
+
+        {previewUrl && (
+          <div className="project-modal-section">
+            <h3 className="project-modal-preview-heading">Live preview</h3>
+            {previewState !== 'failed' && (
+              <iframe
+                className={`project-modal-preview-frame${previewState === 'loading' ? ' is-hidden' : ''}`}
+                src={previewUrl}
+                title={`Live preview of ${project.project_name}`}
+                sandbox="allow-scripts allow-same-origin allow-forms"
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                onLoad={handlePreviewLoad}
+              />
+            )}
+            {previewState === 'loading' && (
+              <p className="project-modal-preview-status">Loading preview…</p>
+            )}
+            {previewState === 'failed' && (
+              <p className="project-modal-preview-status">Preview not available</p>
             )}
           </div>
         )}
