@@ -26,7 +26,6 @@ function ProjectCard({ project }) {
         onKeyDown={handleCardKeyDown}
       >
         <h3 className="project-card-title">{project.project_name}</h3>
-        <p className="project-card-snippet">{project.project_desc}</p>
       </div>
       {isOpen && <ProjectDetailModal project={project} onClose={() => setIsOpen(false)} />}
     </>

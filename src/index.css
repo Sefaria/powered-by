@@ -180,14 +180,6 @@ code {
   color: var(--text-h);
 }
 
-.project-card-snippet {
-  width: 100%;
-  color: var(--text);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .project-card-categories {
   display: flex;
   flex-wrap: wrap;
