@@ -1,17 +1,23 @@
 import { useEffect, useState } from 'react'
 import { fetchProjects } from '../data/fetchProjects.js'
-import { KNOWN_CATEGORIES, UNCATEGORIZED } from '../utils/categories.js'
+import { ALL_CATEGORIES, KNOWN_CATEGORIES, UNCATEGORIZED } from '../utils/categories.js'
+import { paginate } from '../utils/pagination.js'
+import { SORT_ALPHABETICAL, sortProjects } from '../utils/sortProjects.js'
 import Controls from './Controls.jsx'
 import ProjectGrid from './ProjectGrid.jsx'
+import Pagination from './Pagination.jsx'
 
 const FILTER_CATEGORIES = [...KNOWN_CATEGORIES, UNCATEGORIZED]
+const PAGE_SIZE = 24
 
 function Dashboard() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [searchText, setSearchText] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('All')
+  const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORIES)
+  const [sortOption, setSortOption] = useState(SORT_ALPHABETICAL)
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     fetchProjects()
@@ -30,19 +36,36 @@ function Dashboard() {
 
   const search = searchText.toLowerCase()
 
-  const visibleProjects = projects
-    .filter((project) => {
-      const matchesSearch =
-        project.project_name.toLowerCase().includes(search) ||
-        project.project_desc.toLowerCase().includes(search) ||
-        project.project_category.toLowerCase().includes(search)
+  const filteredProjects = projects.filter((project) => {
+    const matchesSearch =
+      project.project_name.toLowerCase().includes(search) ||
+      project.project_desc.toLowerCase().includes(search) ||
+      project.project_category.toLowerCase().includes(search)
 
-      const matchesCategory =
-        selectedCategory === 'All' || project.categories.includes(selectedCategory)
+    const matchesCategory =
+      selectedCategory === ALL_CATEGORIES || project.categories.includes(selectedCategory)
 
-      return matchesSearch && matchesCategory
-    })
-    .sort((a, b) => a.project_name.localeCompare(b.project_name))
+    return matchesSearch && matchesCategory
+  })
+
+  const visibleProjects = sortProjects(filteredProjects, sortOption)
+
+  const { pageItems, totalPages } = paginate(visibleProjects, currentPage, PAGE_SIZE)
+
+  function handleSearchChange(value) {
+    setSearchText(value)
+    setCurrentPage(1)
+  }
+
+  function handleCategoryChange(value) {
+    setSelectedCategory(value)
+    setCurrentPage(1)
+  }
+
+  function handleSortChange(value) {
+    setSortOption(value)
+    setCurrentPage(1)
+  }
 
   return (
     <>
@@ -50,11 +73,14 @@ function Dashboard() {
         searchText={searchText}
         selectedCategory={selectedCategory}
         categories={FILTER_CATEGORIES}
+        sortOption={sortOption}
         count={visibleProjects.length}
-        onSearchChange={setSearchText}
-        onCategoryChange={setSelectedCategory}
+        onSearchChange={handleSearchChange}
+        onCategoryChange={handleCategoryChange}
+        onSortChange={handleSortChange}
       />
-      <ProjectGrid projects={visibleProjects} />
+      <ProjectGrid projects={pageItems} />
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </>
   )
 }

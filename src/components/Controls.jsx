@@ -1,10 +1,15 @@
+import { ALL_CATEGORIES } from '../utils/categories.js'
+import SortDropdown from './SortDropdown.jsx'
+
 function Controls({
   searchText,
   selectedCategory,
   categories,
+  sortOption,
   count,
   onSearchChange,
   onCategoryChange,
+  onSortChange,
 }) {
   return (
     <div className="dashboard-controls">
@@ -20,13 +25,14 @@ function Controls({
           value={selectedCategory}
           onChange={(event) => onCategoryChange(event.target.value)}
         >
-          <option value="All">All categories</option>
+          <option value={ALL_CATEGORIES}>All categories</option>
           {categories.map((category) => (
             <option key={category} value={category}>
               {category}
             </option>
           ))}
         </select>
+        <SortDropdown sortOption={sortOption} onSortChange={onSortChange} />
       </div>
       <span className="project-count">{count} projects</span>
     </div>
