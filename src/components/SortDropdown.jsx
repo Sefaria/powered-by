@@ -1,15 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
+import { SORT_ALPHABETICAL, SORT_NEWEST, SORT_OLDEST } from '../utils/sortProjects.js'
 
 const SORT_OPTIONS = [
-  { value: 'alphabetical', label: 'A-Z' },
-  { value: 'newest', label: 'Year (Newest First)' },
-  { value: 'oldest', label: 'Year (Oldest First)' },
+  { value: SORT_ALPHABETICAL, label: 'A-Z' },
+  { value: SORT_NEWEST, label: 'Year (Newest First)' },
+  { value: SORT_OLDEST, label: 'Year (Oldest First)' },
 ]
 
 function SortDropdown({ sortOption, onSortChange }) {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef(null)
 
+  // Only listen for outside clicks / Escape while the panel is actually open,
+  // so these listeners aren't attached to the document for the component's whole lifetime.
   useEffect(() => {
     if (!isOpen) return
 
@@ -33,6 +36,7 @@ function SortDropdown({ sortOption, onSortChange }) {
     }
   }, [isOpen])
 
+  // Fall back to the first option if sortOption is unset or doesn't match a known value.
   const activeOption = SORT_OPTIONS.find((option) => option.value === sortOption) ?? SORT_OPTIONS[0]
 
   function handleOptionClick(value) {

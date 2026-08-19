@@ -8,6 +8,8 @@ function ProjectDetailModal({ project, onClose }) {
   const previewUrl = getPreviewUrl(project)
   const [previewState, setPreviewState] = useState('loading')
 
+  // If the iframe hasn't fired onLoad within 6s, treat the preview as failed
+  // (covers sites that refuse to load in an iframe without ever erroring).
   useEffect(() => {
     if (!previewUrl) return
     const timer = setTimeout(() => {
@@ -28,6 +30,8 @@ function ProjectDetailModal({ project, onClose }) {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [onClose])
 
+  // On mount: move focus into the modal and lock body scroll.
+  // On unmount: restore both, so the page behaves as if the modal never opened.
   useEffect(() => {
     const previouslyFocused = document.activeElement
     modalRef.current?.focus()
@@ -39,6 +43,7 @@ function ProjectDetailModal({ project, onClose }) {
     }
   }, [])
 
+  // Only close when the backdrop itself was clicked, not a click that bubbled up from inside the modal.
   function handleBackdropClick(event) {
     if (event.target === event.currentTarget) onClose()
   }
@@ -155,6 +160,7 @@ function ProjectDetailModal({ project, onClose }) {
 
         {metaParts.length > 0 && <p className="project-modal-meta">{metaParts.join(' · ')}</p>}
 
+        {/* isSafeUrl restricts links to http/https so a malformed or javascript: URL can't be rendered as an href */}
         {(isSafeUrl(project.project_link) || isSafeUrl(project.project_source_code)) && (
           <div className="project-modal-links">
             {isSafeUrl(project.project_link) && (
@@ -175,9 +181,11 @@ function ProjectDetailModal({ project, onClose }) {
             <h3 className="project-modal-preview-heading">Live preview</h3>
             {previewState !== 'failed' && (
               <iframe
+                // Hidden (not unmounted) while loading so onLoad still fires; swapped in once loaded.
                 className={`project-modal-preview-frame${previewState === 'loading' ? ' is-hidden' : ''}`}
                 src={previewUrl}
                 title={`Live preview of ${project.project_name}`}
+                // Sandboxed to limit what the embedded, third-party project can do inside our page.
                 sandbox="allow-scripts allow-same-origin allow-forms"
                 referrerPolicy="no-referrer"
                 onLoad={handlePreviewLoad}

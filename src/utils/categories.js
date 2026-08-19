@@ -8,6 +8,9 @@ export const KNOWN_CATEGORIES = [
 
 export const UNCATEGORIZED = 'Uncategorized'
 
+// Sentinel value for the category filter meaning "don't filter by category".
+export const ALL_CATEGORIES = 'All'
+
 // Fixed-order categorical hues, pulled from the brand palette defined in
 // index.css; gray is reserved for Uncategorized (and any unrecognized label)
 // and is never one of the known-category colors.

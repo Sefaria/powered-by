@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { fetchProjects } from '../data/fetchProjects.js'
-import { KNOWN_CATEGORIES, UNCATEGORIZED } from '../utils/categories.js'
+import { ALL_CATEGORIES, KNOWN_CATEGORIES, UNCATEGORIZED } from '../utils/categories.js'
 import { paginate } from '../utils/pagination.js'
-import { sortProjects } from '../utils/sortProjects.js'
+import { SORT_ALPHABETICAL, sortProjects } from '../utils/sortProjects.js'
 import Controls from './Controls.jsx'
 import ProjectGrid from './ProjectGrid.jsx'
 import Pagination from './Pagination.jsx'
@@ -15,8 +15,8 @@ function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [searchText, setSearchText] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('All')
-  const [sortOption, setSortOption] = useState('alphabetical')
+  const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORIES)
+  const [sortOption, setSortOption] = useState(SORT_ALPHABETICAL)
   const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
@@ -43,7 +43,7 @@ function Dashboard() {
       project.project_category.toLowerCase().includes(search)
 
     const matchesCategory =
-      selectedCategory === 'All' || project.categories.includes(selectedCategory)
+      selectedCategory === ALL_CATEGORIES || project.categories.includes(selectedCategory)
 
     return matchesSearch && matchesCategory
   })
