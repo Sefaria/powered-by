@@ -57,10 +57,9 @@ function ProjectDetailModal({ project, onClose }) {
   const showBadges = project.vibe_coded === true || project.is_buggy === true
 
   const metaParts = [
-    hasValue(project.submission_date) && `Submitted ${formatDate(project.submission_date)}`,
     hasValue(project.submission_source) && `via ${project.submission_source}`,
-    hasValue(project.created_at) && `Created ${formatDate(project.created_at)}`,
-    hasValue(project.updated_at) && `Updated ${formatDate(project.updated_at)}`,
+    hasValue(project.submission_date) && `Project Submission Date: ${formatDate(project.submission_date)}`,
+    hasValue(project.created_at) && `Added to database: ${formatDate(project.created_at)}`,
   ].filter(Boolean)
 
   return (
