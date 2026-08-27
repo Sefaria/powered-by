@@ -58,8 +58,8 @@ function ProjectDetailModal({ project, onClose }) {
 
   const metaParts = [
     hasValue(project.submission_source) && `via ${project.submission_source}`,
-    hasValue(project.submission_date) && `Created ${formatDate(project.submission_date)}`,
-    hasValue(project.created_at) && `Project logged ${formatDate(project.created_at)}`,
+    hasValue(project.submission_date) && `Project Submission Date: ${formatDate(project.submission_date)}`,
+    hasValue(project.created_at) && `Added to database: ${formatDate(project.created_at)}`,
   ].filter(Boolean)
 
   return (

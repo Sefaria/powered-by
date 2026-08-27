@@ -81,6 +81,10 @@ function Dashboard() {
       />
       <ProjectGrid projects={pageItems} />
       <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+      <p className="dashboard-footnote">
+        Submission dates for projects that were found "in the wild" were taken from the last commit on Github or the
+        website's url.
+      </p>
     </>
   )
 }
