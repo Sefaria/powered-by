@@ -1,0 +1,46 @@
+/* Hebrew content font, shipped with Sefaria's design system (licence to be confirmed). */
+@font-face {
+  font-family: 'Taamey Frank CLM';
+  src: url('/fonts/Amiri-Taamey-Frank-merged.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+body.scroll-locked {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

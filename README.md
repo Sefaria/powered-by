@@ -14,11 +14,15 @@ AI has made it easier than ever to build with our data — this project helps us
 
 A data-centric home for the developer ecosystem — one place to see the scale and diversity of what's been built on Sefaria's data, enabling deeper understanding of Sefaria as the authoritative data layer for Jewish text development in the age of AI.
 
-
 ## Tech stack
 
-- [React 19](https://react.dev) + [Vite 8](https://vite.dev)
-- ESLint 10
+- TypeScript (strict), [React 19](https://react.dev) + [Vite 8](https://vite.dev), `react-router` v7 (library mode)
+- CSS Modules on top of semantic design tokens (`src/styles/tokens.css`), [Lucide](https://lucide.dev) icons
+- `recharts` for the unlisted `/charts` page (lazy-loaded, so it is not in the main bundle)
+- Vitest + React Testing Library + `vitest-axe` for unit and component tests; Playwright + `@axe-core/playwright` for end to end
+- ESLint (typescript-eslint, react-hooks, jsx-a11y) and Prettier
+
+The spec this implements is in [`docs/REDESIGN_SPEC.md`](docs/REDESIGN_SPEC.md).
 
 ## Getting Started
 
@@ -37,11 +41,35 @@ npm install
 npm run dev    # starts the dev server at http://localhost:5173
 ```
 
-Other scripts:
+### Scripts
 
-- `npm run build` — production build
-- `npm run preview` — preview the production build locally
-- `npm run lint` — run ESLint
+- `npm run dev`: dev server
+- `npm run build`: type-check and production build into `dist/`
+- `npm run preview`: serve the production build
+- `npm run lint` / `npm run format`: ESLint / Prettier
+- `npm run typecheck`: `tsc -b`
+- `npm test`: unit and component tests (Vitest)
+- `npm run e2e`: Playwright (desktop 1440x900 and mobile 390x844). It builds and serves the app itself and runs against a snapshot of the API in `src/lib/__fixtures__/projects.json`, never the live API. First time only: `npx playwright install chromium`.
+- `npm run screenshots`: writes screenshots of every screen at 360, 390, 768, 1024 and 1440px into `screenshots/`
+
+### Data
+
+All data comes from one request to `https://www.sefaria.org/api/powered-by`, made by `src/lib/api.ts` and exposed to components only through the `useProjects` hook. Everything else (filtering, sorting, the charts) happens client-side on the ~150 rows. Only projects that are published _and_ consented to display are ever shown.
+
+## Routes and hosting
+
+| Route     | Purpose                                                                              |
+| --------- | ------------------------------------------------------------------------------------ |
+| `/`       | Browse projects. `?project=<id>` opens a project's dialog (shareable).               |
+| `/charts` | "Powered by Sefaria in numbers". Unlisted: `noindex, nofollow`, not linked anywhere. |
+
+The build is a static single-page app, so the host **must serve `index.html` for any unknown path** (otherwise `/charts` and deep links 404 on refresh). On Coolify, enable the SPA fallback, or use nginx:
+
+```nginx
+location / {
+  try_files $uri /index.html;
+}
+```
 
 ## Troubleshooting
 

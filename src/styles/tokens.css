@@ -1,0 +1,94 @@
+/* Design tokens: Sefaria Product Design, DevPortal theme (REDESIGN_SPEC §4).
+   Components reference these semantic names only. */
+:root {
+  /* Color */
+  --text-primary: #121212;
+  --text-secondary: #575757;
+  --text-muted: #707070;
+  --text-inverse: #ffffff;
+  --text-inverse-soft: rgba(255, 255, 255, 0.85);
+  --text-link: #18345d;
+  --text-link-hovered: #132b4c;
+
+  --surface-page: #ffffff;
+  --surface-subtle: #fafafa;
+  --surface-hover: #eeeeee;
+  --surface-selected: #f2f5fa;
+
+  --border-default: #ededec;
+  --border-strong: #653259;
+  --border-card-hover: #c9d5e6;
+  --divider: #cccccc;
+  --divider-inverse: rgba(255, 255, 255, 0.2);
+
+  --action-primary: #18345d;
+  --action-primary-hover: #132b4c;
+  --module-primary: #7c416f;
+  --module-primary-hover: #653259;
+
+  --icon-default: #121212;
+  --icon-muted: #6f6f6f;
+  --feedback-warning: #e6b624;
+  --focus-ring: #1976d2;
+  --scrim: rgba(15, 34, 59, 0.6);
+
+  /* Chart ramps (charts only) */
+  --chart-purple-1: #e1bed8;
+  --chart-purple-2: #b36fa2;
+  --chart-purple-3: #7c416f;
+  --chart-purple-4: #38192f;
+  --chart-neutral: #999999;
+
+  /* Typography */
+  --font-serif: 'Adobe Garamond Pro', 'EB Garamond', Garamond, Georgia, serif;
+  --font-sans: Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Roboto Mono', ui-monospace, Menlo, monospace;
+  --font-hebrew: 'Taamey Frank CLM', 'Times New Roman', serif;
+
+  /* Spacing */
+  --space-2xs: 2px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+  --space-4xl: 40px;
+  --space-5xl: 48px;
+  --space-6xl: 64px;
+  --space-7xl: 96px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 18px;
+
+  /* Elevation */
+  --shadow-small:
+    0 8px 16px rgba(31, 31, 31, 0.05), 0 1px 2px rgba(31, 31, 31, 0.04),
+    0 0 10px -1px rgba(83, 83, 83, 0.04);
+  --shadow-large: 0 16px 32px rgba(13, 3, 32, 0.16), 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-xlarge: 0 40px 80px rgba(0, 0, 0, 0.18), 0 1px 2px rgba(0, 0, 0, 0.08);
+
+  /* Sizing */
+  --target-min: 44px;
+  --control-height: 48px;
+  --container-max: 1280px;
+  --container-pad: var(--space-lg);
+  --header-height: 56px;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --container-pad: var(--space-2xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-height: 64px;
+  }
+}

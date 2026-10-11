@@ -1,0 +1,57 @@
+.layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4xl);
+  padding-top: var(--space-3xl);
+  padding-bottom: var(--space-6xl);
+}
+
+/* The sidebar only exists from 1024px; below that, filters live in the sheet. */
+.filters {
+  display: none;
+}
+
+.results {
+  display: flex;
+  flex: 999 1 560px;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-width: 0;
+}
+
+.heading {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.2;
+  scroll-margin-top: var(--space-lg);
+}
+
+.heading:focus {
+  outline: none;
+}
+
+.heading:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+
+.summary {
+  min-height: 18px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 18px;
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    padding-top: var(--space-4xl);
+  }
+
+  .filters {
+    display: block;
+    flex: 1 1 248px;
+    max-width: 280px;
+    padding-top: var(--space-6xl);
+  }
+}

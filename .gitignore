@@ -26,3 +26,8 @@ docs/superpowers/
 *.sln
 *.sw?
 /data/
+
+# Playwright
+playwright-report/
+test-results/
+screenshots/

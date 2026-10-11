@@ -1,0 +1,27 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-5xl) var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--surface-subtle);
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .root {
+    padding: var(--space-6xl);
+  }
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.description {
+  color: var(--text-secondary);
+}

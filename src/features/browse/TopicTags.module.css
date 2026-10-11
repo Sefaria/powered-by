@@ -1,0 +1,16 @@
+.rowSm,
+.rowXs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.rowSm {
+  height: 28px;
+}
+
+.rowXs {
+  height: 24px;
+}

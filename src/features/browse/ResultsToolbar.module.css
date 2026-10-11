@@ -1,0 +1,43 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md) var(--space-lg);
+}
+
+.search {
+  flex: 1 1 100%;
+}
+
+.controls {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* on mobile the filters button takes the leftover room */
+.filtersButton {
+  display: flex;
+  flex: 1;
+}
+
+.filtersButton > * {
+  flex: 1;
+}
+
+@media (min-width: 1024px) {
+  .search {
+    flex: 1 1 320px;
+  }
+
+  .controls {
+    flex: 0 0 auto;
+    gap: var(--space-lg);
+  }
+
+  .filtersButton {
+    display: none;
+  }
+}

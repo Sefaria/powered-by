@@ -1,0 +1,44 @@
+.handle {
+  flex: none;
+  width: 40px;
+  height: 4px;
+  margin: var(--space-sm) auto 0;
+  border-radius: 2px;
+  background: var(--divider);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  padding: var(--space-sm) var(--space-lg) var(--space-sm) var(--space-xl);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-sm) var(--space-lg) var(--space-lg);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: none;
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--border-default);
+  background: var(--surface-page);
+}
+
+.show {
+  flex: 1;
+}
