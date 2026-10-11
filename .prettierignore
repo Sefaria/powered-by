@@ -1,0 +1,5 @@
+dist
+package-lock.json
+public
+src/lib/__fixtures__
+docs
