@@ -1,4 +1,5 @@
 import { formatNumber } from '../../lib/format'
+import { cx } from '../../components/ui/cx'
 import styles from './HBarChart.module.css'
 
 export interface HBarRow {
@@ -16,7 +17,10 @@ export function HBarChart({ rows, ariaLabel }: { rows: readonly HBarRow[]; ariaL
           <span className={styles.label}>{row.label}</span>
           <span className={styles.track}>
             <span className={styles.area}>
-              <span className={styles.bar} style={{ width: `${(row.value / max) * 100}%` }} />
+              <span
+                className={cx(styles.bar, row.value === 0 && styles.zero)}
+                style={{ width: `${(row.value / max) * 100}%` }}
+              />
             </span>
             <span className={styles.value}>{formatNumber(row.value)}</span>
           </span>

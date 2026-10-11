@@ -41,6 +41,10 @@
   min-width: 32px;
 }
 
+.zero {
+  min-width: 0; /* a zero value must not draw a visible bar */
+}
+
 .row:hover .bar {
   background: var(--module-primary-hover);
 }

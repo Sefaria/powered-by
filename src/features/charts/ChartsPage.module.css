@@ -20,6 +20,11 @@
   outline: none;
 }
 
+.title:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+
 .notice {
   display: inline-flex;
   align-items: center;

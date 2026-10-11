@@ -28,7 +28,9 @@ export function ProjectList(props: ProjectListProps) {
 
 function ProjectTable({ projects, activeCategory, onOpen }: ProjectListProps) {
   return (
-    <div className={styles.scroller}>
+    // A scrollable region must be keyboard-focusable so the clipped columns are reachable.
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+    <div className={styles.scroller} tabIndex={0} role="region" aria-label="Projects table">
       <table className={styles.table}>
         <thead>
           <tr>
