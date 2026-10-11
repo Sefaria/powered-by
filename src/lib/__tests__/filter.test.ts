@@ -53,22 +53,15 @@ describe('filterProjects', () => {
   it('matches a project when its categories include the selected one', () => {
     expect(ids(filterProjects(projects, { ...DEFAULT_FILTERS, category: 'learn' }))).toEqual([1, 2])
   })
-  it('open source only requires a source URL', () => {
-    expect(ids(filterProjects(projects, { ...DEFAULT_FILTERS, openSourceOnly: true }))).toEqual([2])
-  })
-  it('combines search, category and open source', () => {
-    expect(
-      ids(filterProjects(projects, { q: 'bot', category: 'ai', openSourceOnly: true })),
-    ).toEqual([2])
-    expect(filterProjects(projects, { q: 'bot', category: 'viz', openSourceOnly: false })).toEqual(
-      [],
-    )
+  it('combines search and category', () => {
+    expect(ids(filterProjects(projects, { q: 'bot', category: 'ai' }))).toEqual([2])
+    expect(filterProjects(projects, { q: 'bot', category: 'viz' })).toEqual([])
   })
 })
 
 describe('categoryCounts', () => {
   it('counts per category and reflects the current search, not the selected category', () => {
-    expect(categoryCounts(projects, { q: '', openSourceOnly: false })).toMatchObject({
+    expect(categoryCounts(projects, { q: '' })).toMatchObject({
       all: 3,
       learn: 2,
       ai: 1,
@@ -77,28 +70,21 @@ describe('categoryCounts', () => {
       community: 0,
       none: 0,
     })
-    expect(categoryCounts(projects, { q: 'study aid', openSourceOnly: false })).toMatchObject({
+    expect(categoryCounts(projects, { q: 'study aid' })).toMatchObject({
       all: 1,
       learn: 1,
       ai: 0,
     })
   })
-  it('respects open source only so counts equal what you would see', () => {
-    expect(categoryCounts(projects, { q: '', openSourceOnly: true })).toMatchObject({
-      all: 1,
-      ai: 1,
-      learn: 1,
-    })
-  })
   it('works on the fixture', () => {
-    const counts = categoryCounts(fixtureProjects, { q: '', openSourceOnly: false })
+    const counts = categoryCounts(fixtureProjects, { q: '' })
     expect(counts.all).toBe(133)
   })
 })
 
 describe('activeFilterCount', () => {
-  it('counts category and open source, not search', () => {
-    expect(activeFilterCount({ q: 'x', category: 'ai', openSourceOnly: true })).toBe(2)
+  it('counts the category, not search', () => {
+    expect(activeFilterCount({ q: 'x', category: 'ai' })).toBe(1)
     expect(activeFilterCount({ ...DEFAULT_FILTERS, q: 'x' })).toBe(0)
   })
 })

@@ -41,27 +41,20 @@ export function BrowsePage() {
     syncQuery(debouncedInput)
   }, [debouncedInput])
 
-  const filters: Filters = {
-    q: state.q,
-    category: state.category,
-    openSourceOnly: state.openSourceOnly,
-  }
+  const filters: Filters = { q: state.q, category: state.category }
   const all = data.projects
   const filterCount = activeFilterCount(filters)
   const hasFilters = filterCount > 0 || state.q.trim() !== ''
 
-  const counts = useMemo(
-    () => (all ? categoryCounts(all, { q: state.q, openSourceOnly: state.openSourceOnly }) : null),
-    [all, state.q, state.openSourceOnly],
-  )
+  const counts = useMemo(() => (all ? categoryCounts(all, { q: state.q }) : null), [all, state.q])
   const results = useMemo(
     () => (all ? sortProjects(filterProjects(all, filters), state.sort) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [all, state.q, state.category, state.openSourceOnly, state.sort],
+    [all, state.q, state.category, state.sort],
   )
 
   // Page size resets whenever the filters, search or sort change.
-  const signature = `${state.q}|${state.category}|${state.openSourceOnly}|${state.sort}`
+  const signature = `${state.q}|${state.category}|${state.sort}`
   const [limit, setLimit] = useState(PAGE_SIZE)
   const [seenSignature, setSeenSignature] = useState(signature)
   if (seenSignature !== signature) {
@@ -87,7 +80,7 @@ export function BrowsePage() {
 
   const clearAll = () => {
     setInput('')
-    update({ q: '', category: 'all', openSourceOnly: false })
+    update({ q: '', category: 'all' })
   }
 
   const explore = () => {
@@ -117,9 +110,7 @@ export function BrowsePage() {
             <FilterPanel
               counts={counts}
               category={state.category}
-              openSourceOnly={state.openSourceOnly}
               onCategoryChange={(category) => update({ category })}
-              onOpenSourceChange={(openSourceOnly) => update({ openSourceOnly })}
             />
           )}
         </aside>
@@ -140,11 +131,7 @@ export function BrowsePage() {
           <p className={styles.summary} aria-live="polite">
             {summary}
           </p>
-          <ActiveFilters
-            filters={filters}
-            onClearCategory={() => update({ category: 'all' })}
-            onClearOpenSource={() => update({ openSourceOnly: false })}
-          />
+          <ActiveFilters filters={filters} onClearCategory={() => update({ category: 'all' })} />
 
           {data.status === 'loading' && <ResultsSkeleton view={state.view} />}
           {data.status === 'error' && (

@@ -25,7 +25,6 @@ export function parseQueryState(
   return {
     q: params.get('q') ?? DEFAULT_FILTERS.q,
     category: isCategoryId(category) ? category : 'all',
-    openSourceOnly: params.get('open') === '1',
     sort: sort === 'az' ? 'az' : DEFAULT_SORT,
     view: view === 'grid' || view === 'list' ? view : defaultView,
     project: Number.isInteger(project) && project > 0 ? project : null,
@@ -40,7 +39,6 @@ export function serializeQueryState(
   const params = new URLSearchParams()
   if (state.q) params.set('q', state.q)
   if (state.category !== 'all') params.set('category', state.category)
-  if (state.openSourceOnly) params.set('open', '1')
   if (state.sort !== DEFAULT_SORT) params.set('sort', state.sort)
   if (state.view !== defaultView) params.set('view', state.view)
   if (state.project !== null) params.set('project', String(state.project))

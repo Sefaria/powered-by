@@ -1,16 +1,13 @@
 import { CATEGORIES, getCategoryMeta } from '../../lib/categories'
 import type { CategoryCounts, CategoryFilter } from '../../lib/filter'
 import { CategoryIcon } from '../../components/icons/CategoryIcon'
-import { Checkbox } from '../../components/ui/Checkbox'
 import { cx } from '../../components/ui/cx'
 import styles from './FilterPanel.module.css'
 
 interface FilterPanelProps {
   counts: CategoryCounts
   category: CategoryFilter
-  openSourceOnly: boolean
   onCategoryChange: (category: CategoryFilter) => void
-  onOpenSourceChange: (value: boolean) => void
   /** Taller 52px rows, for the mobile sheet. */
   large?: boolean
   /** Unique radio group name when more than one panel can exist at once. */
@@ -22,13 +19,11 @@ const ROWS: ReadonlyArray<{ id: CategoryFilter; label: string }> = [
   ...CATEGORIES.map((c) => ({ id: c.id, label: getCategoryMeta(c.id).shortLabel })),
 ]
 
-/** Category radio group plus the "Open source only" checkbox. Used in the sidebar and the sheet. */
+/** Category radio group. Used in the sidebar and the sheet. */
 export function FilterPanel({
   counts,
   category,
-  openSourceOnly,
   onCategoryChange,
-  onOpenSourceChange,
   large,
   name = 'category',
 }: FilterPanelProps) {
@@ -56,10 +51,6 @@ export function FilterPanel({
             <span className={styles.count}>{counts[id]}</span>
           </label>
         ))}
-      </fieldset>
-      <fieldset className={styles.group}>
-        <legend className={styles.legend}>CODE</legend>
-        <Checkbox label="Open source only" checked={openSourceOnly} onChange={onOpenSourceChange} />
       </fieldset>
     </div>
   )

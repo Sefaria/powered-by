@@ -41,17 +41,14 @@ describe('FilterSheet', () => {
     const { onApply } = setup()
     await userEvent.click(screen.getByRole('radio', { name: /AI & Apps/ }))
     expect(screen.getByRole('button', { name: 'Show 1 project' })).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('checkbox', { name: 'Open source only' }))
-    expect(screen.getByRole('button', { name: 'Show 0 projects' })).toBeInTheDocument()
     expect(onApply).not.toHaveBeenCalled()
   })
 
   it('applies the selection on Show', async () => {
     const { onApply, onClose } = setup()
     await userEvent.click(screen.getByRole('radio', { name: /Learning & Study/ }))
-    await userEvent.click(screen.getByRole('checkbox', { name: 'Open source only' }))
-    await userEvent.click(screen.getByRole('button', { name: 'Show 1 project' }))
-    expect(onApply).toHaveBeenCalledWith({ category: 'learn', openSourceOnly: true })
+    await userEvent.click(screen.getByRole('button', { name: 'Show 2 projects' }))
+    expect(onApply).toHaveBeenCalledWith({ category: 'learn' })
     expect(onClose).toHaveBeenCalled()
   })
 

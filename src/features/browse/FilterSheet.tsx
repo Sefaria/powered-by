@@ -18,7 +18,7 @@ import styles from './FilterSheet.module.css'
 interface FilterSheetProps {
   projects: readonly Project[]
   filters: Filters
-  onApply: (next: Pick<Filters, 'category' | 'openSourceOnly'>) => void
+  onApply: (next: Pick<Filters, 'category'>) => void
   onClose: () => void
 }
 
@@ -29,15 +29,11 @@ interface FilterSheetProps {
 export function FilterSheet({ projects, filters, onApply, onClose }: FilterSheetProps) {
   const titleId = useId()
   const [category, setCategory] = useState<CategoryFilter>(filters.category)
-  const [openSourceOnly, setOpenSourceOnly] = useState(filters.openSourceOnly)
 
-  const counts = useMemo(
-    () => categoryCounts(projects, { q: filters.q, openSourceOnly }),
-    [projects, filters.q, openSourceOnly],
-  )
+  const counts = useMemo(() => categoryCounts(projects, { q: filters.q }), [projects, filters.q])
   const matching = useMemo(
-    () => filterProjects(projects, { q: filters.q, category, openSourceOnly }).length,
-    [projects, filters.q, category, openSourceOnly],
+    () => filterProjects(projects, { q: filters.q, category }).length,
+    [projects, filters.q, category],
   )
 
   return (
@@ -57,19 +53,11 @@ export function FilterSheet({ projects, filters, onApply, onClose }: FilterSheet
           name="sheet-category"
           counts={counts}
           category={category}
-          openSourceOnly={openSourceOnly}
           onCategoryChange={setCategory}
-          onOpenSourceChange={setOpenSourceOnly}
         />
       </div>
       <div className={styles.footer}>
-        <Button
-          variant="text"
-          onClick={() => {
-            setCategory(DEFAULT_FILTERS.category)
-            setOpenSourceOnly(DEFAULT_FILTERS.openSourceOnly)
-          }}
-        >
+        <Button variant="text" onClick={() => setCategory(DEFAULT_FILTERS.category)}>
           Clear all
         </Button>
         <Button
@@ -77,7 +65,7 @@ export function FilterSheet({ projects, filters, onApply, onClose }: FilterSheet
           size="lg"
           className={styles.show}
           onClick={() => {
-            onApply({ category, openSourceOnly })
+            onApply({ category })
             onClose()
           }}
         >

@@ -4,7 +4,6 @@ import { parseQueryState, serializeQueryState, type QueryState } from '../url'
 const base: QueryState = {
   q: '',
   category: 'all',
-  openSourceOnly: false,
   sort: 'new',
   view: 'grid',
   project: null,
@@ -19,18 +18,17 @@ describe('query state', () => {
     const state: QueryState = {
       q: 'rav kook',
       category: 'viz',
-      openSourceOnly: true,
       sort: 'az',
       view: 'list',
       project: 42,
     }
     const search = serializeQueryState(state).toString()
-    expect(search).toBe('q=rav+kook&category=viz&open=1&sort=az&view=list&project=42')
+    expect(search).toBe('q=rav+kook&category=viz&sort=az&view=list&project=42')
     expect(parseQueryState(search)).toEqual(state)
   })
 
   it('falls back to defaults for invalid values', () => {
-    expect(parseQueryState('category=bogus&sort=x&view=y&project=abc&open=0')).toEqual(base)
+    expect(parseQueryState('category=bogus&sort=x&view=y&project=abc&open=1')).toEqual(base)
     expect(parseQueryState('project=-3').project).toBeNull()
     expect(parseQueryState('project=1.5').project).toBeNull()
   })

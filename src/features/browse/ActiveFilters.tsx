@@ -6,18 +6,16 @@ import styles from './ActiveFilters.module.css'
 interface ActiveFiltersProps {
   filters: Filters
   onClearCategory: () => void
-  onClearOpenSource: () => void
 }
 
 /** Removable chips for the active filters (mobile and tablet). */
-export function ActiveFilters({ filters, onClearCategory, onClearOpenSource }: ActiveFiltersProps) {
+export function ActiveFilters({ filters, onClearCategory }: ActiveFiltersProps) {
   const chips = [
     filters.category !== 'all' && {
       key: 'category',
       label: getCategoryMeta(filters.category).shortLabel,
       onRemove: onClearCategory,
     },
-    filters.openSourceOnly && { key: 'open', label: 'Open source', onRemove: onClearOpenSource },
   ].filter((chip): chip is { key: string; label: string; onRemove: () => void } => chip !== false)
 
   if (chips.length === 0) return null

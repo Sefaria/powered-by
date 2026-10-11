@@ -6,10 +6,9 @@ export type CategoryFilter = CategoryId | 'all'
 export interface Filters {
   q: string
   category: CategoryFilter
-  openSourceOnly: boolean
 }
 
-export const DEFAULT_FILTERS: Filters = { q: '', category: 'all', openSourceOnly: false }
+export const DEFAULT_FILTERS: Filters = { q: '', category: 'all' }
 
 function searchHaystack(p: Project): string {
   return [
@@ -32,9 +31,7 @@ export function searchProjects(projects: readonly Project[], q: string): Project
 
 export function filterProjects(projects: readonly Project[], filters: Filters): Project[] {
   return searchProjects(projects, filters.q).filter(
-    (p) =>
-      (!filters.openSourceOnly || p.sourceUrl !== null) &&
-      (filters.category === 'all' || p.categories.includes(filters.category)),
+    (p) => filters.category === 'all' || p.categories.includes(filters.category),
   )
 }
 
@@ -42,12 +39,11 @@ export type CategoryCounts = Record<CategoryFilter, number>
 
 /**
  * Counts per category for the filter UI, computed from the current search
- * results (and the open-source toggle, so a count always equals what you'd
- * see after choosing that row) but not from the category selection itself.
+ * results but not from the category selection itself.
  */
 export function categoryCounts(
   projects: readonly Project[],
-  filters: Pick<Filters, 'q' | 'openSourceOnly'>,
+  filters: Pick<Filters, 'q'>,
 ): CategoryCounts {
   const base = filterProjects(projects, { ...filters, category: 'all' })
   const counts = { all: base.length } as CategoryCounts
@@ -58,5 +54,5 @@ export function categoryCounts(
 }
 
 export function activeFilterCount(filters: Filters): number {
-  return (filters.category !== 'all' ? 1 : 0) + (filters.openSourceOnly ? 1 : 0)
+  return filters.category !== 'all' ? 1 : 0
 }
