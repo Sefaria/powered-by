@@ -1,11 +1,12 @@
 import { ChevronRight, ExternalLink as ExternalLinkIcon } from 'lucide-react'
-import { getCategoryMeta, type CategoryId } from '../../lib/categories'
+import { CATEGORY_META, type CategoryId } from '../../lib/categories'
 import type { CategoryFilter } from '../../lib/filter'
 import { formatDate } from '../../lib/format'
-import { visibleTopics, type Project } from '../../lib/project'
+import type { Project } from '../../lib/project'
 import { MEDIA_SM, useMediaQuery } from '../../hooks/useMediaQuery'
 import { CategoryTile } from '../../components/icons/CategoryIcon'
 import { ExternalLink } from '../../components/ui/ExternalLink'
+import { KnownIssuesBadge } from '../../components/ui/KnownIssuesBadge'
 import { VisuallyHidden } from '../../components/ui/VisuallyHidden'
 import { TopicTags } from './TopicTags'
 import styles from './ProjectList.module.css'
@@ -65,12 +66,13 @@ function ProjectTable({ projects, activeCategory, onOpen }: ProjectListProps) {
                       {project.description && (
                         <p className={styles.oneLine}>{project.description}</p>
                       )}
+                      {project.isBuggy && <KnownIssuesBadge />}
                     </div>
                   </div>
                 </td>
-                <td className={styles.category}>{getCategoryMeta(category).shortLabel}</td>
+                <td className={styles.category}>{CATEGORY_META[category].label}</td>
                 <td className={styles.topics}>
-                  <TopicTags topics={visibleTopics(project).slice(0, 3)} size="xs" />
+                  <TopicTags topics={project.topics.slice(0, 3)} size="xs" />
                 </td>
                 <td className={styles.date}>
                   {project.submittedAt ? formatDate(project.submittedAt) : ''}
@@ -97,8 +99,7 @@ function ProjectRows({ projects, activeCategory, onOpen }: ProjectListProps) {
     <ul className={styles.rows}>
       {projects.map((project, index) => {
         const category = displayCategory(project, activeCategory)
-        const topics = visibleTopics(project)
-        const subline = [getCategoryMeta(category).shortLabel, topics.join(', ')]
+        const subline = [CATEGORY_META[category].label, project.topics.join(', ')]
           .filter(Boolean)
           .join(' · ')
         return (
@@ -113,6 +114,7 @@ function ProjectRows({ projects, activeCategory, onOpen }: ProjectListProps) {
               <span className={styles.rowText}>
                 <span className={styles.rowName}>{project.name}</span>
                 <span className={styles.rowSub}>{subline}</span>
+                {project.isBuggy && <KnownIssuesBadge />}
               </span>
               <ChevronRight size={18} strokeWidth={2} aria-hidden="true" />
             </button>

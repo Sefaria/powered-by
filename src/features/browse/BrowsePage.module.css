@@ -53,5 +53,11 @@
     flex: 1 1 248px;
     max-width: 280px;
     padding-top: var(--space-6xl);
+    /* sticky below the page header; scrolls on its own when taller than the viewport */
+    position: sticky;
+    top: var(--space-lg);
+    align-self: flex-start;
+    max-height: calc(100vh - 2 * var(--space-lg));
+    overflow-y: auto;
   }
 }

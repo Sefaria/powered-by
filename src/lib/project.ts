@@ -1,4 +1,6 @@
 import { parseCategories, type CategoryId } from './categories'
+import { resourceGroup } from './endpoints'
+import { languageName } from './languages'
 import { parseExperience, type ExperienceLevel } from './experience'
 import { parseReach, type ReachBucket } from './reach'
 import { parseTech } from './tech'
@@ -44,16 +46,25 @@ export interface Project {
   /** Safe http(s) only. */
   sourceUrl: string | null
   categories: CategoryId[]
-  /** Cleaned tags. May include "English", see {@link visibleTopics}. */
+  /** Cleaned tags, without language tags (see {@link languages}). */
   topics: string[]
+  /** Language tags pulled out of `tags`: "English", "Hebrew", … */
+  languages: string[]
   resources: string[]
+  /** `resources` mapped to the /charts groups, deduped. The generic "Sefaria API" is dropped. */
+  resourceGroups: string[]
   builtWith: string | null
   reach: ReachBucket | null
   submittedAt: Date | null
+  /** Set in Django admin; selects the featured band. */
+  featured: boolean
+  /** Hidden from the public site unless "Show projects with known issues" is on. */
+  isBuggy: boolean
+  /** Technologies found in `builtWith`, for the "Built with" filter and /charts. */
+  techMentions: string[]
   // Analytics only: never rendered in the project UI.
   experience: ExperienceLevel | null
   vibeCoded: boolean
-  techMentions: string[]
 }
 
 export function safeUrl(value: string | null | undefined): URL | null {
@@ -71,8 +82,6 @@ const MONTH_YEAR =
 const META_TAGS = new Set(['not vibe-coded', 'no experience', 'experience unspecified'])
 const ALIASES: Record<string, string> = { kaballah: 'Kabbalah' }
 
-export const LANGUAGE_TAG = 'English'
-
 /** Trim, dedupe case-insensitively, alias typos, drop dates and meta tags. */
 export function cleanTopics(tags: readonly string[] | null | undefined): string[] {
   const seen = new Set<string>()
@@ -88,6 +97,21 @@ export function cleanTopics(tags: readonly string[] | null | undefined): string[
     out.push(topic)
   }
   return out
+}
+
+/** Cleaned tags split into topics and languages, each in first-seen order. */
+export function splitTags(tags: readonly string[] | null | undefined): {
+  topics: string[]
+  languages: string[]
+} {
+  const topics: string[] = []
+  const languages: string[] = []
+  for (const tag of cleanTopics(tags)) {
+    const language = languageName(tag)
+    if (language) languages.push(language)
+    else topics.push(tag)
+  }
+  return { topics, languages }
 }
 
 /** Strings only, trimmed, deduped, trailing "/" removed. */
@@ -113,8 +137,20 @@ function textOrNull(value: string | null | undefined): string | null {
   return trimmed ? trimmed : null
 }
 
+/** Distinct Sefaria resource groups for a project's raw resources, in first-seen order. */
+export function cleanResourceGroups(resources: readonly string[]): string[] {
+  const groups = new Set<string>()
+  for (const resource of resources) {
+    const group = resourceGroup(resource)
+    if (group) groups.add(group)
+  }
+  return [...groups]
+}
+
 export function normalizeProject(raw: RawProject): Project {
   const url = safeUrl(raw.project_link)
+  const { topics, languages } = splitTags(raw.tags)
+  const resources = cleanResources(raw.sefaria_tools_used)
   return {
     id: raw.id,
     name: raw.project_name.trim(),
@@ -124,11 +160,15 @@ export function normalizeProject(raw: RawProject): Project {
     domain: url ? url.hostname.replace(/^www\./, '') : null,
     sourceUrl: safeUrl(raw.project_source_code)?.href ?? null,
     categories: parseCategories(raw.project_category),
-    topics: cleanTopics(raw.tags),
-    resources: cleanResources(raw.sefaria_tools_used),
+    topics,
+    languages,
+    resources,
+    resourceGroups: cleanResourceGroups(resources),
     builtWith: textOrNull(raw.tech_used_raw),
     reach: parseReach(raw.project_reach),
     submittedAt: parseDate(raw.submission_date),
+    featured: raw.featured === true,
+    isBuggy: raw.is_buggy === true,
     experience: parseExperience(raw.technical_experience),
     vibeCoded: raw.vibe_coded === true,
     techMentions: parseTech(raw.tech_used_raw),
@@ -140,13 +180,7 @@ export function normalizeProjects(raw: readonly RawProject[]): Project[] {
   return raw.filter((p) => p.is_published && p.consent_to_display).map(normalizeProject)
 }
 
-/** Topics for cards and list rows: the language tag is not a topic. */
-export function visibleTopics(project: Project): string[] {
-  return project.topics.filter((t) => t !== LANGUAGE_TAG)
-}
-
-/** Topics for the detail view: "English" appears only when it is the sole topic. */
+/** Topics for the detail view: the languages stand in only when there are no other topics. */
 export function detailTopics(project: Project): string[] {
-  const topics = visibleTopics(project)
-  return topics.length > 0 ? topics : project.topics
+  return project.topics.length > 0 ? project.topics : project.languages
 }

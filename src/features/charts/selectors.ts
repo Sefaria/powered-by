@@ -1,6 +1,6 @@
 import { EXPERIENCE_LEVELS, type ExperienceLevel } from '../../lib/experience'
 import { resourceGroup, type ResourceGroup } from '../../lib/endpoints'
-import { LANGUAGE_TAG, type Project } from '../../lib/project'
+import type { Project } from '../../lib/project'
 import { REACH_BUCKETS, type ReachBucket } from '../../lib/reach'
 
 const MONTH_ABBR = [
@@ -180,13 +180,16 @@ export interface TagCounts {
   englishCount: number
 }
 
+const ENGLISH = 'English'
+
 export function topTags(projects: readonly Project[], limit = 10): TagCounts {
   const counts = new Map<string, number>()
   let englishCount = 0
   for (const p of projects) {
-    for (const topic of p.topics) {
-      if (topic === LANGUAGE_TAG) englishCount++
-      else increment(counts, topic)
+    // Language tags are separate on a Project but were always tags on this chart.
+    for (const tag of [...p.languages, ...p.topics]) {
+      if (tag === ENGLISH) englishCount++
+      else increment(counts, tag)
     }
   }
   return { rows: topCounts(counts, limit), englishCount }

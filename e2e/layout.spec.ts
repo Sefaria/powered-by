@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test'
-import { expect, RICH_PROJECT, test, waitForProjects } from './support'
+import { expect, RICH_PROJECT, serveProjects, test, waitForProjects } from './support'
 
 const INTERACTIVE = 'button, a[href], input, select, [role=radio]'
 
@@ -60,6 +60,31 @@ test.describe('touch targets (>= 44x44)', () => {
       await page.getByRole('button', { name: 'Open menu' }).click()
       expect(await smallTargets(page)).toEqual([])
     }
+  })
+
+  test('featured band and every expanded filter section', async ({ page, isMobile }) => {
+    await serveProjects(page, (rows) => {
+      for (const row of rows) if ([155, 143, 141].includes(row.id as number)) row.featured = true
+    })
+    await page.goto('/')
+    await waitForProjects(page)
+    await scrollThrough(page, async () => expect(await smallTargets(page)).toEqual([]))
+
+    if (isMobile) {
+      await page.getByRole('button', { name: 'Filters', exact: true }).click()
+    }
+    const scope = isMobile
+      ? page.getByRole('dialog', { name: 'Filters' })
+      : page.getByRole('complementary', { name: 'Filters' })
+    for (const name of ['Topics', 'Language', 'Sefaria resources', 'Built with']) {
+      await scope.getByRole('button', { name: new RegExp(`^${name}`) }).click()
+    }
+    await scope
+      .getByRole('button', { name: /^Show all/ })
+      .first()
+      .click()
+    await page.getByRole('heading', { name: 'Browse projects' }).scrollIntoViewIfNeeded()
+    expect(await smallTargets(page)).toEqual([])
   })
 
   test('charts page', async ({ page }) => {

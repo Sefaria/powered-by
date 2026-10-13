@@ -1,11 +1,12 @@
 import { useId } from 'react'
 import { X } from 'lucide-react'
-import { getCategoryMeta } from '../../lib/categories'
+import { CATEGORY_META } from '../../lib/categories'
 import type { Project } from '../../lib/project'
 import { MEDIA_SM, useMediaQuery } from '../../hooks/useMediaQuery'
 import { CategoryIcon } from '../../components/icons/CategoryIcon'
 import { Dialog } from '../../components/ui/Dialog'
 import { IconButton } from '../../components/ui/IconButton'
+import { KnownIssuesBadge } from '../../components/ui/KnownIssuesBadge'
 import { Tag } from '../../components/ui/Tag'
 import { PrimaryCta, ProjectDetail } from './ProjectDetail'
 import styles from './ProjectDialog.module.css'
@@ -26,15 +27,18 @@ export function ProjectDialog({ project, onClose }: ProjectDialogProps) {
   return (
     <Dialog labelledBy={titleId} onClose={onClose}>
       <div className={styles.header}>
-        <ul className={styles.chips}>
-          {project.categories.map((id) => (
-            <li key={id}>
-              <Tag variant="category" icon={<CategoryIcon id={id} size={14} />}>
-                {getCategoryMeta(id).shortLabel}
-              </Tag>
-            </li>
-          ))}
-        </ul>
+        <div className={styles.headerMain}>
+          {project.isBuggy && <KnownIssuesBadge />}
+          <ul className={styles.chips}>
+            {project.categories.map((id) => (
+              <li key={id}>
+                <Tag variant="category" icon={<CategoryIcon id={id} size={14} />}>
+                  {CATEGORY_META[id].label}
+                </Tag>
+              </li>
+            ))}
+          </ul>
+        </div>
         <IconButton filled aria-label="Close" onClick={onClose}>
           <X size={24} strokeWidth={2} aria-hidden="true" />
         </IconButton>

@@ -32,6 +32,15 @@
   --focus-ring: #1976d2;
   --scrim: rgba(15, 34, 59, 0.6);
 
+  /* Category tile colors: white on each is >= 3:1 (graphic). Reused from Sefaria's library
+     category palette; they don't carry the library's section meanings here. */
+  --category-learn: #004e5f;
+  --category-ai: #7c416f;
+  --category-community: #ab4e66;
+  --category-viz: #4b71b7;
+  --category-ext: #5d956f;
+  --category-none: #575757;
+
   /* Chart ramps (charts only) */
   --chart-purple-1: #e1bed8;
   --chart-purple-2: #b36fa2;

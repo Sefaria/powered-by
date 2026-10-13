@@ -4,6 +4,11 @@ import { parseQueryState, serializeQueryState, type QueryState } from '../url'
 const base: QueryState = {
   q: '',
   category: 'all',
+  topics: [],
+  languages: [],
+  resources: [],
+  tech: [],
+  showBuggy: false,
   sort: 'new',
   view: 'grid',
   project: null,
@@ -18,16 +23,49 @@ describe('query state', () => {
     const state: QueryState = {
       q: 'rav kook',
       category: 'viz',
+      topics: ['Gemara', 'Tanakh'],
+      languages: ['Hebrew'],
+      resources: ['Texts', 'Index & structure'],
+      tech: ['React', 'Claude/Anthropic API'],
+      showBuggy: true,
       sort: 'az',
       view: 'list',
       project: 42,
     }
     const search = serializeQueryState(state).toString()
-    expect(search).toBe('q=rav+kook&category=viz&sort=az&view=list&project=42')
     expect(parseQueryState(search)).toEqual(state)
+    const params = new URLSearchParams(search)
+    expect(params.get('topic')).toBe('Gemara,Tanakh')
+    expect(params.get('lang')).toBe('Hebrew')
+    expect(params.get('resource')).toBe('Texts,Index & structure')
+    expect(params.get('tech')).toBe('React,Claude/Anthropic API')
+    expect(params.get('bugs')).toBe('1')
   })
 
-  it('falls back to defaults for invalid values', () => {
+  it.each([
+    ['topics', 'topic', ['Gemara']],
+    ['languages', 'lang', ['English', 'French']],
+    ['resources', 'resource', ['Search']],
+    ['tech', 'tech', ['.NET', 'C#']],
+  ] as const)('round-trips %s through ?%s=', (field, param, values) => {
+    const search = serializeQueryState({ ...base, [field]: [...values] }).toString()
+    expect(search.startsWith(`${param}=`)).toBe(true)
+    expect(parseQueryState(search)[field]).toEqual(values)
+  })
+
+  it('writes bugs=1 only when on', () => {
+    expect(serializeQueryState({ ...base, showBuggy: true }).toString()).toBe('bugs=1')
+    expect(parseQueryState('bugs=1').showBuggy).toBe(true)
+    expect(parseQueryState('bugs=0').showBuggy).toBe(false)
+    expect(parseQueryState('bugs=true').showBuggy).toBe(false)
+  })
+
+  it('tolerates blanks and duplicates in lists', () => {
+    expect(parseQueryState('topic=Gemara,, Gemara ,Tanakh,').topics).toEqual(['Gemara', 'Tanakh'])
+    expect(parseQueryState('topic=').topics).toEqual([])
+  })
+
+  it('falls back to defaults for invalid values and ignores the removed `open` param', () => {
     expect(parseQueryState('category=bogus&sort=x&view=y&project=abc&open=1')).toEqual(base)
     expect(parseQueryState('project=-3').project).toBeNull()
     expect(parseQueryState('project=1.5').project).toBeNull()
