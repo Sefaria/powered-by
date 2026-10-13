@@ -146,7 +146,7 @@ export function BrowsePage() {
           <p className={styles.summary} aria-live="polite">
             {summary}
           </p>
-          <ActiveFilters filters={filters} onChange={update} />
+          <ActiveFilters filters={filters} onChange={update} onClearAll={clearAll} />
 
           {data.status === 'loading' && <ResultsSkeleton view={state.view} />}
           {data.status === 'error' && (
@@ -187,7 +187,10 @@ export function BrowsePage() {
         <FilterSheet
           projects={all}
           filters={filters}
-          onApply={(next) => update(next)}
+          onApply={(next) => {
+            setInput(next.q)
+            update(next)
+          }}
           onClose={() => setSheetOpen(false)}
         />
       )}

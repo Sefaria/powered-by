@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { axe } from 'vitest-axe'
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_FILTERS, filterFacets, type Filters } from '../../../lib/filter'
+import { CLEARED_VALUES, DEFAULT_FILTERS, filterFacets, type Filters } from '../../../lib/filter'
 import { FilterPanel } from '../FilterPanel'
 import { ActiveFilters } from '../ActiveFilters'
 import { fixtureProjects, makeProject } from '../../../test/factories'
@@ -32,7 +32,11 @@ function Harness({
   const [filters, setFilters] = useState(initial)
   return (
     <>
-      <ActiveFilters filters={filters} onChange={(p) => setFilters((f) => ({ ...f, ...p }))} />
+      <ActiveFilters
+        filters={filters}
+        onChange={(p) => setFilters((f) => ({ ...f, ...p }))}
+        onClearAll={() => setFilters((f) => ({ ...f, ...CLEARED_VALUES, q: '' }))}
+      />
       <FilterPanel
         large={large}
         facets={filterFacets(projects, filters)}

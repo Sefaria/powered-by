@@ -249,6 +249,16 @@ describe('BrowsePage', () => {
       expect(titles()).toEqual(['Alpha', 'Gamma'])
     })
 
+    it('Clear all in the chips row clears the search box and the filters, not the switch', async () => {
+      stubApi(projects())
+      renderPage('/?q=Alpha&topic=Gemara&bugs=1')
+      await screen.findByText('1 project matches')
+      await userEvent.click(screen.getByRole('button', { name: 'Clear all' }))
+      expect(await screen.findByText(/Showing 3 of 3/)).toBeInTheDocument()
+      expect(screen.getByRole('searchbox')).toHaveValue('')
+      expect(screen.getByRole('switch')).toBeChecked()
+    })
+
     it('shows "Clear filters" on empty results and it clears the filter values', async () => {
       stubApi(projects())
       renderPage('/?topic=Tanakh&lang=English')

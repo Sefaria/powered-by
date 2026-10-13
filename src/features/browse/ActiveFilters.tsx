@@ -1,18 +1,14 @@
 import { X } from 'lucide-react'
 import { CATEGORY_META, type CategoryId } from '../../lib/categories'
-import {
-  activeFilterValues,
-  CLEARED_VALUES,
-  type ActiveValue,
-  type FacetKey,
-  type Filters,
-} from '../../lib/filter'
+import { activeFilterValues, type ActiveValue, type FacetKey, type Filters } from '../../lib/filter'
 import { Button } from '../../components/ui/Button'
 import styles from './ActiveFilters.module.css'
 
 interface ActiveFiltersProps {
   filters: Filters
   onChange: (patch: Partial<Filters>) => void
+  /** Clears the search as well as every filter value (the page owns the search input). */
+  onClearAll: () => void
 }
 
 const PREFIX: Record<FacetKey, string> = {
@@ -27,7 +23,7 @@ function chipLabel({ key, value }: ActiveValue): string {
 }
 
 /** One removable chip per selected filter value, and a trailing "Clear all". Shown at every breakpoint. */
-export function ActiveFilters({ filters, onChange }: ActiveFiltersProps) {
+export function ActiveFilters({ filters, onChange, onClearAll }: ActiveFiltersProps) {
   const values = activeFilterValues(filters)
   if (values.length === 0) return null
 
@@ -57,7 +53,7 @@ export function ActiveFilters({ filters, onChange }: ActiveFiltersProps) {
         )
       })}
       <li>
-        <Button variant="text" onClick={() => onChange(CLEARED_VALUES)}>
+        <Button variant="text" onClick={onClearAll}>
           Clear all
         </Button>
       </li>

@@ -54,6 +54,7 @@ describe('FilterSheet', () => {
     await userEvent.click(screen.getByRole('radio', { name: /Learning & Study/ }))
     await userEvent.click(screen.getByRole('button', { name: 'Show 2 projects' }))
     expect(onApply).toHaveBeenCalledWith({
+      q: '',
       category: 'learn',
       topics: [],
       languages: [],
@@ -138,6 +139,22 @@ describe('FilterSheet', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Clear all' }))
     expect(screen.getByRole('checkbox', { name: /Gemara/ })).not.toBeChecked()
     expect(screen.getByRole('button', { name: 'Show 3 projects' })).toBeInTheDocument()
+  })
+
+  it('Clear all also clears the search, but leaves the display switch alone', async () => {
+    const onApply = vi.fn()
+    render(
+      <FilterSheet
+        projects={projects}
+        filters={{ ...DEFAULT_FILTERS, q: 'gemara', showBuggy: true }}
+        onApply={onApply}
+        onClose={() => {}}
+      />,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Clear all' }))
+    expect(screen.getByRole('switch')).toBeChecked()
+    await userEvent.click(screen.getByRole('button', { name: /^Show \d+ projects?$/ }))
+    expect(onApply).toHaveBeenCalledWith(expect.objectContaining({ q: '', showBuggy: true }))
   })
 
   it('has no axe violations', async () => {

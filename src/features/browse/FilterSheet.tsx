@@ -12,8 +12,8 @@ import styles from './FilterSheet.module.css'
 interface FilterSheetProps {
   projects: readonly Project[]
   filters: Filters
-  /** Everything the sheet controls: all of the filters and the display option, not the search. */
-  onApply: (next: Omit<Filters, 'q'>) => void
+  /** Everything the sheet controls: the filters, the display option and (via Clear all) the search. */
+  onApply: (next: Filters) => void
   onClose: () => void
 }
 
@@ -50,7 +50,7 @@ export function FilterSheet({ projects, filters, onApply, onClose }: FilterSheet
       <div className={styles.footer}>
         <Button
           variant="text"
-          onClick={() => setPending((current) => ({ ...current, ...CLEARED_VALUES }))}
+          onClick={() => setPending((current) => ({ ...current, ...CLEARED_VALUES, q: '' }))}
         >
           Clear all
         </Button>
@@ -60,6 +60,7 @@ export function FilterSheet({ projects, filters, onApply, onClose }: FilterSheet
           className={styles.show}
           onClick={() => {
             onApply({
+              q: pending.q,
               category: pending.category,
               topics: pending.topics,
               languages: pending.languages,
