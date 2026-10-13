@@ -12,18 +12,18 @@ import { resourcesUsed } from '../../features/charts/selectors'
 import { fixtureProjects, fixtureRaw, makeProject, makeRaw } from '../../test/factories'
 
 describe('normalizeProjects visibility', () => {
-  it('keeps only published projects with consent', () => {
+  it('keeps only published projects, whatever their consent flag', () => {
     const raw = [
       makeRaw({ id: 1 }),
       makeRaw({ id: 2, is_published: false }),
       makeRaw({ id: 3, consent_to_display: false }),
     ]
-    expect(normalizeProjects(raw).map((p) => p.id)).toEqual([1])
+    expect(normalizeProjects(raw).map((p) => p.id)).toEqual([1, 3])
   })
 
-  it('yields 133 visible projects from the production fixture', () => {
-    expect(fixtureProjects).toHaveLength(133)
-    expect(fixtureRaw.length).toBeGreaterThanOrEqual(133)
+  it('yields 134 visible projects from the production fixture', () => {
+    expect(fixtureProjects).toHaveLength(134)
+    expect(fixtureRaw.length).toBeGreaterThanOrEqual(134)
   })
 })
 

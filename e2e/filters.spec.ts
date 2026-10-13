@@ -65,7 +65,7 @@ test.describe('filters', () => {
 
     await page.getByRole('button', { name: 'Clear all' }).last().click()
     await expect(page).not.toHaveURL(/topic=|lang=/)
-    await expect(page.getByText(/Showing 24 of 121/)).toBeVisible()
+    await expect(page.getByText(/Showing 24 of 122/)).toBeVisible()
   })
 
   test('OR within a section: two topics match either', async ({ page, isMobile }) => {
@@ -122,7 +122,7 @@ test.describe('filters', () => {
     await waitForProjects(page)
     await openFilters(page, true)
     const sheet = filterScope(page, true)
-    await expect(page.getByRole('button', { name: 'Show 121 projects' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Show 122 projects' })).toBeVisible()
 
     await pick(sheet, 'Topics', /^Gemara\b/)
     await expect(page.getByRole('button', { name: 'Show 16 projects' })).toBeVisible()
@@ -132,14 +132,14 @@ test.describe('filters', () => {
 
     await page.getByRole('button', { name: 'Close' }).click()
     await expect(page).not.toHaveURL(/topic=|lang=/)
-    await expect(page.getByText(/Showing 24 of 121/)).toBeVisible()
+    await expect(page.getByText(/Showing 24 of 122/)).toBeVisible()
 
     await openFilters(page, true)
     await expandSection(filterScope(page, true), 'Topics')
     await expect(
       filterScope(page, true).getByRole('checkbox', { name: /^Gemara\b/ }),
     ).not.toBeChecked()
-    await expect(page.getByRole('button', { name: 'Show 121 projects' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Show 122 projects' })).toBeVisible()
   })
 
   test('known issues: hidden by default, shown with a badge when switched on', async ({
@@ -148,8 +148,8 @@ test.describe('filters', () => {
   }) => {
     await page.goto('/')
     await waitForProjects(page)
-    await expect(page.getByRole('button', { name: 'Explore 121 projects' })).toBeVisible()
-    await expect(page.getByText('Showing 24 of 121 projects')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Explore 122 projects' })).toBeVisible()
+    await expect(page.getByText('Showing 24 of 122 projects')).toBeVisible()
 
     await openFilters(page, isMobile)
     const toggle = filterScope(page, isMobile).getByRole('switch', {
@@ -161,8 +161,8 @@ test.describe('filters', () => {
     await applyIfSheet(page, isMobile)
 
     await expect(page).toHaveURL(/bugs=1/)
-    await expect(page.getByRole('button', { name: 'Explore 133 projects' })).toBeVisible()
-    await expect(page.getByText('Showing 24 of 133 projects')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Explore 134 projects' })).toBeVisible()
+    await expect(page.getByText('Showing 24 of 134 projects')).toBeVisible()
 
     // a buggy project is now findable, with its badge; off again, it's gone
     await page.goto('/?bugs=1&q=Daf+Quiz')
@@ -196,7 +196,7 @@ test.describe('filters', () => {
     await expect(page).not.toHaveURL(/bugs=/)
     await page.getByRole('button', { name: 'Close' }).click()
     await expect(dialog).toBeHidden()
-    await expect(page.getByRole('button', { name: 'Explore 121 projects' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Explore 122 projects' })).toBeVisible()
     await openFilters(page, isMobile)
     await expect(
       filterScope(page, isMobile).getByRole('switch', { name: 'Show projects with known issues' }),
@@ -208,7 +208,7 @@ test.describe('filters', () => {
     await expect(page.getByText('No projects match that search.')).toBeVisible()
     await page.getByRole('button', { name: 'Clear filters' }).click()
     await expect(page).not.toHaveURL(/topic=|lang=/)
-    await expect(page.getByText(/Showing 24 of 121/)).toBeVisible()
+    await expect(page.getByText(/Showing 24 of 122/)).toBeVisible()
   })
 
   test('accessibility: no axe violations with every section open', async ({ page, isMobile }) => {

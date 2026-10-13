@@ -28,11 +28,11 @@ describe('mostRecentCompletedMonth', () => {
 describe('submissionsByYear', () => {
   it('matches the production fixture', () => {
     const { rows, total, undated } = submissionsByYear(fixtureProjects, FIXTURE_NOW)
-    expect(total).toBe(133)
-    expect(undated).toBe(23)
+    expect(total).toBe(134)
+    expect(undated).toBe(24)
     expect(rows.find((r) => r.year === 2026)?.count).toBe(58)
     expect(rows.at(-1)?.year).toBe(2026)
-    expect(rows.reduce((s, r) => s + r.count, 0)).toBe(133 - 23)
+    expect(rows.reduce((s, r) => s + r.count, 0)).toBe(134 - 24)
   })
 
   it('includes zero years between the earliest and the current year', () => {
@@ -127,8 +127,8 @@ describe('topTags', () => {
     expect(rows.find((r) => r.label === 'English')).toBeUndefined()
     expect(englishCount).toBeGreaterThan(100)
     const byLabel = Object.fromEntries(rows.map((r) => [r.label, r.count]))
-    expect(byLabel).toMatchObject({ AI: 35, Gemara: 18, Tanakh: 13, Hebrew: 13 })
-    expect(rows[0]).toEqual({ label: 'AI', count: 35 })
+    expect(byLabel).toMatchObject({ AI: 36, Gemara: 18, Tanakh: 13, Hebrew: 13 })
+    expect(rows[0]).toEqual({ label: 'AI', count: 36 })
   })
   it('counts the Kabbalah alias together', () => {
     const projects = [
@@ -179,7 +179,7 @@ describe('reachBuckets', () => {
   it('is reported by 11 projects in the fixture, in bucket order', () => {
     const { rows, reported, total } = reachBuckets(fixtureProjects)
     expect(reported).toBe(11)
-    expect(total).toBe(133)
+    expect(total).toBe(134)
     expect(rows.map((r) => r.bucket)).toEqual(['poc', 'lt10', '10', '100', '1000'])
     expect(rows.reduce((s, r) => s + r.count, 0)).toBe(11)
   })

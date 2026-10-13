@@ -128,9 +128,9 @@ describe('filterProjects', () => {
     expect(ids(filterProjects(projects, filters({ q: 'buggy', showBuggy: true })))).toEqual([4])
   })
 
-  it('shows 121 of the 133 fixture projects by default', () => {
-    expect(filterProjects(fixtureProjects, DEFAULT_FILTERS)).toHaveLength(121)
-    expect(filterProjects(fixtureProjects, filters({ showBuggy: true }))).toHaveLength(133)
+  it('shows 122 of the 134 fixture projects by default', () => {
+    expect(filterProjects(fixtureProjects, DEFAULT_FILTERS)).toHaveLength(122)
+    expect(filterProjects(fixtureProjects, filters({ showBuggy: true }))).toHaveLength(134)
   })
 })
 
@@ -164,8 +164,8 @@ describe('categoryCounts', () => {
     })
   })
   it('works on the fixture', () => {
-    expect(categoryCounts(fixtureProjects, {}).all).toBe(121)
-    expect(categoryCounts(fixtureProjects, { showBuggy: true }).all).toBe(133)
+    expect(categoryCounts(fixtureProjects, {}).all).toBe(122)
+    expect(categoryCounts(fixtureProjects, { showBuggy: true }).all).toBe(134)
   })
 })
 

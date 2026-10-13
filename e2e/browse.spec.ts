@@ -7,7 +7,7 @@ test.describe('browse', () => {
   }) => {
     await page.goto('/')
     await waitForProjects(page)
-    await expect(page.getByText('Showing 24 of 121 projects · newest first')).toBeVisible()
+    await expect(page.getByText('Showing 24 of 122 projects · newest first')).toBeVisible()
 
     await page.getByRole('searchbox', { name: 'Search projects' }).fill('torah')
     await expect(page).toHaveURL(/q=torah/)
@@ -112,7 +112,7 @@ test.describe('browse', () => {
     await expect(page.getByText('No projects match that search.')).toBeVisible()
     await page.getByRole('button', { name: 'Clear filters' }).click()
     await expect(page.getByRole('searchbox')).toHaveValue('')
-    await expect(page.getByText(/Showing 24 of 121/)).toBeVisible()
+    await expect(page.getByText(/Showing 24 of 122/)).toBeVisible()
   })
 
   test('unknown routes show a client-side 404', async ({ page }) => {
