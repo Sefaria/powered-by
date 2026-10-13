@@ -1,7 +1,8 @@
-import { getCategoryMeta } from '../../lib/categories'
+import { CATEGORY_META } from '../../lib/categories'
 import type { CategoryFilter } from '../../lib/filter'
-import { visibleTopics, type Project } from '../../lib/project'
+import type { Project } from '../../lib/project'
 import { CategoryTile } from '../../components/icons/CategoryIcon'
+import { KnownIssuesBadge } from '../../components/ui/KnownIssuesBadge'
 import { TopicTags } from './TopicTags'
 import styles from './ProjectCard.module.css'
 
@@ -13,15 +14,15 @@ interface ProjectCardProps {
   onOpen: (project: Project) => void
 }
 
-/** A closed card shows only icon, category, title, description and topics. The whole card is the button. */
+/** A closed card shows only icon, category, title, description, topics and, when shown, the known-issues badge. The whole card is the button. */
 export function ProjectCard({ project, activeCategory, resultIndex, onOpen }: ProjectCardProps) {
   const categoryId = activeCategory !== 'all' ? activeCategory : (project.categories[0] ?? 'none')
-  const topics = visibleTopics(project).slice(0, 3)
+  const topics = project.topics.slice(0, 3)
   return (
     <article className={styles.card}>
       <div className={styles.category}>
         <CategoryTile id={categoryId} />
-        <span className={styles.categoryLabel}>{getCategoryMeta(categoryId).shortLabel}</span>
+        <span className={styles.categoryLabel}>{CATEGORY_META[categoryId].label}</span>
       </div>
       <h3 className={styles.heading}>
         <button
@@ -34,6 +35,7 @@ export function ProjectCard({ project, activeCategory, resultIndex, onOpen }: Pr
         </button>
       </h3>
       {project.description && <p className={styles.description}>{project.description}</p>}
+      {project.isBuggy && <KnownIssuesBadge />}
       {topics.length > 0 && <TopicTags topics={topics} size="sm" />}
     </article>
   )

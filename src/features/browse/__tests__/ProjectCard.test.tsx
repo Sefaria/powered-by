@@ -79,6 +79,20 @@ describe('ProjectCard', () => {
     expect(onOpen).toHaveBeenCalledWith(project)
   })
 
+  it('shows the Known issues badge only for a project with known issues', () => {
+    const { unmount } = renderCard()
+    expect(screen.queryByText('Known issues')).toBeNull()
+    unmount()
+    renderCard({ project: makeProject({ is_buggy: true }) })
+    expect(screen.getByText('Known issues')).toBeInTheDocument()
+  })
+
+  it('colors the icon tile from the category token, not a hard-coded purple', () => {
+    const { container } = renderCard({ activeCategory: 'learn' })
+    const tile = container.querySelector('article span[aria-hidden="true"]') as HTMLElement
+    expect(tile.style.getPropertyValue('--tile-color')).toBe('var(--category-learn)')
+  })
+
   it('has no axe violations', async () => {
     const { container } = renderCard()
     expect(await axe(container)).toHaveNoViolations()

@@ -5,8 +5,10 @@ import {
   detailTopics,
   normalizeProjects,
   safeUrl,
-  visibleTopics,
+  splitTags,
 } from '../project'
+import { resourceGroup } from '../endpoints'
+import { resourcesUsed } from '../../features/charts/selectors'
 import { fixtureProjects, fixtureRaw, makeProject, makeRaw } from '../../test/factories'
 
 describe('normalizeProjects visibility', () => {
@@ -108,14 +110,81 @@ describe('cleanTopics', () => {
     ).toEqual(['Gemara'])
   })
 
-  it('keeps English in data, hides it on cards, shows it in detail only when alone', () => {
+  it('splits language tags out of topics; the detail view falls back to them when alone', () => {
     const both = makeProject({ tags: ['English', 'Gemara'] })
-    expect(both.topics).toEqual(['English', 'Gemara'])
-    expect(visibleTopics(both)).toEqual(['Gemara'])
+    expect(both.topics).toEqual(['Gemara'])
+    expect(both.languages).toEqual(['English'])
     expect(detailTopics(both)).toEqual(['Gemara'])
     const only = makeProject({ tags: ['English'] })
-    expect(visibleTopics(only)).toEqual([])
+    expect(only.topics).toEqual([])
     expect(detailTopics(only)).toEqual(['English'])
+  })
+})
+
+describe('splitTags', () => {
+  it('separates languages (any case) from topics, in first-seen order', () => {
+    expect(splitTags(['english', 'AI', 'Hebrew', 'French', 'Gemara', 'Korean', 'German'])).toEqual({
+      topics: ['AI', 'Gemara'],
+      languages: ['English', 'Hebrew', 'French', 'Korean', 'German'],
+    })
+  })
+  it('recognises other language names and drops junk tags first', () => {
+    expect(splitTags(['Yiddish', 'Russian', 'May 2026', 'not vibe-coded', 'Spanish'])).toEqual({
+      topics: [],
+      languages: ['Yiddish', 'Russian', 'Spanish'],
+    })
+  })
+  it('keeps tags that merely contain a language word as topics', () => {
+    expect(splitTags(['Hebrew grammar']).topics).toEqual(['Hebrew grammar'])
+  })
+  it('splits every tag of the production fixture exactly once', () => {
+    for (const p of fixtureProjects) {
+      expect(new Set([...p.topics, ...p.languages]).size).toBe(p.topics.length + p.languages.length)
+    }
+    const languages = new Set(fixtureProjects.flatMap((p) => p.languages))
+    expect([...languages].sort()).toEqual(
+      ['English', 'French', 'German', 'Hebrew', 'Korean', 'Spanish'].sort(),
+    )
+  })
+})
+
+describe('resourceGroups', () => {
+  it('maps endpoints and names to groups, dropping "Sefaria API" and unmapped values', () => {
+    const p = makeProject({
+      sefaria_tools_used: [
+        '/api/texts/',
+        '/api/v3/texts',
+        'Sefaria API',
+        'Documentation',
+        '/api/zzz',
+      ],
+    })
+    expect(p.resourceGroups).toEqual(['Texts', 'Documentation'])
+  })
+  it('matches the /charts "Sefaria resources used" grouping on the fixture', () => {
+    const counts = new Map<string, number>()
+    for (const p of fixtureProjects) {
+      expect(p.resourceGroups).toEqual([
+        ...new Set(p.resources.map(resourceGroup).filter((g) => g !== null)),
+      ])
+      for (const group of p.resourceGroups) counts.set(group, (counts.get(group) ?? 0) + 1)
+    }
+    const chart = Object.fromEntries(resourcesUsed(fixtureProjects).map((r) => [r.label, r.count]))
+    expect(Object.fromEntries(counts)).toEqual(chart)
+  })
+})
+
+describe('featured and buggy flags', () => {
+  it('carries featured and isBuggy from the raw flags', () => {
+    expect(makeProject({ featured: true, is_buggy: true })).toMatchObject({
+      featured: true,
+      isBuggy: true,
+    })
+    expect(makeProject()).toMatchObject({ featured: false, isBuggy: false })
+  })
+  it('has 12 buggy and no featured projects in the production fixture', () => {
+    expect(fixtureProjects.filter((p) => p.isBuggy)).toHaveLength(12)
+    expect(fixtureProjects.filter((p) => p.featured)).toHaveLength(0)
   })
 })
 

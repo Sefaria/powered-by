@@ -45,6 +45,31 @@ export const test = base.extend({
 
 export { expect }
 
+/** Serve the snapshot with some rows changed, e.g. to flag projects as featured. */
+export async function serveProjects(
+  page: Page,
+  change: (rows: Array<Record<string, unknown>>) => void,
+) {
+  const data = JSON.parse(fixture) as { projects: Array<Record<string, unknown>> }
+  change(data.projects)
+  await page.route('https://www.sefaria.org/api/powered-by', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify(data),
+      headers: { 'access-control-allow-origin': '*' },
+    }),
+  )
+}
+
+/** Ids of fixture projects used by tests. Names are checked so a data refresh can't silently change them. */
+export const PROJECTS = {
+  todaysDaf: 155,
+  talmudNavigator: 143,
+  torahMcp: 141,
+  /** Flagged is_buggy in the snapshot. */
+  dafQuiz: 51,
+}
+
 export async function expectNoAxeViolations(page: Page) {
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])

@@ -1,21 +1,13 @@
 .panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
 }
 
 .group {
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);
-}
-
-.legend {
-  margin-bottom: var(--space-sm);
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 18px;
 }
 
 .row {
@@ -75,7 +67,7 @@
 .icon {
   display: inline-flex;
   flex: none;
-  color: var(--module-primary);
+  color: var(--icon-color);
 }
 
 .label {

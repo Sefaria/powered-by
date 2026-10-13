@@ -225,8 +225,13 @@ interface Project {
   builtWith: string | null;      // tech_used_raw trimmed
   reach: ReachBucket | null;     // see 5.3
   submittedAt: Date | null;
+  languages: string[];           // language tags pulled out of `tags` (see §16.3)
+  resourceGroups: string[];      // `resources` mapped to the /charts groups (see §16.3)
+  featured: boolean;             // admin-set, drives the featured band (see §16.2)
+  isBuggy: boolean;              // drives the "Show projects with known issues" rule (see §16.4)
+  techMentions: string[];        // from the tech_used_raw parser; also used by the "Built with" filter
   // analytics-only (never rendered in the project UI):
-  experience: ExperienceLevel | null; vibeCoded: boolean; techMentions: string[];
+  experience: ExperienceLevel | null; vibeCoded: boolean;
 }
 ```
 
@@ -238,13 +243,14 @@ Rules:
   - Trim each tag and dedupe case-insensitively.
   - Alias `Kaballah` → `Kabbalah`.
   - Drop tags that are dates (`/^(January|…|December) \d{4}$/`) and meta tags (`not vibe-coded`, `No Experience`, `Experience Unspecified`).
-  - `English` is a language, not a topic: keep it in data but don't show it on cards. Show it in the detail view only if no other topics exist.
+  - Language tags (English, Hebrew, French, …) are not topics: `normalizeProject` splits them into `languages` (§16.3). Topics never include them. The detail view shows the languages in the Topics row only if the project has no other topics.
 - **Sort:**
   - *Newest*: `submittedAt` desc, with undated projects last, A–Z among themselves. This is the default.
   - *A–Z*: `localeCompare`.
 - **Search:** case-insensitive substring over name, description, topics, short category labels and resources. Debounce input by 150 ms.
 - **Category filter:** single-select. A project matches if `categories` includes the selected id. Counts in the filter UI are computed from the **current search results**, so they update as you type.
-- **Open source only:** `sourceUrl !== null`.
+- **Open source only:** removed in Revision 2 (§16.4).
+- **Filters:** Topics, Language, Sefaria resources and Built with were added in Revision 2 (§16.3).
 
 #### 5.3 Reach
 
@@ -267,9 +273,9 @@ These must not appear on cards or in the detail dialog:
 
 - `technical_experience`
 - `vibe_coded`
-- `is_buggy`
+- `is_buggy`, except through the "Known issues" badge (§16.4), which is the only place it is ever shown
 - `status`
-- `featured`
+- `featured`, except that it selects the featured band (§16.2)
 - `submission_source`
 - `created_at`
 - `image_url`
@@ -285,10 +291,13 @@ Sync these to query params with `replaceState` (no history spam), omitting defau
 
 - `q`
 - `category`
-- `open=1` (open source only)
+- `topic`, `lang`, `resource`, `tech`: comma-separated values (§16.3)
+- `bugs=1`: show projects with known issues (§16.4)
 - `sort` (`new` | `az`)
 - `view` (`grid` | `list`)
 - `project` (open dialog id)
+
+The old `open` param is gone.
 
 Opening a project pushes history, so **Back closes the dialog**. Also persist `view` to `localStorage` (wrapped in try/catch) as the default for the next visit.
 
@@ -381,12 +390,12 @@ Layout below the hero, inside the container:
 
 **Section "CATEGORY"** (14/600 uppercase `--text-secondary` legend):
 
-- Single-select radio rows, 44px (52px in the sheet). Each row shows the category icon (18px, purple), the short label, and a right-aligned count (14px, `--text-secondary`).
+- Single-select radio rows, 44px (52px in the sheet). Each row shows the category icon (18px, in the category color, §16.1), the short label, and a right-aligned count (14px, `--text-secondary`).
 - Rows: All projects, Learning & Study, AI & Apps, Extensions & API, Visualization & Data, Community & Social, Uncategorized.
 - Selected row: `--surface-selected` background and weight 600.
 - Implement as a real radio group (`fieldset` + `legend` + inputs, visually styled), not buttons, so arrow keys work.
 
-**Section "CODE":** a checkbox **"Open source only"** (20px box, `accent-color: var(--module-primary)`, 44px row).
+**Other sections:** Revision 2 replaces the old "CODE" section (Open source only) with Topics, Language, Sefaria resources, Built with and Display. See §16.3 and §16.4.
 
 **FilterSheet** (mobile and tablet):
 
@@ -414,13 +423,13 @@ One row on desktop that wraps on mobile:
 Below the toolbar:
 
 - **Summary line**, `aria-live="polite"`, 14px `--text-secondary`. Reads "Showing 24 of 133 projects · newest first", or with filters "{n} projects match".
-- **ActiveFilters chips** (mobile and tablet; optional on desktop): e.g. "AI & Apps ×". Category chip style, 36px tall, ≥44px hit area. Removing a chip clears that filter.
+- **ActiveFilters chips** (all breakpoints, §16.3): one per selected value, e.g. "AI & Apps ×". 36px tall, ≥44px hit area. Removing a chip clears that value.
 
 #### 7.3 Grid view (default)
 
 - **Grid:** `repeat(auto-fill, minmax(min(280px, 100%), 1fr))`, gap 24 (16 on mobile).
 - **Card:** white, 1px `--border-default`, radius 12, padding 24 (20 on mobile), column gap 16. Content, top to bottom:
-  1. The category icon tile (40px) plus the short label of the **first** category (14px, `--text-secondary`). When the list is filtered by a category, show **that** category instead.
+  1. The category icon tile (40px, in the category color, §16.1) plus the short label of the **first** category (14px, `--text-secondary`). When the list is filtered by a category, show **that** category instead.
   2. The title (serif 24/500).
   3. The description, 16/1.5 `--text-secondary`, **clamped to 2 lines**.
   4. Up to 3 topic tags. **The tag row is always a single line:** `display:flex; flex-wrap:wrap; height:28px; overflow:hidden`, with tags `white-space:nowrap; flex-shrink:0`. Tags that don't fit are hidden whole, never cut and never wrapped. No "+n" counter.
@@ -466,7 +475,8 @@ Below the toolbar:
 
 **Header** (sticky inside the dialog, bottom border):
 
-- Category chips, all categories in order: 32px tall, radius 4, white fill, 1px `--border-strong` inset, `--module-primary` 14/600 text, plus the icon.
+- "Known issues" badge (§16.4) when `isBuggy`, shown even when the list toggle is off (deep link).
+- Category chips (these stay purple in Revision 2: they read as the "category" tag type), all categories in order: 32px tall, radius 4, white fill, 1px `--border-strong` inset, `--module-primary` 14/600 text, plus the icon.
 - **Close button:** 48×48, `--surface-hover` fill, radius 8, `X` 24px, `aria-label="Close"`.
 
 **Body** (padding 32 desktop, 24/16 mobile; gap 32/28), in this order:
@@ -623,6 +633,7 @@ Snapshot the API response into `src/lib/__fixtures__/projects.json` for tests.
 - `Dialog` focus trap, Escape, focus return.
 - `SegmentedControl` `aria-pressed`.
 - `FilterSheet` applies on Show and discards on close.
+- Revision 2 tests: see §16.5.
 
 **E2E (Playwright, desktop and mobile):**
 
@@ -639,7 +650,7 @@ Snapshot the API response into `src/lib/__fixtures__/projects.json` for tests.
 - **API:** keep `technical_experience` and `vibe_coded` in `/api/powered-by` (needed by `/charts`), and consider adding a cleaned `tags` array server-side. Reach is now public.
 - **Data hygiene:** merge `Kaballah`/`Kabbalah`; remove junk tags (dates, "not vibe-coded", experience values used as tags).
 
-### 14. PR template
+### 14. PR template (first PR; Revision 2 PR notes are in §16.6)
 
 ```
 ## Powered by Sefaria redesign
@@ -675,3 +686,105 @@ Desktop 1440 + mobile 390 for: browse grid, browse list, filters (sidebar / shee
 4. **Chart notes and the tracking start date** for "Projects over time".
 5. An **OG/share image**.
 6. Licensing check: confirm the Taamey Frank / Amiri merged font may be self-hosted on powered-by.sefaria.org. It ships with Sefaria's design system.
+
+### 16. Revision 2 (follow-up on `feature/pbs-redesign`)
+
+Four changes. Same rules as before: semantic tokens only, typed and tested, 44px minimum touch targets, pure unit-tested logic in `lib/`.
+
+#### 16.1 Per-category icon colors
+
+Tokens (`src/styles/tokens.css`):
+
+| Token | Value | Category | White-on-color contrast |
+|---|---|---|---|
+| `--category-learn` | `#004e5f` | Learning & Study (teal) | 9.3:1 |
+| `--category-ai` | `#7c416f` | AI & Apps (DevPortal purple) | 7.4:1 |
+| `--category-community` | `#ab4e66` | Community & Social (rose) | 5.2:1 |
+| `--category-viz` | `#4b71b7` | Visualization & Data (blue) | 4.8:1 |
+| `--category-ext` | `#5d956f` | Extensions & API (green) | 3.5:1 |
+| `--category-none` | `#575757` | Uncategorized (grey); also the "All projects" filter icon | 7.0:1 |
+
+- `src/lib/categories.ts` exports one `CATEGORY_META: Record<CategoryId, { label, Icon, colorVar }>`. `Icon` is a lucide-react component and `colorVar` is the `var(--category-*)` expression. Every component reads label, icon and color from it. No hard-coded purple remains on category icons.
+- **Applies to:** grid-card tile (40px tile, 24px white icon), list-row tile (32px, 18px), featured-card header (§16.2), category filter rows (18px icon in the category color, no tile).
+- **Does not apply to:** the category chips in the project dialog (purple outline and text, so they keep reading as the "category" tag type).
+- When the list is filtered by one category, cards show that category's icon, color and label. Otherwise the project's first category.
+- Accessibility: white on every color is ≥3:1 (enough for a graphic). The text label always accompanies the color.
+- These colors are reused from Sefaria's library category palette. They do not carry the library's section meanings here (say so in the PR).
+
+#### 16.2 Featured projects band
+
+`<FeaturedProjects>` renders between the hero and the browse area.
+
+**Data**
+
+- Source: projects with `featured === true` (set in Django admin), newest first, maximum 3. Pure selector `getFeaturedProjects(projects, { showBuggy })` in `lib/featured.ts`.
+- None featured: render nothing (no band, no heading). Never backfill. Today every project has `featured=false`, so the band stays hidden until an admin sets the flag.
+- Known-issues rule: a buggy project is never featured while the toggle is off.
+- The band ignores search and filters. Only the known-issues toggle affects it.
+
+**Band**
+
+- Full width, `--surface-subtle` background, 1px `--border-default` bottom border. Inner container max-width 1280, padding 48px 24px (32px 16px below 640px), gap 24.
+- `<section aria-labelledby="featured-heading">`. `<h2 id="featured-heading">Featured projects</h2>`: serif 32/1.2, weight 500 (28 below 640px). Subtitle "Hand-picked by the Sefaria team.", 16px, `--text-secondary`.
+- ≥900px: CSS grid, 3 equal columns, gap 24.
+- <900px: a horizontal scroll-snap row. Cards are `minmax(280px, 82%)` wide (300px on phones) so the next card peeks in. `scroll-snap-type: x mandatory`; `scroll-padding` matches the side padding; the scroller bleeds to the screen edges. The scroller has `tabindex="0"`, `role="region"` and `aria-label="Featured projects, scrollable"`. (Not plain "Featured projects": the `<section>` is already a landmark with that name, and axe's `landmark-unique` rejects two.) No arrows, dots or autoplay. Respect `prefers-reduced-motion`.
+
+**`<FeaturedCard>`** (a variant of `ProjectCard`: same open-dialog behaviour and stretched button)
+
+- White, 1px `--border-default`, radius 16, `overflow: hidden`. Hover and focus as `ProjectCard`.
+- Header art (`aria-hidden`), 128px tall (104px below 640px): category color background; the category icon at 168px, strokeWidth 1, white, opacity 0.18, at right -24px / top -20px; bottom-left (left 24, bottom 20) a 48×48 tile, radius 12, `rgba(255,255,255,.16)` fill, inset 1px `rgba(255,255,255,.32)`, with the 26px white icon.
+- Body (padding 24, 20 on phones; column, gap 10): category label (14px, `--text-secondary`); title (serif 28/1.2, weight 500, 24 on phones) as the stretched `<button>` opening `?project=<id>`; description (16/1.5, `--text-secondary`, clamped to 3 lines); domain (14px, `--text-secondary`, pinned to the bottom, one line with ellipsis).
+- No tags. (A buggy project shown with the toggle on carries the "Known issues" badge next to the category label, since the badge is the one place `is_buggy` is surfaced.)
+
+#### 16.3 More filters
+
+The filter panel is, in order:
+
+| Section | Source | Control |
+|---|---|---|
+| Category | `project.categories` | single-select radio, with counts (unchanged) |
+| Topics | cleaned `project.topics` (no language tags) | multi-select checkboxes |
+| Language | language tags from `tags`: English, Hebrew, French, Spanish, German, Korean, plus any other language name in `lib/languages.ts` | multi-select checkboxes |
+| Sefaria resources | `resourceGroups`: grouped exactly as the `/charts` "Sefaria resources used" chart (`resourceGroup()` in `lib/endpoints.ts`); the generic "Sefaria API" and unmapped values are dropped | multi-select checkboxes |
+| Built with | `techMentions` from the `tech_used_raw` parser | multi-select checkboxes |
+| Display | §16.4 | toggle |
+
+**Data model:** `Project` gains `languages`, `resourceGroups` (and keeps `techMentions`). Option lists are built from the data, never hard-coded. Each option shows a live count. An option with count 0 is hidden unless selected (then it shows 0 so it can be deselected). Options sort by count desc, then A–Z.
+
+**Filter logic** (`lib/filter.ts`, pure): OR within a section, AND across sections. Search applies first, then `category ∧ topics ∧ languages ∧ resources ∧ builtWith ∧ visibility`. Counts are faceted: a section's counts reflect every other active filter plus search, but not that section's own selection.
+
+**URL** (comma-separated, defaults omitted, `replaceState`): existing `q`, `category`, `sort`, `view`, `project`; new `topic`, `lang`, `resource`, `tech`, `bugs=1`. The old `open` param is removed.
+
+**UI**
+
+- Each section after Category is a disclosure: a `<button aria-expanded aria-controls>` header, 44px tall, with a chevron and the number selected ("Topics · 2"). Category and Display are always open on desktop. The others start collapsed unless they have a selection.
+- Long lists show the top 8, then a 44px "Show all {n}" text button. Topics also gets a "Filter topics" search input once it has more than 12 options.
+- Rows are real checkboxes in a `<fieldset>` with a `<legend>`: 44px on desktop, 52px in the sheet. Checkbox 20px, `accent-color: var(--module-primary)`. Count right-aligned, 14px, `--text-secondary`.
+- Desktop sidebar: sections stack; `position: sticky; top: 16px` with its own scroll if taller than the viewport.
+- Mobile sheet: same sections, all collapsible. Sticky footer keeps "Clear all" and "Show {N} projects" (N live from the pending selection). Selection applies only on "Show".
+- Active filter chips (above results, all breakpoints): one removable chip per selected value ("Gemara ×", "Built with: React ×"), 36px visual with a 44px hit area, `aria-label` "Remove filter: Gemara". A trailing "Clear all" text button.
+- The "Filters" button badge shows the total number of active values (the Display toggle is not a filter value and is not counted).
+- Empty results: the `EmptyState` plus a "Clear filters" button. "Clear filters" and "Clear all" clear search and filter values, and leave the Display toggle alone.
+
+#### 16.4 "Show projects with known issues" replaces "Open source only"
+
+- "Open source only" is removed entirely (UI, state, URL param, tests).
+- Display section with one toggle: label "Show projects with known issues", a real `<input type="checkbox" role="switch">`. **Default: off.**
+- While off, every project with `is_buggy === true` is excluded everywhere on the public site: grid, list, featured band, search results, filter counts and the "Explore {N} projects" hero count.
+- While on, buggy projects appear in results, each with a small "Known issues" badge on its card, list row and the detail dialog header: lucide `TriangleAlert` 14px in `--feedback-warning`, 14px `--text-secondary` text, `--surface-subtle` fill, radius 4, 24px tall. The badge is the only place `is_buggy` is shown publicly.
+- URL: `bugs=1` when on, omitted when off.
+- Deep link: `?project=<id>` for a buggy project opens its dialog (with the badge) even while the toggle is off, and does not flip the toggle.
+- `/charts` is unchanged and counts every visible project, buggy or not. Today 12 of 133 visible projects are flagged buggy.
+
+#### 16.5 Tests
+
+- **Unit:** `getFeaturedProjects` (empty when none featured, caps at 3, newest first, excludes buggy when the toggle is off); `CATEGORY_META` covers every `CategoryId`; normalize splits languages out of tags; resource grouping matches `/charts`; `filter.ts` (OR within, AND across, faceted counts exclude the section's own selection, selected zero-count options stay visible, buggy excluded by default and included with `bugs=1`); URL round trip for topic, lang, resource, tech, bugs.
+- **Component (RTL + vitest-axe):** `FeaturedProjects` renders nothing for an empty list; disclosures have the right `aria-expanded` and selection counts; "Show all" expands; chips remove their values; the switch has `role="switch"` and is off by default; the Known issues badge renders only for buggy projects; no axe violations.
+- **Playwright (1440 and 390):** combine topic + language + tech and assert results and URL; mobile sheet pending selection, live "Show N" and discard on close; toggling known issues changes counts; deep link to a buggy project opens its dialog; the featured band shows and hides correctly; the touch-target audit and axe still pass.
+
+#### 16.6 PR notes
+
+- Before/after screenshots (desktop and mobile): the featured band, mixed icon colors, the expanded filter panel, the mobile filter sheet, a buggy project with its badge.
+- Note the category colors are reused from Sefaria's library palette without its section meanings.
+- Ask Sarah which projects to feature (the mockups use Torah MCP, Today's Daf and Talmud Navigator).
+- Don't deploy: Penina QAs and triggers the deploy.

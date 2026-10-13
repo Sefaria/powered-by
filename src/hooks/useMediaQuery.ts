@@ -15,3 +15,5 @@ export function useMediaQuery(query: string): boolean {
 
 export const MEDIA_SM = '(min-width: 640px)'
 export const MEDIA_LG = '(min-width: 1024px)'
+/** The featured band is a 3-column grid from here, a scroll-snap row below. */
+export const MEDIA_BAND_GRID = '(min-width: 900px)'

@@ -1,39 +1,60 @@
+import {
+  BookOpen,
+  ChartColumn,
+  Folder,
+  LayoutGrid,
+  Plug,
+  Sparkles,
+  Users,
+  type LucideIcon,
+} from 'lucide-react'
+
 export type CategoryId = 'learn' | 'ai' | 'community' | 'viz' | 'ext' | 'none'
 
 export interface CategoryMeta {
   id: CategoryId
   /** Label as stored by the Sefaria API (the free-text field may hold several). */
   apiLabel: string
-  /** Short label shown in the UI. */
-  shortLabel: string
 }
 
 /** Display order of the filter rows (after "All projects"). */
 export const CATEGORIES: readonly CategoryMeta[] = [
-  { id: 'learn', apiLabel: 'Learning & Study Tools', shortLabel: 'Learning & Study' },
-  { id: 'ai', apiLabel: 'AI Projects, Apps, & Other Tools', shortLabel: 'AI & Apps' },
-  {
-    id: 'ext',
-    apiLabel: 'Extensions, API Integrations, & GitHub Code',
-    shortLabel: 'Extensions & API',
-  },
-  { id: 'viz', apiLabel: 'Visualization & Data Analysis', shortLabel: 'Visualization & Data' },
-  {
-    id: 'community',
-    apiLabel: 'Community, Interaction, & Social',
-    shortLabel: 'Community & Social',
-  },
-  { id: 'none', apiLabel: '', shortLabel: 'Uncategorized' },
+  { id: 'learn', apiLabel: 'Learning & Study Tools' },
+  { id: 'ai', apiLabel: 'AI Projects, Apps, & Other Tools' },
+  { id: 'ext', apiLabel: 'Extensions, API Integrations, & GitHub Code' },
+  { id: 'viz', apiLabel: 'Visualization & Data Analysis' },
+  { id: 'community', apiLabel: 'Community, Interaction, & Social' },
+  { id: 'none', apiLabel: '' },
 ]
 
-const BY_ID = new Map(CATEGORIES.map((c) => [c.id, c]))
+export interface CategoryDisplay {
+  /** Short label shown in the UI. */
+  label: string
+  /** Lucide used directly: not yet in Sefaria's icon library. */
+  Icon: LucideIcon
+  /** CSS color expression for the tile and filter icon, from tokens.css. */
+  colorVar: string
+}
 
-export function getCategoryMeta(id: CategoryId): CategoryMeta {
-  return BY_ID.get(id) ?? (BY_ID.get('none') as CategoryMeta)
+/** The one place a category's label, icon and color are defined. */
+export const CATEGORY_META: Record<CategoryId, CategoryDisplay> = {
+  learn: { label: 'Learning & Study', Icon: BookOpen, colorVar: 'var(--category-learn)' },
+  ai: { label: 'AI & Apps', Icon: Sparkles, colorVar: 'var(--category-ai)' },
+  community: { label: 'Community & Social', Icon: Users, colorVar: 'var(--category-community)' },
+  viz: { label: 'Visualization & Data', Icon: ChartColumn, colorVar: 'var(--category-viz)' },
+  ext: { label: 'Extensions & API', Icon: Plug, colorVar: 'var(--category-ext)' },
+  none: { label: 'Uncategorized', Icon: Folder, colorVar: 'var(--category-none)' },
+}
+
+/** The "All projects" filter row: not a category, so it is kept out of CATEGORY_META. */
+export const ALL_PROJECTS_META: CategoryDisplay = {
+  label: 'All projects',
+  Icon: LayoutGrid,
+  colorVar: 'var(--category-none)',
 }
 
 export function isCategoryId(value: string): value is CategoryId {
-  return BY_ID.has(value as CategoryId)
+  return Object.hasOwn(CATEGORY_META, value)
 }
 
 /** Older submissions used this wording for the "ext" category. */

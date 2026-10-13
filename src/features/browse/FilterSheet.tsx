@@ -1,12 +1,6 @@
 import { useId, useMemo, useState } from 'react'
 import { X } from 'lucide-react'
-import {
-  categoryCounts,
-  DEFAULT_FILTERS,
-  filterProjects,
-  type CategoryFilter,
-  type Filters,
-} from '../../lib/filter'
+import { CLEARED_VALUES, filterFacets, filterProjects, type Filters } from '../../lib/filter'
 import type { Project } from '../../lib/project'
 import { formatNumber, pluralize } from '../../lib/format'
 import { Button } from '../../components/ui/Button'
@@ -18,7 +12,8 @@ import styles from './FilterSheet.module.css'
 interface FilterSheetProps {
   projects: readonly Project[]
   filters: Filters
-  onApply: (next: Pick<Filters, 'category'>) => void
+  /** Everything the sheet controls: the filters, the display option and (via Clear all) the search. */
+  onApply: (next: Filters) => void
   onClose: () => void
 }
 
@@ -28,13 +23,10 @@ interface FilterSheetProps {
  */
 export function FilterSheet({ projects, filters, onApply, onClose }: FilterSheetProps) {
   const titleId = useId()
-  const [category, setCategory] = useState<CategoryFilter>(filters.category)
+  const [pending, setPending] = useState<Filters>(filters)
 
-  const counts = useMemo(() => categoryCounts(projects, { q: filters.q }), [projects, filters.q])
-  const matching = useMemo(
-    () => filterProjects(projects, { q: filters.q, category }).length,
-    [projects, filters.q, category],
-  )
+  const facets = useMemo(() => filterFacets(projects, pending), [projects, pending])
+  const matching = useMemo(() => filterProjects(projects, pending).length, [projects, pending])
 
   return (
     <Dialog placement="sheet" labelledBy={titleId} onClose={onClose}>
@@ -50,14 +42,16 @@ export function FilterSheet({ projects, filters, onApply, onClose }: FilterSheet
       <div className={styles.body}>
         <FilterPanel
           large
-          name="sheet-category"
-          counts={counts}
-          category={category}
-          onCategoryChange={setCategory}
+          facets={facets}
+          filters={pending}
+          onChange={(patch) => setPending((current) => ({ ...current, ...patch }))}
         />
       </div>
       <div className={styles.footer}>
-        <Button variant="text" onClick={() => setCategory(DEFAULT_FILTERS.category)}>
+        <Button
+          variant="text"
+          onClick={() => setPending((current) => ({ ...current, ...CLEARED_VALUES, q: '' }))}
+        >
           Clear all
         </Button>
         <Button
@@ -65,7 +59,15 @@ export function FilterSheet({ projects, filters, onApply, onClose }: FilterSheet
           size="lg"
           className={styles.show}
           onClick={() => {
-            onApply({ category })
+            onApply({
+              q: pending.q,
+              category: pending.category,
+              topics: pending.topics,
+              languages: pending.languages,
+              resources: pending.resources,
+              tech: pending.tech,
+              showBuggy: pending.showBuggy,
+            })
             onClose()
           }}
         >
