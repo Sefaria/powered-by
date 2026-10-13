@@ -31,9 +31,9 @@ describe('BrowsePage', () => {
   it('fetches once and shows the first page of cards with the live count', async () => {
     const fetchMock = stubApi(fixtureRaw)
     renderPage()
-    expect(await screen.findByRole('button', { name: 'Explore 121 projects' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Explore 122 projects' })).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledTimes(1)
-    expect(screen.getByText('Showing 24 of 121 projects · newest first')).toBeInTheDocument()
+    expect(screen.getByText('Showing 24 of 122 projects · newest first')).toBeInTheDocument()
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(24)
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
   })
@@ -98,14 +98,14 @@ describe('BrowsePage', () => {
   it('has no axe violations (loaded)', async () => {
     stubApi(fixtureRaw)
     const { container } = renderPage()
-    await screen.findByText(/Showing 24 of 121/)
+    await screen.findByText(/Showing 24 of 122/)
     expect(await axe(container)).toHaveNoViolations()
   })
 
   it('has the landmarks and a skip link as the first focusable element', async () => {
     stubApi(fixtureRaw)
     renderPage()
-    await screen.findByText(/Showing 24 of 121/)
+    await screen.findByText(/Showing 24 of 122/)
     expect(screen.getByRole('banner')).toBeInTheDocument()
     expect(screen.getByRole('main')).toBeInTheDocument()
     expect(screen.getByRole('contentinfo')).toBeInTheDocument()

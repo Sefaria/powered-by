@@ -175,9 +175,9 @@ export function normalizeProject(raw: RawProject): Project {
   }
 }
 
-/** Only published projects whose owners consented to display are ever shown. */
+/** Only published projects are ever shown. `consent_to_display` is deliberately not checked: some projects found in the wild are published without explicit consent. */
 export function normalizeProjects(raw: readonly RawProject[]): Project[] {
-  return raw.filter((p) => p.is_published && p.consent_to_display).map(normalizeProject)
+  return raw.filter((p) => p.is_published).map(normalizeProject)
 }
 
 /** Topics for the detail view: the languages stand in only when there are no other topics. */

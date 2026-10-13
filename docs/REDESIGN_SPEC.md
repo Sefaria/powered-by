@@ -237,7 +237,7 @@ interface Project {
 
 Rules:
 
-- **Visibility:** keep only `is_published && consent_to_display`.
+- **Visibility:** keep only `is_published`. `consent_to_display` is deliberately ignored: some projects found in the wild are published without explicit consent.
 - **Categories:** port `getCategories`, including the legacy label map.
 - **Topics:**
   - Trim each tag and dedupe case-insensitively.

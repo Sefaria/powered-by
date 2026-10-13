@@ -19,11 +19,7 @@ const rows = (JSON.parse(fixture) as { projects: RawRow[] }).projects
 /** A visible project that fills every section of the dialog. */
 export const RICH_PROJECT = rows.find(
   (p) =>
-    p.is_published &&
-    p.consent_to_display &&
-    p.project_why &&
-    p.project_source_code &&
-    p.sefaria_tools_used.length > 0,
+    p.is_published && p.project_why && p.project_source_code && p.sefaria_tools_used.length > 0,
 ) as RawRow
 
 /** Every test runs against the snapshot, never the live API, so results are deterministic. */

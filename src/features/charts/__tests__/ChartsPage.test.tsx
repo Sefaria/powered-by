@@ -62,14 +62,14 @@ describe('ChartsPage', () => {
   it('shows the headline figures and footnotes from the fixture', async () => {
     renderPage()
     await screen.findAllByRole('heading', { level: 2 })
-    expect(screen.getByText('133')).toBeInTheDocument()
+    expect(screen.getByText('134')).toBeInTheDocument()
     expect(
       screen.getByText(
-        "Total is the all-time count. 23 projects have no submission date and aren't plotted.",
+        "Total is the all-time count. 24 projects have no submission date and aren't plotted.",
       ),
     ).toBeInTheDocument()
     expect(
-      screen.getByText('Self-reported by 11 of 133 projects; the rest left it blank.'),
+      screen.getByText('Self-reported by 11 of 134 projects; the rest left it blank.'),
     ).toBeInTheDocument()
     expect(screen.getByText(/Tracking began March 2024/)).toBeInTheDocument()
   })
