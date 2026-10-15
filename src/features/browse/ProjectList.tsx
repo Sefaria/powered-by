@@ -6,7 +6,7 @@ import type { Project } from '../../lib/project'
 import { MEDIA_SM, useMediaQuery } from '../../hooks/useMediaQuery'
 import { CategoryTile } from '../../components/icons/CategoryIcon'
 import { ExternalLink } from '../../components/ui/ExternalLink'
-import { KnownIssuesBadge } from '../../components/ui/KnownIssuesBadge'
+import { BugBadge } from '../../components/ui/BugBadge'
 import { VisuallyHidden } from '../../components/ui/VisuallyHidden'
 import { TopicTags } from './TopicTags'
 import styles from './ProjectList.module.css'
@@ -55,18 +55,20 @@ function ProjectTable({ projects, activeCategory, onOpen }: ProjectListProps) {
                   <div className={styles.projectCell}>
                     <CategoryTile id={category} size="sm" />
                     <div className={styles.projectText}>
-                      <button
-                        type="button"
-                        className={styles.name}
-                        data-result-index={index}
-                        onClick={() => onOpen(project)}
-                      >
-                        {project.name}
-                      </button>
+                      <div className={styles.nameLine}>
+                        <button
+                          type="button"
+                          className={styles.name}
+                          data-result-index={index}
+                          onClick={() => onOpen(project)}
+                        >
+                          {project.name}
+                        </button>
+                        {project.isBuggy && <BugBadge size="sm" />}
+                      </div>
                       {project.description && (
                         <p className={styles.oneLine}>{project.description}</p>
                       )}
-                      {project.isBuggy && <KnownIssuesBadge />}
                     </div>
                   </div>
                 </td>
@@ -112,9 +114,11 @@ function ProjectRows({ projects, activeCategory, onOpen }: ProjectListProps) {
             >
               <CategoryTile id={category} size="sm" />
               <span className={styles.rowText}>
-                <span className={styles.rowName}>{project.name}</span>
+                <span className={styles.rowNameLine}>
+                  <span className={styles.rowName}>{project.name}</span>
+                  {project.isBuggy && <BugBadge size="sm" />}
+                </span>
                 <span className={styles.rowSub}>{subline}</span>
-                {project.isBuggy && <KnownIssuesBadge />}
               </span>
               <ChevronRight size={18} strokeWidth={2} aria-hidden="true" />
             </button>

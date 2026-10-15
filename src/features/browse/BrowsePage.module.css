@@ -59,5 +59,8 @@
     align-self: flex-start;
     max-height: calc(100vh - 2 * var(--space-lg));
     overflow-y: auto;
+    /* keep the scrollbar off the counts and the row highlight */
+    scrollbar-gutter: stable;
+    padding-right: var(--space-2xl);
   }
 }

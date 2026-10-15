@@ -62,7 +62,7 @@ describe('FeaturedProjects', () => {
 
   it('marks a buggy project with the Known issues badge', () => {
     render(<FeaturedProjects projects={projects} onOpen={() => {}} />)
-    expect(screen.getAllByText('Known issues')).toHaveLength(1)
+    expect(screen.getAllByRole('img', { name: 'Known issues' })).toHaveLength(1)
   })
 
   it('makes the sideways scroller a focusable, named region below 900px', () => {

@@ -1,7 +1,8 @@
 import type { CSSProperties } from 'react'
 import { CATEGORY_META } from '../../lib/categories'
 import type { Project } from '../../lib/project'
-import { KnownIssuesBadge } from '../../components/ui/KnownIssuesBadge'
+import { BugBadge } from '../../components/ui/BugBadge'
+import { QuickOpenLink } from '../../components/ui/QuickOpenLink'
 import styles from './FeaturedCard.module.css'
 
 interface FeaturedCardProps {
@@ -27,7 +28,8 @@ export function FeaturedCard({ project, onOpen }: FeaturedCardProps) {
       <div className={styles.body}>
         <div className={styles.meta}>
           <span className={styles.category}>{label}</span>
-          {project.isBuggy && <KnownIssuesBadge />}
+          {project.isBuggy && <BugBadge />}
+          <QuickOpenLink project={project} />
         </div>
         <h3 className={styles.heading}>
           <button type="button" className={styles.title} onClick={() => onOpen(project)}>

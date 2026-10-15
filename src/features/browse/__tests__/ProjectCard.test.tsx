@@ -51,9 +51,9 @@ describe('ProjectCard', () => {
     expect(within(card).getByText('Study aid for the daf.')).toBeInTheDocument()
     const tags = within(card).getByTestId('topic-tags')
     expect([...tags.children].map((t) => t.textContent)).toEqual(['Gemara', 'AI', 'Tanakh'])
-    // nothing else: only one interactive element, no links
+    // nothing else: one open-dialog button and the quick-open link
     expect(within(card).getAllByRole('button')).toHaveLength(1)
-    expect(within(card).queryByRole('link')).toBeNull()
+    expect(within(card).getAllByRole('link')).toHaveLength(1)
     expect(card.textContent).not.toMatch(/github|React|Texts|\/api|2026|live|vibe/i)
   })
 
@@ -81,10 +81,27 @@ describe('ProjectCard', () => {
 
   it('shows the Known issues badge only for a project with known issues', () => {
     const { unmount } = renderCard()
-    expect(screen.queryByText('Known issues')).toBeNull()
+    expect(screen.queryByRole('img', { name: 'Known issues' })).toBeNull()
     unmount()
     renderCard({ project: makeProject({ is_buggy: true }) })
-    expect(screen.getByText('Known issues')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Known issues' })).toHaveAttribute('title', 'Known issues')
+  })
+
+  it('has a quick-open link that does not open the dialog', async () => {
+    const { onOpen } = renderCard()
+    const link = screen.getByRole('link', { name: 'Visit Talmud Helper (opens in a new tab)' })
+    expect(link).toHaveAttribute('href', project.url)
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noreferrer')
+    expect(link).toHaveAttribute('title', 'Open project')
+    link.addEventListener('click', (e) => e.preventDefault())
+    await userEvent.click(link)
+    expect(onOpen).not.toHaveBeenCalled()
+  })
+
+  it('omits the quick-open link when the project has no URL', () => {
+    renderCard({ project: { ...project, url: null } })
+    expect(screen.queryByRole('link')).toBeNull()
   })
 
   it('colors the icon tile from the category token, not a hard-coded purple', () => {
