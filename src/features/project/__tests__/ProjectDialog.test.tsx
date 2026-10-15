@@ -11,6 +11,7 @@ describe('ProjectDialog', () => {
     unmount()
     render(<ProjectDialog project={makeProject({ is_buggy: true })} onClose={() => {}} />)
     expect(screen.getByText('Known issues')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Known issues' })).toBeInTheDocument()
   })
 
   it('keeps the category chips as purple "category" tags (no per-category color)', () => {

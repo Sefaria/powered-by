@@ -135,7 +135,7 @@ describe('BrowsePage', () => {
       expect(
         screen.getByRole('switch', { name: 'Show projects with known issues' }),
       ).not.toBeChecked()
-      expect(screen.queryByText('Known issues')).toBeNull()
+      expect(screen.queryByRole('img', { name: 'Known issues' })).toBeNull()
     })
 
     it('shows them with a badge when the switch is turned on, and hides them again when off', async () => {
@@ -146,7 +146,7 @@ describe('BrowsePage', () => {
       expect(await screen.findByText('Showing 3 of 3 projects · newest first')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Explore 3 projects' })).toBeInTheDocument()
       expect(titles()).toContain('Buggy One')
-      expect(screen.getAllByText('Known issues')).toHaveLength(1)
+      expect(screen.getAllByRole('img', { name: 'Known issues' })).toHaveLength(1)
       await userEvent.click(toggle)
       expect(await screen.findByText('Showing 2 of 2 projects · newest first')).toBeInTheDocument()
     })

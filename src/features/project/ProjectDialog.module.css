@@ -45,3 +45,17 @@
     padding: var(--space-3xl);
   }
 }
+
+.issuesPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: 32px;
+  padding: 0 var(--space-md) 0 var(--space-xs);
+  border-radius: var(--radius-lg);
+  background: var(--surface-subtle);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 18px;
+}

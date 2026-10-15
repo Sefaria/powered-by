@@ -111,7 +111,7 @@ test.describe('featured band', () => {
     await page.goto('/?bugs=1')
     await waitForProjects(page)
     await expect(band(page).getByRole('button', { name: 'Daf Quiz' })).toBeVisible()
-    await expect(band(page).getByText('Known issues', { exact: true })).toBeVisible()
+    await expect(band(page).getByRole('img', { name: 'Known issues' })).toBeVisible()
   })
 
   test('the band ignores search and filters', async ({ page }) => {

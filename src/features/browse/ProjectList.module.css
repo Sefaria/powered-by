@@ -52,6 +52,14 @@
   min-width: 0;
 }
 
+.nameLine,
+.rowNameLine {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
 .name {
   display: inline-flex;
   align-items: center;

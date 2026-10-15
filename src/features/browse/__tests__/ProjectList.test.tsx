@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { axe } from 'vitest-axe'
 import { describe, expect, it } from 'vitest'
 import { ProjectList } from '../ProjectList'
@@ -13,8 +13,8 @@ describe('ProjectList', () => {
   it('shows the Known issues badge only on the buggy row (narrow rows)', () => {
     render(<ProjectList projects={projects} activeCategory="all" onOpen={() => {}} />)
     const rows = screen.getAllByRole('listitem')
-    expect(rows[0]).not.toHaveTextContent('Known issues')
-    expect(rows[1]).toHaveTextContent('Known issues')
+    expect(within(rows[0]!).queryByRole('img', { name: 'Known issues' })).toBeNull()
+    expect(within(rows[1]!).getByRole('img', { name: 'Known issues' })).toBeInTheDocument()
   })
 
   it('has no axe violations', async () => {

@@ -1,4 +1,5 @@
 import { useId, type CSSProperties } from 'react'
+import { BugBadge } from '../../components/ui/BugBadge'
 import { ALL_PROJECTS_META, CATEGORIES, CATEGORY_META } from '../../lib/categories'
 import type { CategoryFilter, FacetKey, FilterFacets, Filters } from '../../lib/filter'
 import { CategoryIcon } from '../../components/icons/CategoryIcon'
@@ -108,6 +109,7 @@ export function FilterPanel({ facets, filters, onChange, large }: FilterPanelPro
             <legend className={legendClassName}>Display</legend>
             <Switch
               label="Show projects with known issues"
+              adornment={<BugBadge size="sm" />}
               checked={filters.showBuggy}
               large={large}
               onChange={(showBuggy) => onChange({ showBuggy })}

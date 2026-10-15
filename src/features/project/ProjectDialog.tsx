@@ -6,7 +6,7 @@ import { MEDIA_SM, useMediaQuery } from '../../hooks/useMediaQuery'
 import { CategoryIcon } from '../../components/icons/CategoryIcon'
 import { Dialog } from '../../components/ui/Dialog'
 import { IconButton } from '../../components/ui/IconButton'
-import { KnownIssuesBadge } from '../../components/ui/KnownIssuesBadge'
+import { BugBadge } from '../../components/ui/BugBadge'
 import { Tag } from '../../components/ui/Tag'
 import { PrimaryCta, ProjectDetail } from './ProjectDetail'
 import styles from './ProjectDialog.module.css'
@@ -28,7 +28,6 @@ export function ProjectDialog({ project, onClose }: ProjectDialogProps) {
     <Dialog labelledBy={titleId} onClose={onClose}>
       <div className={styles.header}>
         <div className={styles.headerMain}>
-          {project.isBuggy && <KnownIssuesBadge />}
           <ul className={styles.chips}>
             {project.categories.map((id) => (
               <li key={id}>
@@ -38,6 +37,12 @@ export function ProjectDialog({ project, onClose }: ProjectDialogProps) {
               </li>
             ))}
           </ul>
+          {project.isBuggy && (
+            <span className={styles.issuesPill}>
+              <BugBadge size="sm" />
+              Known issues
+            </span>
+          )}
         </div>
         <IconButton filled aria-label="Close" onClick={onClose}>
           <X size={24} strokeWidth={2} aria-hidden="true" />

@@ -29,6 +29,7 @@
 }
 
 .categoryLabel {
+  flex: 1;
   color: var(--text-secondary);
   font-size: 14px;
   line-height: 18px;

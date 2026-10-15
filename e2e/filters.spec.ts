@@ -167,7 +167,7 @@ test.describe('filters', () => {
     // a buggy project is now findable, with its badge; off again, it's gone
     await page.goto('/?bugs=1&q=Daf+Quiz')
     await expect(page.getByRole('heading', { level: 3, name: 'Daf Quiz' })).toBeVisible()
-    await expect(page.getByText('Known issues', { exact: true })).toBeVisible()
+    await expect(page.getByRole('img', { name: 'Known issues' })).toBeVisible()
     await page.goto('/?q=Daf+Quiz')
     await expect(page.getByText('No projects match that search.')).toBeVisible()
   })
