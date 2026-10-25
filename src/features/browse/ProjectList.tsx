@@ -1,12 +1,13 @@
-import { ChevronRight, ExternalLink as ExternalLinkIcon } from 'lucide-react'
+import { Link } from 'react-router'
+import { ChevronRight } from 'lucide-react'
 import { CATEGORY_META, type CategoryId } from '../../lib/categories'
 import type { CategoryFilter } from '../../lib/filter'
 import { formatDate } from '../../lib/format'
 import type { Project } from '../../lib/project'
+import { FROM_BROWSE, projectPath } from '../../lib/slug'
 import { MEDIA_SM, useMediaQuery } from '../../hooks/useMediaQuery'
 import { CategoryTile } from '../../components/icons/CategoryIcon'
-import { ExternalLink } from '../../components/ui/ExternalLink'
-import { BugBadge } from '../../components/ui/BugBadge'
+import { ProjectAction } from '../../components/ui/ProjectAction'
 import { VisuallyHidden } from '../../components/ui/VisuallyHidden'
 import { TopicTags } from './TopicTags'
 import styles from './ProjectList.module.css'
@@ -14,7 +15,6 @@ import styles from './ProjectList.module.css'
 interface ProjectListProps {
   projects: readonly Project[]
   activeCategory: CategoryFilter
-  onOpen: (project: Project) => void
 }
 
 function displayCategory(project: Project, active: CategoryFilter): CategoryId {
@@ -27,7 +27,7 @@ export function ProjectList(props: ProjectListProps) {
   return wide ? <ProjectTable {...props} /> : <ProjectRows {...props} />
 }
 
-function ProjectTable({ projects, activeCategory, onOpen }: ProjectListProps) {
+function ProjectTable({ projects, activeCategory }: ProjectListProps) {
   return (
     // A scrollable region must be keyboard-focusable so the clipped columns are reachable.
     // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
@@ -56,15 +56,14 @@ function ProjectTable({ projects, activeCategory, onOpen }: ProjectListProps) {
                     <CategoryTile id={category} size="sm" />
                     <div className={styles.projectText}>
                       <div className={styles.nameLine}>
-                        <button
-                          type="button"
+                        <Link
+                          to={projectPath(project)}
+                          state={FROM_BROWSE}
                           className={styles.name}
                           data-result-index={index}
-                          onClick={() => onOpen(project)}
                         >
                           {project.name}
-                        </button>
-                        {project.isBuggy && <BugBadge size="sm" />}
+                        </Link>
                       </div>
                       {project.description && (
                         <p className={styles.oneLine}>{project.description}</p>
@@ -80,12 +79,7 @@ function ProjectTable({ projects, activeCategory, onOpen }: ProjectListProps) {
                   {project.submittedAt ? formatDate(project.submittedAt) : ''}
                 </td>
                 <td>
-                  {project.url && (
-                    <ExternalLink href={project.url} className={styles.visit}>
-                      <ExternalLinkIcon size={18} strokeWidth={2} aria-hidden="true" />
-                      <VisuallyHidden>Visit {project.name}</VisuallyHidden>
-                    </ExternalLink>
-                  )}
+                  <ProjectAction project={project} surface="list" />
                 </td>
               </tr>
             )
@@ -96,7 +90,7 @@ function ProjectTable({ projects, activeCategory, onOpen }: ProjectListProps) {
   )
 }
 
-function ProjectRows({ projects, activeCategory, onOpen }: ProjectListProps) {
+function ProjectRows({ projects, activeCategory }: ProjectListProps) {
   return (
     <ul className={styles.rows}>
       {projects.map((project, index) => {
@@ -106,22 +100,21 @@ function ProjectRows({ projects, activeCategory, onOpen }: ProjectListProps) {
           .join(' · ')
         return (
           <li key={project.id}>
-            <button
-              type="button"
+            <Link
+              to={projectPath(project)}
+              state={FROM_BROWSE}
               className={styles.row}
               data-result-index={index}
-              onClick={() => onOpen(project)}
             >
               <CategoryTile id={category} size="sm" />
               <span className={styles.rowText}>
                 <span className={styles.rowNameLine}>
                   <span className={styles.rowName}>{project.name}</span>
-                  {project.isBuggy && <BugBadge size="sm" />}
                 </span>
                 <span className={styles.rowSub}>{subline}</span>
               </span>
               <ChevronRight size={18} strokeWidth={2} aria-hidden="true" />
-            </button>
+            </Link>
           </li>
         )
       })}

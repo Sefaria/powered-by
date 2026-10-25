@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router'
 import { axe } from 'vitest-axe'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ProjectCard } from '../ProjectCard'
@@ -22,17 +22,11 @@ const project = makeProject({
 })
 
 function renderCard(overrides: Partial<Parameters<typeof ProjectCard>[0]> = {}) {
-  const onOpen = vi.fn()
-  const utils = render(
-    <ProjectCard
-      project={project}
-      activeCategory="all"
-      resultIndex={0}
-      onOpen={onOpen}
-      {...overrides}
-    />,
+  return render(
+    <MemoryRouter>
+      <ProjectCard project={project} activeCategory="all" resultIndex={0} {...overrides} />
+    </MemoryRouter>,
   )
-  return { onOpen, ...utils }
 }
 
 const topicTagsCss = readFileSync(
@@ -51,9 +45,9 @@ describe('ProjectCard', () => {
     expect(within(card).getByText('Study aid for the daf.')).toBeInTheDocument()
     const tags = within(card).getByTestId('topic-tags')
     expect([...tags.children].map((t) => t.textContent)).toEqual(['Gemara', 'AI', 'Tanakh'])
-    // nothing else: one open-dialog button and the quick-open link
-    expect(within(card).getAllByRole('button')).toHaveLength(1)
-    expect(within(card).getAllByRole('link')).toHaveLength(1)
+    // nothing else: the title link to the project page and the visit link
+    expect(within(card).queryAllByRole('button')).toHaveLength(0)
+    expect(within(card).getAllByRole('link')).toHaveLength(2)
     expect(card.textContent).not.toMatch(/github|React|Texts|\/api|2026|live|vibe/i)
   })
 
@@ -73,35 +67,40 @@ describe('ProjectCard', () => {
     expect(screen.getByText('Learning & Study')).toBeInTheDocument()
   })
 
-  it('opens when the title is activated', async () => {
-    const { onOpen } = renderCard()
-    await userEvent.click(screen.getByRole('button', { name: 'Talmud Helper' }))
-    expect(onOpen).toHaveBeenCalledWith(project)
+  it('links the title to the project page', () => {
+    renderCard()
+    expect(screen.getByRole('link', { name: 'Talmud Helper' })).toHaveAttribute(
+      'href',
+      `/projects/${project.id}-talmud-helper`,
+    )
   })
 
-  it('shows the Known issues badge only for a project with known issues', () => {
-    const { unmount } = renderCard()
+  it('has no bug icon, even for a project with known issues', () => {
+    const { container } = renderCard({ project: makeProject({ is_buggy: true }) })
     expect(screen.queryByRole('img', { name: 'Known issues' })).toBeNull()
-    unmount()
-    renderCard({ project: makeProject({ is_buggy: true }) })
-    expect(screen.getByRole('img', { name: 'Known issues' })).toHaveAttribute('title', 'Known issues')
+    expect(container.querySelector('.lucide-bug')).toBeNull()
   })
 
-  it('has a quick-open link that does not open the dialog', async () => {
-    const { onOpen } = renderCard()
+  it('has an external visit link for a healthy project', () => {
+    renderCard()
     const link = screen.getByRole('link', { name: 'Visit Talmud Helper (opens in a new tab)' })
     expect(link).toHaveAttribute('href', project.url)
     expect(link).toHaveAttribute('target', '_blank')
-    expect(link).toHaveAttribute('rel', 'noreferrer')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
     expect(link).toHaveAttribute('title', 'Open project')
-    link.addEventListener('click', (e) => e.preventDefault())
-    await userEvent.click(link)
-    expect(onOpen).not.toHaveBeenCalled()
   })
 
-  it('omits the quick-open link when the project has no URL', () => {
+  it('has an internal arrow to the project page for a known-issues project', () => {
+    renderCard({ project: makeProject({ id: 7, project_name: 'Old App', is_buggy: true }) })
+    const link = screen.getByRole('link', { name: 'About Old App' })
+    expect(link).toHaveAttribute('href', '/projects/7-old-app')
+    expect(link).not.toHaveAttribute('target')
+    expect(screen.queryByRole('link', { name: /Visit Old App/ })).toBeNull()
+  })
+
+  it('omits the visit link when a healthy project has no URL', () => {
     renderCard({ project: { ...project, url: null } })
-    expect(screen.queryByRole('link')).toBeNull()
+    expect(screen.getAllByRole('link')).toHaveLength(1)
   })
 
   it('colors the icon tile from the category token, not a hard-coded purple', () => {

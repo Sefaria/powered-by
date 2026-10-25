@@ -1,7 +1,7 @@
 import { expect, expectNoAxeViolations, RICH_PROJECT, test, waitForProjects } from './support'
 
 test.describe('browse', () => {
-  test('search, filter, switch to list, open a project, Back closes the dialog', async ({
+  test('search, filter, switch to list, open a project, Back restores them', async ({
     page,
     isMobile,
   }) => {
@@ -33,48 +33,32 @@ test.describe('browse', () => {
     const first = page.locator('[data-result-index="0"]')
     const name = (await first.textContent())?.trim() ?? ''
     await first.click()
-    const dialog = page.getByRole('dialog')
-    await expect(dialog).toBeVisible()
-    await expect(page).toHaveURL(/project=\d+/)
-    // (on mobile the row also contains its subline, so compare the other way round)
-    const title = (await dialog.getByRole('heading', { level: 2 }).textContent()) ?? ''
+    await expect(page).toHaveURL(/\/projects\/\d+-/)
+    const title = (await page.getByRole('heading', { level: 1 }).textContent()) ?? ''
     expect(title.length).toBeGreaterThan(0)
+    // (on mobile the row also contains its subline, so compare the other way round)
     expect(name).toContain(title)
 
     await page.goBack()
-    await expect(dialog).toBeHidden()
-    await expect(page).not.toHaveURL(/project=/)
-    // filters survive closing the dialog, and focus returns to the opener
+    // search, filter and view survive, and the opener has its place back
+    await expect(page).toHaveURL(/q=torah/)
     await expect(page).toHaveURL(/category=ai/)
-    await expect(first).toBeFocused()
+    await expect(page).toHaveURL(/view=list/)
+    await expect(first).toBeVisible()
   })
 
-  test('deep link opens the dialog and Escape closes it', async ({ page }) => {
+  test('an old ?project=<id> link goes to the project page', async ({ page }) => {
     await page.goto(`/?project=${RICH_PROJECT.id}`)
-    const dialog = page.getByRole('dialog', { name: RICH_PROJECT.project_name })
-    await expect(dialog).toBeVisible()
-    await expect(dialog.getByRole('link', { name: /^Open / })).toBeVisible()
-    await page.keyboard.press('Escape')
-    await expect(dialog).toBeHidden()
-    await expect(page).not.toHaveURL(/project=/)
+    await expect(page).toHaveURL(new RegExp(`/projects/${RICH_PROJECT.id}-`))
+    await expect(
+      page.getByRole('heading', { level: 1, name: RICH_PROJECT.project_name }),
+    ).toBeVisible()
   })
 
-  test('closes the dialog from the close button and the backdrop', async ({ page, isMobile }) => {
-    await page.goto(`/?project=${RICH_PROJECT.id}`)
-    await page.getByRole('button', { name: 'Close' }).click()
-    await expect(page.getByRole('dialog')).toBeHidden()
-    test.skip(isMobile, 'The mobile dialog is full screen: there is no backdrop')
-    await page.goto(`/?project=${RICH_PROJECT.id}`)
-    await expect(page.getByRole('dialog')).toBeVisible()
-    await page.mouse.click(2, 2)
-    await expect(page.getByRole('dialog')).toBeHidden()
-  })
-
-  test('an unknown project id is silently dropped', async ({ page }) => {
+  test('an unknown ?project= id is ignored', async ({ page }) => {
     await page.goto('/?project=999999')
     await waitForProjects(page)
-    await expect(page).not.toHaveURL(/project=/)
-    await expect(page.getByRole('dialog')).toBeHidden()
+    await expect(page).toHaveURL(/\/\?project=999999$/)
   })
 
   test('Show more appends 24 and moves focus to the first new card', async ({ page }) => {
@@ -120,7 +104,7 @@ test.describe('browse', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible()
   })
 
-  test('accessibility: no axe violations on browse, dialog and filter sheet', async ({
+  test('accessibility: no axe violations on browse, the project page and filter sheet', async ({
     page,
     isMobile,
   }) => {
@@ -132,8 +116,8 @@ test.describe('browse', () => {
     await waitForProjects(page)
     await expectNoAxeViolations(page)
 
-    await page.goto(`/?project=${RICH_PROJECT.id}`)
-    await expect(page.getByRole('dialog')).toBeVisible()
+    await page.goto(`/projects/${RICH_PROJECT.id}`)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     await expectNoAxeViolations(page)
 
     if (isMobile) {

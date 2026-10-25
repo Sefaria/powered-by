@@ -1,4 +1,6 @@
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { useLocation, useNavigate, useSearchParams } from 'react-router'
+import { searchResultsBucket, track } from '../../lib/analytics'
 import { getFeaturedProjects } from '../../lib/featured'
 import {
   activeFilterCount,
@@ -6,11 +8,13 @@ import {
   filterFacets,
   filterProjects,
   isVisible,
+  FACET_KEYS,
   type Filters,
 } from '../../lib/filter'
 import { formatNumber } from '../../lib/format'
 import { SORT_LABELS, sortProjects } from '../../lib/sort'
-import type { Project } from '../../lib/project'
+import { projectPath } from '../../lib/slug'
+import type { QueryState } from '../../lib/url'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { useProjectQueryState } from '../../hooks/useProjectQueryState'
 import { useProjects } from '../../hooks/useProjects'
@@ -20,7 +24,6 @@ import { Container } from '../../components/layout/Container'
 import { Button } from '../../components/ui/Button'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { FeaturedProjects } from '../featured/FeaturedProjects'
-import { ProjectDialog } from '../project/ProjectDialog'
 import { ActiveFilters } from './ActiveFilters'
 import { FilterPanel } from './FilterPanel'
 import { FilterSheet } from './FilterSheet'
@@ -36,9 +39,23 @@ const RESULTS_ID = 'results'
 
 export function BrowsePage() {
   const data = useProjects()
-  const { state, update, openProject, closeProject, dropProject } = useProjectQueryState()
+  const { state, update: updateState } = useProjectQueryState()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
   const [sheetOpen, setSheetOpen] = useState(false)
   const headingRef = useRef<HTMLHeadingElement>(null)
+
+  const update = (patch: Partial<QueryState>) => {
+    for (const key of [...FACET_KEYS, 'category', 'showBuggy'] as const) {
+      if (key in patch && JSON.stringify(patch[key]) !== JSON.stringify(state[key])) {
+        track('filter_change', { facet: key })
+      }
+    }
+    if (patch.sort && patch.sort !== state.sort) track('sort_change', { sort: patch.sort })
+    if (patch.view && patch.view !== state.view) track('view_change', { view: patch.view })
+    updateState(patch)
+  }
 
   // Search input: instant locally, debounced into the URL (and so into the results).
   const [input, setInput] = useState(state.q)
@@ -62,10 +79,7 @@ export function BrowsePage() {
   // Projects with known issues are out of everything below unless the display option is on.
   const shown = useMemo(() => all?.filter((p) => isVisible(p, showBuggy)) ?? null, [all, showBuggy])
   const facets = useMemo(() => (all ? filterFacets(all, filters) : null), [all, filters])
-  const featured = useMemo(
-    () => (all ? getFeaturedProjects(all, { showBuggy }) : []),
-    [all, showBuggy],
-  )
+  const featured = useMemo(() => (all ? getFeaturedProjects(all) : []), [all])
   const results = useMemo(
     () => (all ? sortProjects(filterProjects(all, filters), state.sort) : []),
     [all, filters, state.sort],
@@ -73,13 +87,47 @@ export function BrowsePage() {
 
   // Page size resets whenever the filters, search or sort change.
   const signature = JSON.stringify([filters, state.sort])
-  const [limit, setLimit] = useState(PAGE_SIZE)
+  // "Show more" depth is kept on this history entry, so Back from a project page lands on the
+  // same list; it only counts while the filters, search and sort are the ones it was saved for.
+  const saved = (location.state as { browseLimit?: { signature: string; limit: number } } | null)
+    ?.browseLimit
+  const savedLimit = saved?.signature === signature ? saved.limit : PAGE_SIZE
+  const [limit, setLimit] = useState(savedLimit)
   const [seenSignature, setSeenSignature] = useState(signature)
   if (seenSignature !== signature) {
     setSeenSignature(signature)
     setLimit(PAGE_SIZE)
   }
   const visible = results.slice(0, limit)
+
+  const saveLimit = useEffectEvent(() => {
+    if (limit === savedLimit) return
+    navigate(
+      { pathname: location.pathname, search: location.search, hash: location.hash },
+      {
+        replace: true,
+        preventScrollReset: true,
+        state: { ...(location.state as object | null), browseLimit: { signature, limit } },
+      },
+    )
+  })
+  useEffect(() => {
+    saveLimit()
+  }, [limit, signature, savedLimit]) // savedLimit changes when this entry's state is replaced
+
+  // One search event 1s after typing stops: whether there was a query and how many results, never the text.
+  const sendSearch = useEffectEvent(() => {
+    if (input.trim()) {
+      track('search', { has_query: true, results: searchResultsBucket(results.length) })
+    }
+  })
+  // Not before the data arrives, or a slow load would be recorded as "0 results".
+  const loaded = all !== null
+  useEffect(() => {
+    if (!input.trim() || !loaded) return
+    const timer = window.setTimeout(sendSearch, 1000)
+    return () => window.clearTimeout(timer)
+  }, [input, loaded])
 
   // After "Show more", move focus to the first newly shown item.
   const focusIndex = useRef<number | null>(null)
@@ -89,16 +137,12 @@ export function BrowsePage() {
     focusIndex.current = null
   }, [limit])
 
-  // Looked up in every project, not just the shown ones: a deep link to a project with
-  // known issues still opens its dialog while the display option is off.
-  const selected =
-    all && state.project !== null ? (all.find((p) => p.id === state.project) ?? null) : null
-  const unknownProject = all !== null && state.project !== null && selected === null
+  // Links from before projects had pages: /?project=141 is now /projects/141-name.
+  const legacyId = Number(searchParams.get('project'))
+  const legacyProject = all && legacyId > 0 ? all.find((p) => p.id === legacyId) : undefined
   useEffect(() => {
-    if (unknownProject) dropProject()
-  }, [unknownProject, dropProject])
-
-  const open = (project: Project) => openProject(project.id)
+    if (legacyProject) navigate(projectPath(legacyProject), { replace: true })
+  }, [legacyProject, navigate])
 
   const clearAll = () => {
     setInput('')
@@ -124,7 +168,7 @@ export function BrowsePage() {
   return (
     <PageLayout skipTo={{ id: RESULTS_ID, label: 'Skip to projects' }}>
       <Hero projectCount={shown?.length ?? null} onExplore={explore} />
-      <FeaturedProjects projects={featured} onOpen={open} />
+      <FeaturedProjects projects={featured} />
       <Container className={styles.layout}>
         <aside className={styles.filters} aria-label="Filters">
           {facets && <FilterPanel facets={facets} filters={filters} onChange={update} />}
@@ -166,9 +210,9 @@ export function BrowsePage() {
           {data.status === 'success' && results.length > 0 && (
             <>
               {state.view === 'grid' ? (
-                <ProjectGrid projects={visible} activeCategory={state.category} onOpen={open} />
+                <ProjectGrid projects={visible} activeCategory={state.category} />
               ) : (
-                <ProjectList projects={visible} activeCategory={state.category} onOpen={open} />
+                <ProjectList projects={visible} activeCategory={state.category} />
               )}
               {visible.length < results.length && (
                 <ShowMore
@@ -194,7 +238,6 @@ export function BrowsePage() {
           onClose={() => setSheetOpen(false)}
         />
       )}
-      {selected && <ProjectDialog project={selected} onClose={closeProject} />}
     </PageLayout>
   )
 }

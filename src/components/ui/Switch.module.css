@@ -73,9 +73,3 @@
     transition: none;
   }
 }
-
-.adornment {
-  display: inline-flex;
-  margin-left: var(--space-sm);
-  vertical-align: middle;
-}

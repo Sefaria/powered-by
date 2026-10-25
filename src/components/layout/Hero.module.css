@@ -27,20 +27,10 @@
 }
 
 .eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
   font-size: 14px;
   font-weight: 600;
   line-height: 18px;
   letter-spacing: 0;
-}
-
-.eyebrow::before {
-  content: '';
-  width: 24px;
-  height: 2px;
-  background: var(--text-inverse);
 }
 
 .title {
@@ -55,10 +45,6 @@
   margin-top: var(--space-lg);
   font-size: 17px;
   line-height: 1.6;
-}
-
-.desktopOnly {
-  display: none;
 }
 
 .actions {
@@ -114,14 +100,6 @@
 
   .lead {
     font-size: 18px;
-  }
-
-  .desktopOnly {
-    display: inline;
-  }
-
-  .mobileOnly {
-    display: none;
   }
 
   .actions {

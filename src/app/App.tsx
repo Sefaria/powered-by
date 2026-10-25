@@ -1,10 +1,9 @@
-import { BrowserRouter } from 'react-router'
-import { AppRoutes } from './routes'
+import { createBrowserRouter, RouterProvider } from 'react-router'
+import { routes } from './routes'
+
+// A data router, which <ScrollRestoration> needs.
+const router = createBrowserRouter(routes)
 
 export function App() {
-  return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
-  )
+  return <RouterProvider router={router} />
 }

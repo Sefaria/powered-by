@@ -7,8 +7,6 @@ export type ViewMode = 'grid' | 'list'
 export interface QueryState extends Filters {
   sort: SortOption
   view: ViewMode
-  /** Id of the project whose dialog is open. */
-  project: number | null
 }
 
 export const DEFAULT_VIEW: ViewMode = 'grid'
@@ -34,7 +32,6 @@ export function parseQueryState(
   const category = params.get('category') ?? ''
   const sort = params.get('sort')
   const view = params.get('view')
-  const project = Number(params.get('project'))
   return {
     q: params.get('q') ?? DEFAULT_FILTERS.q,
     category: isCategoryId(category) ? category : 'all',
@@ -43,9 +40,9 @@ export function parseQueryState(
     resources: parseList(params.get(FACET_PARAMS.resources)),
     tech: parseList(params.get(FACET_PARAMS.tech)),
     showBuggy: params.get('bugs') === '1',
+    // anything else, including the retired ?sort=users and ?sort=popular, is the default
     sort: sort === 'az' ? 'az' : DEFAULT_SORT,
     view: view === 'grid' || view === 'list' ? view : defaultView,
-    project: Number.isInteger(project) && project > 0 ? project : null,
   }
 }
 
@@ -63,6 +60,5 @@ export function serializeQueryState(
   if (state.showBuggy) params.set('bugs', '1')
   if (state.sort !== DEFAULT_SORT) params.set('sort', state.sort)
   if (state.view !== defaultView) params.set('view', state.view)
-  if (state.project !== null) params.set('project', String(state.project))
   return params
 }

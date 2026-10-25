@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { sortProjects } from '../sort'
+import { parseQueryState } from '../url'
+import { SORT_LABELS, sortProjects } from '../sort'
 import { makeProject } from '../../test/factories'
 
 const a = makeProject({ id: 1, project_name: 'Alpha', submission_date: '2025-01-01T00:00:00Z' })
@@ -31,5 +32,13 @@ describe('sortProjects', () => {
     const copy = [...input]
     sortProjects(input, 'az')
     expect(input).toEqual(copy)
+  })
+
+  it('offers only Newest and A–Z', () => {
+    expect(Object.keys(SORT_LABELS)).toEqual(['new', 'az'])
+  })
+
+  it.each(['users', 'popular', 'bogus'])('falls back to newest for ?sort=%s', (sort) => {
+    expect(parseQueryState(`sort=${sort}`).sort).toBe('new')
   })
 })

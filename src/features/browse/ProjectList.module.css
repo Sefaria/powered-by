@@ -70,6 +70,7 @@
   font-size: 16px;
   font-weight: 600;
   text-align: left;
+  text-decoration: none;
 }
 
 .name:hover {
@@ -91,20 +92,6 @@
   font-size: 14px;
 }
 
-.visit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--target-min);
-  height: var(--target-min);
-  border-radius: var(--radius-md);
-  color: var(--icon-default);
-}
-
-.visit:hover {
-  background: var(--surface-hover);
-}
-
 /* rows (< 640px) */
 .rows {
   border-top: 1px solid var(--border-default);
@@ -122,6 +109,7 @@
   min-height: 72px;
   padding: var(--space-sm) 0;
   color: var(--text-primary);
+  text-decoration: none;
 }
 
 .row:hover {

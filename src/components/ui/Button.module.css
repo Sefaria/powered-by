@@ -63,7 +63,7 @@
   color: var(--text-inverse);
 }
 .accent:hover {
-  background: var(--module-primary-hover);
+  background: var(--brand-devportal-hover);
 }
 
 .accent-outline {

@@ -7,11 +7,10 @@ import styles from './FeaturedProjects.module.css'
 interface FeaturedProjectsProps {
   /** From getFeaturedProjects: already filtered, sorted and capped. */
   projects: readonly Project[]
-  onOpen: (project: Project) => void
 }
 
 /** The band between the hero and the browse area. Renders nothing when no project is featured. */
-export function FeaturedProjects({ projects, onOpen }: FeaturedProjectsProps) {
+export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   const grid = useMediaQuery(MEDIA_BAND_GRID)
   if (projects.length === 0) return null
 
@@ -31,9 +30,9 @@ export function FeaturedProjects({ projects, onOpen }: FeaturedProjectsProps) {
         </div>
         <div className={styles.scroller} {...scrollerProps}>
           <ul className={styles.cards}>
-            {projects.map((project) => (
+            {projects.map((project, index) => (
               <li key={project.id} className={styles.item}>
-                <FeaturedCard project={project} onOpen={onOpen} />
+                <FeaturedCard project={project} position={index + 1} />
               </li>
             ))}
           </ul>

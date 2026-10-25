@@ -1,9 +1,11 @@
-import { render, screen, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render as rtlRender, screen, within } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
 import { axe } from 'vitest-axe'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { FeaturedProjects } from '../FeaturedProjects'
 import { makeProject } from '../../../test/factories'
+
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: MemoryRouter })
 
 const projects = [
   makeProject({
@@ -12,6 +14,7 @@ const projects = [
     project_desc: 'Ask your AI about Torah.',
     project_category: 'AI Projects, Apps, & Other Tools',
     project_link: 'https://www.torah.example/mcp',
+    sefaria_tools_used: ['Sefaria API', '/api/v3/texts', '/api/related'],
     tags: ['AI', 'Chatbot'],
     featured: true,
   }),
@@ -26,13 +29,13 @@ const projects = [
 
 describe('FeaturedProjects', () => {
   it('renders nothing for an empty list: no band and no heading', () => {
-    const { container } = render(<FeaturedProjects projects={[]} onOpen={() => {}} />)
+    const { container } = render(<FeaturedProjects projects={[]} />)
     expect(container).toBeEmptyDOMElement()
     expect(screen.queryByRole('heading', { name: 'Featured projects' })).toBeNull()
   })
 
   it('is a section labelled by its heading, with the subtitle', () => {
-    const { container } = render(<FeaturedProjects projects={projects} onOpen={() => {}} />)
+    const { container } = render(<FeaturedProjects projects={projects} />)
     const band = container.querySelector('section') as HTMLElement
     const heading = within(band).getByRole('heading', { level: 2, name: 'Featured projects' })
     expect(heading).toHaveAttribute('id', 'featured-heading')
@@ -40,34 +43,56 @@ describe('FeaturedProjects', () => {
     expect(within(band).getByText('Hand-picked by the Sefaria team.')).toBeInTheDocument()
   })
 
-  it('shows each card: category label, title button, description and domain, no tags', () => {
-    render(<FeaturedProjects projects={projects} onOpen={() => {}} />)
+  it('shows each card: category art, label, title link, description and "Made with", no tags', () => {
+    render(<FeaturedProjects projects={projects} />)
     const card = screen.getByRole('heading', { level: 3, name: 'Torah MCP' }).closest('article')
     expect(card).not.toBeNull()
     const inCard = within(card as HTMLElement)
     expect(inCard.getByText('AI & Apps')).toBeInTheDocument()
-    expect(inCard.getByRole('button', { name: 'Torah MCP' })).toBeInTheDocument()
+    expect(inCard.getByRole('link', { name: 'Torah MCP' })).toHaveAttribute(
+      'href',
+      '/projects/1-torah-mcp',
+    )
     expect(inCard.getByText('Ask your AI about Torah.')).toBeInTheDocument()
-    expect(inCard.getByText('torah.example')).toBeInTheDocument()
-    expect(screen.queryByTestId('topic-tags')).toBeNull()
+    expect(inCard.getByText('Made with')).toBeInTheDocument()
+    expect(inCard.getByText('Sefaria API · /api/v3/texts')).toBeInTheDocument()
+    expect(screen.queryByText('torah.example')).toBeNull()
     expect(card?.textContent).not.toMatch(/Chatbot/)
+    const art = (card as HTMLElement).querySelector('img') as HTMLImageElement
+    expect(art).toHaveAttribute('src', '/category-art/ai.svg')
+    expect(art).toHaveAttribute('alt', '')
+    expect(art).toHaveAttribute('loading', 'lazy')
   })
 
-  it('opens the project from the title button', async () => {
-    const onOpen = vi.fn()
-    render(<FeaturedProjects projects={projects} onOpen={onOpen} />)
-    await userEvent.click(screen.getByRole('button', { name: 'Torah MCP' }))
-    expect(onOpen).toHaveBeenCalledWith(projects[0])
+  it('falls back to "Sefaria texts" when no resources are listed', () => {
+    render(<FeaturedProjects projects={projects} />)
+    const card = screen.getByRole('heading', { level: 3, name: "Today's Daf" }).closest('article')
+    expect(within(card as HTMLElement).getByText('Sefaria texts')).toBeInTheDocument()
   })
 
-  it('marks a buggy project with the Known issues badge', () => {
-    render(<FeaturedProjects projects={projects} onOpen={() => {}} />)
-    expect(screen.getAllByRole('img', { name: 'Known issues' })).toHaveLength(1)
+  it('uses the primary category image, and the none image without a category', () => {
+    render(
+      <FeaturedProjects
+        projects={[makeProject({ id: 9, project_name: 'Plain', project_category: null })]}
+      />,
+    )
+    expect(document.querySelector('img')).toHaveAttribute('src', '/category-art/none.svg')
+  })
+
+  it('shows an arrow to the project page, not the site, for a known-issues project', () => {
+    render(<FeaturedProjects projects={projects} />)
+    expect(screen.getByRole('link', { name: "About Today's Daf" })).toHaveAttribute(
+      'href',
+      '/projects/2-todays-daf',
+    )
+    expect(
+      screen.getByRole('link', { name: 'Visit Torah MCP (opens in a new tab)' }),
+    ).toHaveAttribute('href', 'https://www.torah.example/mcp')
   })
 
   it('makes the sideways scroller a focusable, named region below 900px', () => {
     // jsdom matches no media query, so this is the < 900px layout
-    const { container } = render(<FeaturedProjects projects={projects} onOpen={() => {}} />)
+    const { container } = render(<FeaturedProjects projects={projects} />)
     const scroller = container.querySelector('div[role="region"]')
     expect(scroller).toHaveAttribute('aria-label', 'Featured projects, scrollable')
     expect(scroller).toHaveAttribute('tabindex', '0')
@@ -75,7 +100,7 @@ describe('FeaturedProjects', () => {
   })
 
   it('has no axe violations', async () => {
-    const { container } = render(<FeaturedProjects projects={projects} onOpen={() => {}} />)
+    const { container } = render(<FeaturedProjects projects={projects} />)
     expect(await axe(container)).toHaveNoViolations()
   })
 })

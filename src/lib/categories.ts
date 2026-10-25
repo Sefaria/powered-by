@@ -34,16 +34,48 @@ export interface CategoryDisplay {
   Icon: LucideIcon
   /** CSS color expression for the tile and filter icon, from tokens.css. */
   colorVar: string
+  /** Same hue for text on white, where the tile color is too light (>= 4.5:1). */
+  textVar: string
 }
 
 /** The one place a category's label, icon and color are defined. */
 export const CATEGORY_META: Record<CategoryId, CategoryDisplay> = {
-  learn: { label: 'Learning & Study', Icon: BookOpen, colorVar: 'var(--category-learn)' },
-  ai: { label: 'AI & Apps', Icon: Sparkles, colorVar: 'var(--category-ai)' },
-  community: { label: 'Community & Social', Icon: Users, colorVar: 'var(--category-community)' },
-  viz: { label: 'Visualization & Data', Icon: ChartColumn, colorVar: 'var(--category-viz)' },
-  ext: { label: 'Extensions & API', Icon: Plug, colorVar: 'var(--category-ext)' },
-  none: { label: 'Uncategorized', Icon: Folder, colorVar: 'var(--category-none)' },
+  learn: {
+    label: 'Learning & Study',
+    Icon: BookOpen,
+    colorVar: 'var(--category-learn)',
+    textVar: 'var(--category-learn)',
+  },
+  ai: {
+    label: 'AI & Apps',
+    Icon: Sparkles,
+    colorVar: 'var(--category-ai)',
+    textVar: 'var(--category-ai)',
+  },
+  community: {
+    label: 'Community & Social',
+    Icon: Users,
+    colorVar: 'var(--category-community)',
+    textVar: 'var(--category-community)',
+  },
+  viz: {
+    label: 'Visualization & Data',
+    Icon: ChartColumn,
+    colorVar: 'var(--category-viz)',
+    textVar: 'var(--category-viz)',
+  },
+  ext: {
+    label: 'Extensions & API',
+    Icon: Plug,
+    colorVar: 'var(--category-ext)',
+    textVar: 'var(--category-ext-text)',
+  },
+  none: {
+    label: 'Uncategorized',
+    Icon: Folder,
+    colorVar: 'var(--category-none)',
+    textVar: 'var(--category-none)',
+  },
 }
 
 /** The "All projects" filter row: not a category, so it is kept out of CATEGORY_META. */
@@ -51,6 +83,7 @@ export const ALL_PROJECTS_META: CategoryDisplay = {
   label: 'All projects',
   Icon: LayoutGrid,
   colorVar: 'var(--category-none)',
+  textVar: 'var(--category-none)',
 }
 
 export function isCategoryId(value: string): value is CategoryId {

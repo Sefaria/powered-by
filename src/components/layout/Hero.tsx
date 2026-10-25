@@ -21,19 +21,12 @@ export function Hero({ projectCount, onExplore }: HeroProps) {
         <div className={styles.copy}>
           <p className={styles.eyebrow}>COMMUNITY SHOWCASE</p>
           <h1 id="hero-title" className={styles.title}>
-            Built on the open Jewish library.
+            Apps built on Sefaria’s open Jewish library.
           </h1>
           <p className={styles.lead}>
-            <span className={styles.desktopOnly}>
-              Sefaria is the hub for Torah innovation. Our entire library of Jewish texts is free
-              for anyone to build with, and this is what people around the world have made: apps,
-              study tools, AI assistants, and research.
-            </span>
-            <span className={styles.mobileOnly}>
-              Sefaria is the hub for Torah innovation. Our entire library of Jewish texts is free to
-              build with. Explore the apps, study tools, AI assistants, and research people have
-              made.
-            </span>
+            Sefaria is the hub for Torah innovation. Our entire library of Jewish texts is free for
+            anyone to build with, and people around the world have used it to make study tools, AI
+            assistants, research projects, and more.
           </p>
           <div className={styles.actions}>
             <Button variant="inverse" className={styles.action} onClick={onExplore}>

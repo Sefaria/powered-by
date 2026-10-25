@@ -31,7 +31,7 @@ function HeaderLinks({ backLink, menu }: SiteHeaderProps & { menu?: boolean }) {
         <ArrowUpRight size={18} strokeWidth={2} aria-hidden="true" />
       </ExternalLink>
       <ExternalLink href={DEVELOPERS_URL} className={row}>
-        Docs
+        Developer docs
         <ArrowUpRight size={18} strokeWidth={2} aria-hidden="true" />
       </ExternalLink>
       <ExternalLink href={DONATE_URL} className={menu ? styles.menuRow : styles.donate}>

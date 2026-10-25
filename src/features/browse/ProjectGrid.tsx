@@ -6,20 +6,14 @@ import styles from './ProjectGrid.module.css'
 interface ProjectGridProps {
   projects: readonly Project[]
   activeCategory: CategoryFilter
-  onOpen: (project: Project) => void
 }
 
-export function ProjectGrid({ projects, activeCategory, onOpen }: ProjectGridProps) {
+export function ProjectGrid({ projects, activeCategory }: ProjectGridProps) {
   return (
     <ul className={styles.grid}>
       {projects.map((project, index) => (
         <li key={project.id}>
-          <ProjectCard
-            project={project}
-            activeCategory={activeCategory}
-            resultIndex={index}
-            onOpen={onOpen}
-          />
+          <ProjectCard project={project} activeCategory={activeCategory} resultIndex={index} />
         </li>
       ))}
     </ul>

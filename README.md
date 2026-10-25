@@ -49,27 +49,51 @@ npm run dev    # starts the dev server at http://localhost:5173
 - `npm run lint` / `npm run format`: ESLint / Prettier
 - `npm run typecheck`: `tsc -b`
 - `npm test`: unit and component tests (Vitest)
-- `npm run e2e`: Playwright (desktop 1440x900 and mobile 390x844). It builds and serves the app itself and runs against a snapshot of the API in `src/lib/__fixtures__/projects.json`, never the live API. First time only: `npx playwright install chromium`.
+- `npm run e2e`: Playwright (desktop 1440x900 and mobile 390x844; the project-page spec sets its own 1280, 834 and 390 viewports). It builds and serves the app itself and runs against a snapshot of the API in `src/lib/__fixtures__/projects.json`, never the live API. First time only: `npx playwright install chromium`.
 - `npm run screenshots`: writes screenshots of every screen at 360, 390, 768, 1024 and 1440px into `screenshots/`
 
 ### Data
 
-All data comes from one request to `https://www.sefaria.org/api/powered-by`, made by `src/lib/api.ts` and exposed to components only through the `useProjects` hook. Everything else (filtering, sorting, the charts) happens client-side on the ~150 rows. Only projects that are published _and_ consented to display are ever shown.
+All data comes from one request to `https://www.sefaria.org/api/powered-by`, made by `src/lib/api.ts` and exposed to components only through the `useProjects` hook. Everything else (filtering, sorting, the charts) happens client-side on the ~150 rows. Every published project is shown (`consent_to_display` is deliberately not checked).
 
 ## Routes and hosting
 
-| Route     | Purpose                                                                              |
-| --------- | ------------------------------------------------------------------------------------ |
-| `/`       | Browse projects. `?project=<id>` opens a project's dialog (shareable).               |
-| `/charts` | "Powered by Sefaria in numbers". Unlisted: `noindex, nofollow`, not linked anywhere. |
+| Route             | Purpose                                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| `/`               | Browse projects. Search, filters, sort and view live in the URL.                                         |
+| `/projects/:slug` | One project. The slug is `${id}-${name}` (`141-torah-mcp`); only the id is used, a stale name redirects. |
+| `/charts`         | "Powered by Sefaria in numbers". Unlisted: `noindex, nofollow`, not linked anywhere.                     |
 
-The build is a static single-page app, so the host **must serve `index.html` for any unknown path** (otherwise `/charts` and deep links 404 on refresh). On Coolify, enable the SPA fallback, or use nginx:
+The build is a static single-page app, so the host **must serve `index.html` for any unknown path** (otherwise `/charts` and project links 404 on refresh). On Coolify, enable the SPA fallback, or use nginx. The category images under `/category-art/` never change under the same name, so give them a long cache:
 
 ```nginx
+location /category-art/ {
+  add_header Cache-Control "public, max-age=31536000, immutable";
+}
+
 location / {
   try_files $uri /index.html;
 }
 ```
+
+An unknown project id renders a "Project not found" page and sets `<meta name="prerender-status-code" content="404">` for prerendering services; a plain static host still answers 200 for it.
+
+## Brand purple
+
+The brand purple is `--brand-devportal` (`#653259`, design-system purple-800), with `#4e2544` (purple-900) on hover. The design system's DevPortal theme maps `module-primary` to purple-700 (`#7c416f`), which is lighter than the live Developer Portal, so we use purple-800 until the design system is updated. `#7c416f` stays as the AI & Apps category color only.
+
+## Analytics (off by default)
+
+`src/lib/analytics.ts` is Plausible-compatible and does nothing unless `VITE_ANALYTICS_DOMAIN` is set at build time:
+
+| Variable                | Meaning                                                                                                                                                                             |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_ANALYTICS_DOMAIN` | The site's domain in the analytics account. Unset means analytics is off and the footer says nothing.                                                                               |
+| `VITE_ANALYTICS_SRC`    | Script URL. Defaults to `https://plausible.io/js/script.manual.js`; it must be a _manual_ variant, because the app sends its own page views on route changes (never for `/charts`). |
+
+Do Not Track and Global Privacy Control switch it off. There are no cookies, storage ids or user ids, and events carry only ids and UI context, never search text. The events are `project_outbound`, `project_source`, `featured_open`, `filter_change` (facet name only), `sort_change`, `view_change` and `search` (`has_query` and a results bucket). When you turn it on, allow the script and API hosts in the site's Content-Security-Policy (`script-src` and `connect-src`); the app sets none itself.
+
+The OG image is regenerated with `node scripts/generate-og-image.mjs` (needs network for the fonts).
 
 ## Troubleshooting
 

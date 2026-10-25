@@ -27,6 +27,20 @@ test.describe('featured band', () => {
     await expect(band(page)).toHaveCount(0)
   })
 
+  test('clicking the "Made with" tag opens the project like the rest of the card', async ({
+    page,
+  }) => {
+    await serveProjects(page, featureThree)
+    await page.goto('/')
+    await waitForProjects(page)
+    // by coordinates, as a person would: the tag itself no longer takes pointer events
+    const label = band(page).getByText('Made with').first()
+    await label.scrollIntoViewIfNeeded()
+    const tag = (await label.boundingBox())!
+    await page.mouse.click(tag.x + tag.width / 2, tag.y + tag.height / 2)
+    await expect(page).toHaveURL(/\/projects\/\d+-/)
+  })
+
   test('shows up to 3 featured projects, newest first, between the hero and browse area', async ({
     page,
   }) => {
@@ -84,18 +98,20 @@ test.describe('featured band', () => {
     void scroller
   })
 
-  test('opening a featured card shows the project dialog', async ({ page }) => {
+  test('opening a featured card shows the project page', async ({ page }) => {
     await serveProjects(page, featureThree)
     await page.goto('/')
     await waitForProjects(page)
-    await band(page).getByRole('button', { name: 'Talmud Navigator' }).click()
-    await expect(page.getByRole('dialog', { name: 'Talmud Navigator' })).toBeVisible()
-    await expect(page).toHaveURL(new RegExp(`project=${PROJECTS.talmudNavigator}`))
+    await band(page).getByRole('link', { name: 'Talmud Navigator', exact: true }).click()
+    await expect(page).toHaveURL(
+      new RegExp(`/projects/${PROJECTS.talmudNavigator}-talmud-navigator`),
+    )
+    await expect(page.getByRole('heading', { level: 1, name: 'Talmud Navigator' })).toBeVisible()
     await page.goBack()
-    await expect(page.getByRole('dialog')).toBeHidden()
+    await expect(band(page)).toBeVisible()
   })
 
-  test('never features a buggy project while known issues are hidden', async ({ page }) => {
+  test('never features a buggy project, even when known issues are shown', async ({ page }) => {
     await serveProjects(page, (rows) => {
       featureThree(rows)
       for (const row of rows) {
@@ -110,8 +126,8 @@ test.describe('featured band', () => {
 
     await page.goto('/?bugs=1')
     await waitForProjects(page)
-    await expect(band(page).getByRole('button', { name: 'Daf Quiz' })).toBeVisible()
-    await expect(band(page).getByRole('img', { name: 'Known issues' })).toBeVisible()
+    await expect(band(page).getByRole('heading', { level: 3 })).toHaveCount(3)
+    await expect(band(page).getByText('Daf Quiz')).toHaveCount(0)
   })
 
   test('the band ignores search and filters', async ({ page }) => {

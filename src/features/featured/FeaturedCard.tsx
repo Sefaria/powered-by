@@ -1,18 +1,24 @@
 import type { CSSProperties } from 'react'
+import { Link } from 'react-router'
+import { track } from '../../lib/analytics'
 import { CATEGORY_META } from '../../lib/categories'
+import { madeWithResources } from '../../lib/madeWith'
 import type { Project } from '../../lib/project'
-import { BugBadge } from '../../components/ui/BugBadge'
-import { QuickOpenLink } from '../../components/ui/QuickOpenLink'
+import { FROM_BROWSE, projectPath } from '../../lib/slug'
+import { ProjectAction } from '../../components/ui/ProjectAction'
 import styles from './FeaturedCard.module.css'
 
 interface FeaturedCardProps {
   project: Project
-  onOpen: (project: Project) => void
+  /** 1-based place in the band, for analytics. */
+  position: number
 }
 
-/** A larger ProjectCard for the featured band: colored header art, no tags. The title button opens the dialog. */
-export function FeaturedCard({ project, onOpen }: FeaturedCardProps) {
-  const { label, Icon, colorVar } = CATEGORY_META[project.categories[0] ?? 'none']
+/** A larger ProjectCard for the featured band: static category art, a "Made with" tag. The title links to the project's page. */
+export function FeaturedCard({ project, position }: FeaturedCardProps) {
+  const categoryId = project.categories[0] ?? 'none'
+  const { label, Icon, colorVar } = CATEGORY_META[categoryId]
+  const resources = madeWithResources(project)
   return (
     <article className={styles.card}>
       <div
@@ -20,7 +26,13 @@ export function FeaturedCard({ project, onOpen }: FeaturedCardProps) {
         style={{ '--art-color': colorVar } as CSSProperties}
         aria-hidden="true"
       >
-        <Icon className={styles.watermark} size={168} strokeWidth={1} />
+        <img
+          className={styles.image}
+          src={`/category-art/${categoryId}.svg`}
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
         <span className={styles.tile}>
           <Icon size={26} strokeWidth={2} />
         </span>
@@ -28,16 +40,23 @@ export function FeaturedCard({ project, onOpen }: FeaturedCardProps) {
       <div className={styles.body}>
         <div className={styles.meta}>
           <span className={styles.category}>{label}</span>
-          {project.isBuggy && <BugBadge />}
-          <QuickOpenLink project={project} />
+          <ProjectAction project={project} surface="featured" />
         </div>
         <h3 className={styles.heading}>
-          <button type="button" className={styles.title} onClick={() => onOpen(project)}>
+          <Link
+            to={projectPath(project)}
+            state={FROM_BROWSE}
+            className={styles.title}
+            onClick={() => track('featured_open', { project_id: project.id, position })}
+          >
             {project.name}
-          </button>
+          </Link>
         </h3>
         {project.description && <p className={styles.description}>{project.description}</p>}
-        {project.domain && <p className={styles.domain}>{project.domain}</p>}
+        <p className={styles.madeWith}>
+          <span className={styles.madeWithLabel}>Made with</span>
+          <span className={styles.madeWithValue}>{resources.join(' \u00b7 ')}</span>
+        </p>
       </div>
     </article>
   )
