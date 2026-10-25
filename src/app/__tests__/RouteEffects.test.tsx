@@ -69,6 +69,12 @@ describe('page views', () => {
     expect(pageviews()).toHaveLength(1)
   })
 
+  it('counts a project page once whatever the case of the path (the router matches any)', async () => {
+    renderAt('/Projects/141-an-old-name')
+    expect(await screen.findByRole('heading', { level: 1, name: 'Torah MCP' })).toBeInTheDocument()
+    expect(pageviews()).toHaveLength(1)
+  })
+
   it('counts a stale slug once, only after it has been replaced', async () => {
     renderAt('/projects/141-an-old-name')
     expect(await screen.findByRole('heading', { level: 1, name: 'Torah MCP' })).toBeInTheDocument()

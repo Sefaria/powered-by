@@ -76,6 +76,19 @@ describe('BrowsePage', () => {
     expect(screen.getByRole('link', { name: 'P40' })).toBeInTheDocument()
   })
 
+  it('keeps the depth when the history entry is replaced under it (header home link)', async () => {
+    stubApi(Array.from({ length: 60 }, (_, i) => makeRaw({ id: i + 1, project_name: `P${i + 1}` })))
+    renderPage()
+    await screen.findByText(/Showing 24 of 60/)
+    await userEvent.click(screen.getByRole('button', { name: 'Show more projects' }))
+    await userEvent.click(screen.getByRole('link', { name: 'Powered by Sefaria' }))
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(48)
+    await userEvent.click(screen.getByRole('link', { name: 'P40' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Back' }))
+    await screen.findByText(/Showing 48 of 60/)
+    expect(screen.getByRole('link', { name: 'P40' })).toBeInTheDocument()
+  })
+
   it('does not restore a saved depth once the filters have changed', async () => {
     stubApi(Array.from({ length: 60 }, (_, i) => makeRaw({ id: i + 1, project_name: `P${i + 1}` })))
     renderPage()

@@ -113,7 +113,7 @@ export function BrowsePage() {
   })
   useEffect(() => {
     saveLimit()
-  }, [limit, signature])
+  }, [limit, signature, savedLimit]) // savedLimit changes when this entry's state is replaced
 
   // One search event 1s after typing stops: whether there was a query and how many results, never the text.
   const sendSearch = useEffectEvent(() => {
