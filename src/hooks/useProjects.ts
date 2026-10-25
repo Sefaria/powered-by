@@ -26,8 +26,10 @@ function load(fetcher: Fetcher): Promise<Project[]> {
   if (!promise) {
     promise = fetcher()
     cache.set(fetcher, promise)
-    promise.then((projects) => resolved.set(fetcher, projects))
-    promise.catch(() => cache.delete(fetcher)) // a failure must be retryable
+    promise.then(
+      (projects) => resolved.set(fetcher, projects),
+      () => cache.delete(fetcher), // a failure must be retryable
+    )
   }
   return promise
 }
