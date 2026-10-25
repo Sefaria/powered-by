@@ -27,6 +27,20 @@ test.describe('featured band', () => {
     await expect(band(page)).toHaveCount(0)
   })
 
+  test('clicking the "Made with" tag opens the project like the rest of the card', async ({
+    page,
+  }) => {
+    await serveProjects(page, featureThree)
+    await page.goto('/')
+    await waitForProjects(page)
+    // by coordinates, as a person would: the tag itself no longer takes pointer events
+    const label = band(page).getByText('Made with').first()
+    await label.scrollIntoViewIfNeeded()
+    const tag = (await label.boundingBox())!
+    await page.mouse.click(tag.x + tag.width / 2, tag.y + tag.height / 2)
+    await expect(page).toHaveURL(/\/projects\/\d+-/)
+  })
+
   test('shows up to 3 featured projects, newest first, between the hero and browse area', async ({
     page,
   }) => {

@@ -8,8 +8,10 @@ export function RouteEffects() {
   const { pathname } = useLocation()
   const [announcement, setAnnouncement] = useState('')
 
+  // Project pages report their own, once the slug is canonical: /projects/141 would otherwise be
+  // counted, and then counted again when it is replaced with /projects/141-torah-mcp.
   useEffect(() => {
-    trackPageview(pathname)
+    if (!pathname.startsWith('/projects/')) trackPageview(pathname)
   }, [pathname])
 
   // Pages set document.title as they load (some lazily), so announce whenever it changes

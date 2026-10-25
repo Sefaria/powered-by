@@ -94,7 +94,8 @@ export function track<E extends keyof AnalyticsEvents>(event: E, props: Analytic
 
 /** SPA page view. The charts page is never counted. */
 export function trackPageview(pathname: string) {
-  if (pathname === '/charts' || pathname.startsWith('/charts/')) return
+  const path = pathname.toLowerCase() // the router matches /Charts too
+  if (path === '/charts' || path.startsWith('/charts/')) return
   send('pageview')
 }
 

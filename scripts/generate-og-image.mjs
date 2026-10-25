@@ -19,7 +19,8 @@ const edges = JSON.parse(
 )
 const hubs = new Set([2, 8, 13])
 const samekh = read('src/components/layout/SamekhLogo.tsx').match(/<path d="([^"]+)"/)[1]
-const hebrewFont = new URL('public/fonts/Amiri-Taamey-Frank-merged.ttf', root).href
+// A data URL: the page is set with setContent() on about:blank, which can't load file:// fonts.
+const hebrewFont = `data:font/ttf;base64,${readFileSync(new URL('public/fonts/Amiri-Taamey-Frank-merged.ttf', root)).toString('base64')}`
 
 const lines = edges
   .map(

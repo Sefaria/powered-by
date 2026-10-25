@@ -60,7 +60,7 @@ for (const { width, layout } of WIDTHS) {
         expect(panelBox!.x).toBeGreaterThan(width / 2)
         expect(panelBox!.width).toBeCloseTo(360, 0)
         expect(openBox!.height).toBeCloseTo(52, 0)
-        await page.evaluate(() => window.scrollTo(0, 300))
+        await page.evaluate(() => window.scrollTo({ top: 300, behavior: 'instant' }))
         // still in view after scrolling: it follows the page
         const after = await panel.boundingBox()
         expect(after!.y).toBeCloseTo(24, 0)
@@ -90,7 +90,9 @@ for (const { width, layout } of WIDTHS) {
       test('the bottom bar never covers the last of the details', async ({ page }) => {
         await page.goto(`/projects/${PROJECTS.torahMcp}`)
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+        await page.evaluate(() =>
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }),
+        )
         const details = page.locator('section[aria-labelledby="details-heading"]')
         await expect(details).toBeVisible()
         const [detailsBox, barBox] = [await details.boundingBox(), await cta(page).boundingBox()]

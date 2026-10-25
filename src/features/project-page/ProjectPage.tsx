@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Link, Navigate, useLocation, useNavigationType, useParams } from 'react-router'
+import { trackPageview } from '../../lib/analytics'
 import { canonicalPath, parseSlug } from '../../lib/slug'
 import { MEDIA_SM, useMediaQuery } from '../../hooks/useMediaQuery'
 import { useDocumentMeta } from '../../hooks/useDocumentMeta'
@@ -117,6 +118,11 @@ function ProjectView({
   useEffect(() => {
     if (navigated) headingRef.current?.focus({ preventScroll: true })
   }, [navigated, project.id])
+
+  const redirecting = canonical !== null
+  useEffect(() => {
+    if (!redirecting) trackPageview(location.pathname)
+  }, [redirecting, location.pathname])
 
   if (canonical) return <Navigate to={canonical} replace state={location.state} />
 

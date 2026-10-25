@@ -81,6 +81,9 @@ describe('analytics', () => {
     vi.stubEnv('VITE_ANALYTICS_DOMAIN', 'powered-by.sefaria.org')
     initAnalytics()
     trackPageview('/charts')
+    // the router matches case-insensitively, so these are the charts page too
+    trackPageview('/Charts')
+    trackPageview('/CHARTS/')
     expect(plausible).not.toHaveBeenCalled()
     trackPageview('/projects/1-x')
     expect(plausible).toHaveBeenCalledWith('pageview', {
