@@ -8,7 +8,7 @@ export const AXIS_LINE = { stroke: 'var(--border-default)' } as const
 export const GRID_STROKE = 'var(--border-default)'
 export const CHART_HEIGHT = 260
 export const BAR_FILL = 'var(--module-primary)'
-export const BAR_FILL_HOVER = 'var(--module-primary-hover)'
+export const BAR_FILL_HOVER = 'var(--brand-devportal-hover)'
 
 /** "Mar 2024" -> "Mar '24". */
 export function shortMonth(month: string): string {

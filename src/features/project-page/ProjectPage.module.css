@@ -1,0 +1,102 @@
+.page {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--space-2xl) var(--space-6xl);
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding-top: var(--space-3xl);
+}
+
+/* <600px: head, body, then the CTA last so it can stick to the bottom of the screen. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'head'
+    'body'
+    'cta';
+  gap: var(--space-2xl);
+  padding-top: var(--space-lg);
+}
+
+.head {
+  grid-area: head;
+  min-width: 0;
+}
+
+.cta {
+  /* A sticky item sticks within its grid area, so on mobile the area spans every row and the bar
+     sits at the end of it: it is last in source order and last on screen. */
+  grid-area: 1 / 1 / -1 / -1;
+  align-self: end;
+  z-index: 5;
+}
+
+.body {
+  grid-area: body;
+  min-width: 0;
+}
+
+/* 600-1023px: the CTA is an inline panel under the header. */
+@media (min-width: 600px) {
+  .layout {
+    grid-template-areas:
+      'head'
+      'cta'
+      'body';
+    gap: var(--space-3xl);
+  }
+
+  .cta {
+    grid-area: cta;
+    align-self: start;
+  }
+}
+
+/* >= 1024px: a 360px right column that follows the page. */
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-areas:
+      'head cta'
+      'body cta';
+    column-gap: var(--space-6xl);
+    align-items: start;
+  }
+
+  .cta {
+    align-self: start;
+  }
+}
+
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  padding-top: var(--space-6xl);
+}
+
+.notFoundTitle {
+  font-family: var(--font-serif);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.notFoundTitle:focus {
+  outline: none;
+}
+
+.notFoundLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  color: var(--text-link);
+  font-weight: 600;
+}

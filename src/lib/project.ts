@@ -25,6 +25,8 @@ export interface RawProject {
   is_buggy: boolean
   status: ProjectStatus
   featured: boolean
+  /** Not in the API yet: absent or null sorts after any number. */
+  featured_order?: number | null
   submission_source: 'formstack' | 'manual' | 'in_the_wild'
   submission_date: string | null
   created_at: string
@@ -58,6 +60,8 @@ export interface Project {
   submittedAt: Date | null
   /** Set in Django admin; selects the featured band. */
   featured: boolean
+  /** Lower first within the featured band; null when unset. */
+  featuredOrder: number | null
   /** Hidden from the public site unless "Show projects with known issues" is on. */
   isBuggy: boolean
   /** Technologies found in `builtWith`, for the "Built with" filter and /charts. */
@@ -168,6 +172,7 @@ export function normalizeProject(raw: RawProject): Project {
     reach: parseReach(raw.project_reach),
     submittedAt: parseDate(raw.submission_date),
     featured: raw.featured === true,
+    featuredOrder: Number.isFinite(raw.featured_order) ? (raw.featured_order as number) : null,
     isBuggy: raw.is_buggy === true,
     experience: parseExperience(raw.technical_experience),
     vibeCoded: raw.vibe_coded === true,

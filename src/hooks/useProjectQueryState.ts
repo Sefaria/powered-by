@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { useLocation, useNavigate, useSearchParams } from 'react-router'
+import { useLocation, useSearchParams } from 'react-router'
 import {
   DEFAULT_VIEW,
   parseQueryState,
@@ -27,26 +27,15 @@ function storeView(view: ViewMode) {
   }
 }
 
-/** Marks history entries created by opening a project, so closing can go Back instead of stacking. */
-interface DialogLocationState {
-  projectDialog?: true
-}
-
 export interface ProjectQueryApi {
   state: QueryState
   /** Update filters, search, sort or view. Replaces history (no back-button spam). */
-  update: (patch: Partial<Omit<QueryState, 'project'>>) => void
-  /** Pushes history so Back closes the dialog. */
-  openProject: (id: number) => void
-  closeProject: () => void
-  /** Silently drop an unknown ?project= id. */
-  dropProject: () => void
+  update: (patch: Partial<QueryState>) => void
 }
 
-/** URL is the source of truth for q, category, open, sort, view and project. */
+/** URL is the source of truth for q, filters, sort and view. */
 export function useProjectQueryState(): ProjectQueryApi {
   const [searchParams, setSearchParams] = useSearchParams()
-  const navigate = useNavigate()
   const location = useLocation()
   const defaultView = useState(readStoredView)[0]
   const state = useMemo(
@@ -65,27 +54,5 @@ export function useProjectQueryState(): ProjectQueryApi {
     [state, defaultView, setSearchParams, location.state],
   )
 
-  const openProject = useCallback(
-    (id: number) => {
-      const state_: DialogLocationState = { projectDialog: true }
-      navigate(
-        { search: serializeQueryState({ ...state, project: id }, defaultView).toString() },
-        { state: state_ },
-      )
-    },
-    [state, defaultView, navigate],
-  )
-
-  const dropProject = useCallback(() => {
-    setSearchParams(serializeQueryState({ ...state, project: null }, defaultView), {
-      replace: true,
-    })
-  }, [state, defaultView, setSearchParams])
-
-  const closeProject = useCallback(() => {
-    if ((location.state as DialogLocationState | null)?.projectDialog) navigate(-1)
-    else dropProject()
-  }, [location.state, navigate, dropProject])
-
-  return { state, update, openProject, closeProject, dropProject }
+  return { state, update }
 }

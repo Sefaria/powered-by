@@ -45,9 +45,9 @@ test.describe('touch targets (>= 44x44)', () => {
     }
   })
 
-  test('dialog, filter sheet and header menu', async ({ page, isMobile }) => {
-    await page.goto(`/?project=${RICH_PROJECT.id}`)
-    await expect(page.getByRole('dialog')).toBeVisible()
+  test('project page, filter sheet and header menu', async ({ page, isMobile }) => {
+    await page.goto(`/projects/${RICH_PROJECT.id}`)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     expect(await smallTargets(page)).toEqual([])
 
     await page.goto('/')

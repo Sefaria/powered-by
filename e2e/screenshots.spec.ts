@@ -40,11 +40,11 @@ for (const width of WIDTHS) {
       await page.screenshot({ path: `${dir}/filters-${width}.png` })
     })
 
-    test('project dialog', async ({ page }) => {
-      await page.goto(`/?project=${RICH_PROJECT.id}`)
-      await expect(page.getByRole('dialog')).toBeVisible()
+    test('project page', async ({ page }) => {
+      await page.goto(`/projects/${RICH_PROJECT.id}`)
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
       await page.evaluate(() => document.fonts.ready)
-      await page.screenshot({ path: `${dir}/dialog-${width}.png` })
+      await page.screenshot({ path: `${dir}/project-page-${width}.png` })
     })
 
     test('empty state', async ({ page }) => {
@@ -127,15 +127,33 @@ for (const width of [1440, 390]) {
       }
     })
 
-    test('a buggy project with its badge', async ({ page }) => {
+    test('a known-issues project: card and page', async ({ page }) => {
       await page.goto('/?bugs=1&q=Daf+Quiz')
       await expect(page.getByRole('heading', { level: 3, name: 'Daf Quiz' })).toBeVisible()
       await page.evaluate(() => document.fonts.ready)
       await page.getByRole('heading', { name: 'Browse projects' }).scrollIntoViewIfNeeded()
       await page.screenshot({ path: `${dir}/known-issues-card-${width}.png` })
-      await page.goto(`/?project=${PROJECTS.dafQuiz}`)
-      await expect(page.getByRole('dialog', { name: 'Daf Quiz' })).toBeVisible()
-      await page.screenshot({ path: `${dir}/known-issues-dialog-${width}.png` })
+      await page.goto(`/projects/${PROJECTS.dafQuiz}`)
+      await expect(page.getByRole('note')).toBeVisible()
+      await page.screenshot({ path: `${dir}/known-issues-page-${width}.png` })
+    })
+  })
+}
+
+// Design gloss (round 2): the project page at the three widths, a known-issues page, the featured band.
+for (const width of [1280, 834, 390]) {
+  test.describe(`project page at ${width}px`, () => {
+    test.use({ viewport: { width, height: width === 390 ? 844 : 900 }, hasTouch: width === 390 })
+
+    test('project page and known-issues page', async ({ page }) => {
+      await page.goto(`/projects/${PROJECTS.torahMcp}`)
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+      await page.evaluate(() => document.fonts.ready)
+      await page.screenshot({ path: `${dir}/page-${width}.png`, fullPage: width !== 390 })
+      await page.goto(`/projects/${PROJECTS.dafQuiz}`)
+      await expect(page.getByRole('note')).toBeVisible()
+      await page.evaluate(() => document.fonts.ready)
+      await page.screenshot({ path: `${dir}/page-known-issues-${width}.png` })
     })
   })
 }

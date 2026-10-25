@@ -4,6 +4,9 @@ import './styles/tokens.css'
 import './styles/reset.css'
 import './styles/global.css'
 import { App } from './app/App'
+import { initAnalytics } from './lib/analytics'
+
+initAnalytics()
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Missing #root element')

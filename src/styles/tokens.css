@@ -23,8 +23,11 @@
 
   --action-primary: #18345d;
   --action-primary-hover: #132b4c;
-  --module-primary: #7c416f;
-  --module-primary-hover: #653259;
+  /* Matches developers.sefaria.org. The design system's DevPortal theme maps module-primary
+     to purple-700 (#7c416f), which is lighter than the live portal, so we use purple-800. */
+  --brand-devportal: #653259;
+  --brand-devportal-hover: #4e2544;
+  --module-primary: var(--brand-devportal);
 
   --icon-default: #121212;
   --icon-muted: #6f6f6f;
@@ -39,12 +42,14 @@
   --category-community: #ab4e66;
   --category-viz: #4b71b7;
   --category-ext: #5d956f;
+  /* Category-colored text on white needs 4.5:1; the ext green is only 3.5:1, so text uses this. */
+  --category-ext-text: #3f7653;
   --category-none: #575757;
 
   /* Chart ramps (charts only) */
   --chart-purple-1: #e1bed8;
   --chart-purple-2: #b36fa2;
-  --chart-purple-3: #7c416f;
+  --chart-purple-3: var(--brand-devportal);
   --chart-purple-4: #38192f;
   --chart-neutral: #999999;
 

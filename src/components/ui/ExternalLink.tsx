@@ -12,7 +12,7 @@ interface ExternalLinkProps extends Omit<
 /** A link to another site: opens in a new tab and says so to assistive tech. */
 export function ExternalLink({ children, ...rest }: ExternalLinkProps) {
   return (
-    <a {...rest} target="_blank" rel="noreferrer">
+    <a {...rest} target="_blank" rel="noopener noreferrer">
       {children}
       <VisuallyHidden> (opens in a new tab)</VisuallyHidden>
     </a>

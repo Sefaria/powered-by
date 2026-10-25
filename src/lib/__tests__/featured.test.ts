@@ -29,7 +29,7 @@ describe('getFeaturedProjects', () => {
     expect(getFeaturedProjects(projects).map((p) => p.id)).toEqual([2, 3, 4])
   })
 
-  it('excludes buggy projects unless they are being shown, then fills from the next newest', () => {
+  it('never features a buggy project, and fills from the next newest', () => {
     const projects = [
       featured(1, '2026-05-01T00:00:00Z', { is_buggy: true }),
       featured(2, '2026-04-01T00:00:00Z'),
@@ -37,8 +37,16 @@ describe('getFeaturedProjects', () => {
       featured(4, '2026-02-01T00:00:00Z'),
     ]
     expect(getFeaturedProjects(projects).map((p) => p.id)).toEqual([2, 3, 4])
-    expect(getFeaturedProjects(projects, { showBuggy: false }).map((p) => p.id)).toEqual([2, 3, 4])
-    expect(getFeaturedProjects(projects, { showBuggy: true }).map((p) => p.id)).toEqual([1, 2, 3])
+  })
+
+  it('orders by featured_order first, then newest; unordered projects come last', () => {
+    const projects = [
+      featured(1, '2026-05-01T00:00:00Z'),
+      featured(2, '2026-04-01T00:00:00Z', { featured_order: 2 }),
+      featured(3, '2026-03-01T00:00:00Z', { featured_order: 1 }),
+      featured(4, '2026-02-01T00:00:00Z', { featured_order: 2 }),
+    ]
+    expect(getFeaturedProjects(projects).map((p) => p.id)).toEqual([3, 2, 4])
   })
 
   it('does not mutate its input', () => {

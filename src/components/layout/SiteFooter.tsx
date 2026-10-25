@@ -1,3 +1,4 @@
+import { analyticsEnabled } from '../../lib/analytics'
 import { ExternalLink } from '../ui/ExternalLink'
 import { Container } from './Container'
 import { DEVELOPERS_URL, DONATE_URL, SEFARIA_URL } from './SiteHeader'
@@ -14,6 +15,8 @@ const LINKS = [
   { label: 'Donate', href: DONATE_URL },
 ] as const
 
+export const PRIVACY_URL = 'https://www.sefaria.org/privacy-policy'
+
 export function SiteFooter() {
   return (
     <footer className={styles.footer}>
@@ -24,6 +27,13 @@ export function SiteFooter() {
             A showcase of independent projects built with Sefaria&rsquo;s free texts, API, and data.
             Each project is created and maintained by its own developers.
           </p>
+          {analyticsEnabled() && (
+            <p className={styles.privacy}>
+              <ExternalLink href={PRIVACY_URL} className={styles.privacyLink}>
+                We count visits anonymously, without cookies.
+              </ExternalLink>
+            </p>
+          )}
         </div>
         <nav aria-label="Footer">
           <ul className={styles.links}>

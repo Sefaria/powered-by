@@ -11,7 +11,6 @@ const base: QueryState = {
   showBuggy: false,
   sort: 'new',
   view: 'grid',
-  project: null,
 }
 
 describe('query state', () => {
@@ -30,7 +29,6 @@ describe('query state', () => {
       showBuggy: true,
       sort: 'az',
       view: 'list',
-      project: 42,
     }
     const search = serializeQueryState(state).toString()
     expect(parseQueryState(search)).toEqual(state)
@@ -65,10 +63,9 @@ describe('query state', () => {
     expect(parseQueryState('topic=').topics).toEqual([])
   })
 
-  it('falls back to defaults for invalid values and ignores the removed `open` param', () => {
+  it('falls back to defaults for invalid values and ignores the retired `open` and `project` params', () => {
     expect(parseQueryState('category=bogus&sort=x&view=y&project=abc&open=1')).toEqual(base)
-    expect(parseQueryState('project=-3').project).toBeNull()
-    expect(parseQueryState('project=1.5').project).toBeNull()
+    expect(parseQueryState('project=3')).toEqual(base)
   })
 
   it('uses the persisted view as the default', () => {

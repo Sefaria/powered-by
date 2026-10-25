@@ -1,4 +1,6 @@
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router'
+import { searchResultsBucket, track } from '../../lib/analytics'
 import { getFeaturedProjects } from '../../lib/featured'
 import {
   activeFilterCount,
@@ -6,11 +8,13 @@ import {
   filterFacets,
   filterProjects,
   isVisible,
+  FACET_KEYS,
   type Filters,
 } from '../../lib/filter'
 import { formatNumber } from '../../lib/format'
 import { SORT_LABELS, sortProjects } from '../../lib/sort'
-import type { Project } from '../../lib/project'
+import { projectPath } from '../../lib/slug'
+import type { QueryState } from '../../lib/url'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { useProjectQueryState } from '../../hooks/useProjectQueryState'
 import { useProjects } from '../../hooks/useProjects'
@@ -20,7 +24,6 @@ import { Container } from '../../components/layout/Container'
 import { Button } from '../../components/ui/Button'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { FeaturedProjects } from '../featured/FeaturedProjects'
-import { ProjectDialog } from '../project/ProjectDialog'
 import { ActiveFilters } from './ActiveFilters'
 import { FilterPanel } from './FilterPanel'
 import { FilterSheet } from './FilterSheet'
@@ -36,9 +39,22 @@ const RESULTS_ID = 'results'
 
 export function BrowsePage() {
   const data = useProjects()
-  const { state, update, openProject, closeProject, dropProject } = useProjectQueryState()
+  const { state, update: updateState } = useProjectQueryState()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [sheetOpen, setSheetOpen] = useState(false)
   const headingRef = useRef<HTMLHeadingElement>(null)
+
+  const update = (patch: Partial<QueryState>) => {
+    for (const key of [...FACET_KEYS, 'category', 'showBuggy'] as const) {
+      if (key in patch && JSON.stringify(patch[key]) !== JSON.stringify(state[key])) {
+        track('filter_change', { facet: key })
+      }
+    }
+    if (patch.sort && patch.sort !== state.sort) track('sort_change', { sort: patch.sort })
+    if (patch.view && patch.view !== state.view) track('view_change', { view: patch.view })
+    updateState(patch)
+  }
 
   // Search input: instant locally, debounced into the URL (and so into the results).
   const [input, setInput] = useState(state.q)
@@ -62,10 +78,7 @@ export function BrowsePage() {
   // Projects with known issues are out of everything below unless the display option is on.
   const shown = useMemo(() => all?.filter((p) => isVisible(p, showBuggy)) ?? null, [all, showBuggy])
   const facets = useMemo(() => (all ? filterFacets(all, filters) : null), [all, filters])
-  const featured = useMemo(
-    () => (all ? getFeaturedProjects(all, { showBuggy }) : []),
-    [all, showBuggy],
-  )
+  const featured = useMemo(() => (all ? getFeaturedProjects(all) : []), [all])
   const results = useMemo(
     () => (all ? sortProjects(filterProjects(all, filters), state.sort) : []),
     [all, filters, state.sort],
@@ -81,6 +94,18 @@ export function BrowsePage() {
   }
   const visible = results.slice(0, limit)
 
+  // One search event 1s after typing stops: whether there was a query and how many results, never the text.
+  const sendSearch = useEffectEvent(() => {
+    if (input.trim()) {
+      track('search', { has_query: true, results: searchResultsBucket(results.length) })
+    }
+  })
+  useEffect(() => {
+    if (!input.trim()) return
+    const timer = window.setTimeout(sendSearch, 1000)
+    return () => window.clearTimeout(timer)
+  }, [input])
+
   // After "Show more", move focus to the first newly shown item.
   const focusIndex = useRef<number | null>(null)
   useEffect(() => {
@@ -89,16 +114,12 @@ export function BrowsePage() {
     focusIndex.current = null
   }, [limit])
 
-  // Looked up in every project, not just the shown ones: a deep link to a project with
-  // known issues still opens its dialog while the display option is off.
-  const selected =
-    all && state.project !== null ? (all.find((p) => p.id === state.project) ?? null) : null
-  const unknownProject = all !== null && state.project !== null && selected === null
+  // Links from before projects had pages: /?project=141 is now /projects/141-name.
+  const legacyId = Number(searchParams.get('project'))
+  const legacyProject = all && legacyId > 0 ? all.find((p) => p.id === legacyId) : undefined
   useEffect(() => {
-    if (unknownProject) dropProject()
-  }, [unknownProject, dropProject])
-
-  const open = (project: Project) => openProject(project.id)
+    if (legacyProject) navigate(projectPath(legacyProject), { replace: true })
+  }, [legacyProject, navigate])
 
   const clearAll = () => {
     setInput('')
@@ -124,7 +145,7 @@ export function BrowsePage() {
   return (
     <PageLayout skipTo={{ id: RESULTS_ID, label: 'Skip to projects' }}>
       <Hero projectCount={shown?.length ?? null} onExplore={explore} />
-      <FeaturedProjects projects={featured} onOpen={open} />
+      <FeaturedProjects projects={featured} />
       <Container className={styles.layout}>
         <aside className={styles.filters} aria-label="Filters">
           {facets && <FilterPanel facets={facets} filters={filters} onChange={update} />}
@@ -166,9 +187,9 @@ export function BrowsePage() {
           {data.status === 'success' && results.length > 0 && (
             <>
               {state.view === 'grid' ? (
-                <ProjectGrid projects={visible} activeCategory={state.category} onOpen={open} />
+                <ProjectGrid projects={visible} activeCategory={state.category} />
               ) : (
-                <ProjectList projects={visible} activeCategory={state.category} onOpen={open} />
+                <ProjectList projects={visible} activeCategory={state.category} />
               )}
               {visible.length < results.length && (
                 <ShowMore
@@ -194,7 +215,6 @@ export function BrowsePage() {
           onClose={() => setSheetOpen(false)}
         />
       )}
-      {selected && <ProjectDialog project={selected} onClose={closeProject} />}
     </PageLayout>
   )
 }

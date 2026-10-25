@@ -1,6 +1,6 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter, Route, Routes } from 'react-router'
 import { axe } from 'vitest-axe'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { resetProjectsCache } from '../../../hooks/useProjects'
@@ -18,7 +18,10 @@ function stubApi(projects: unknown[]) {
 function renderPage(url = '/') {
   return render(
     <MemoryRouter initialEntries={[url]}>
-      <BrowsePage />
+      <Routes>
+        <Route path="/" element={<BrowsePage />} />
+        <Route path="/projects/:slug" element={<p>On a project page</p>} />
+      </Routes>
     </MemoryRouter>,
   )
 }
@@ -84,15 +87,15 @@ describe('BrowsePage', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
-  it('opens the dialog for ?project=<id> and drops an unknown id', async () => {
+  it('sends an old ?project=<id> link to the project page, and ignores an unknown id', async () => {
     stubApi([makeRaw({ id: 7, project_name: 'Seven' })])
     const { unmount } = renderPage('/?project=7')
-    expect(await screen.findByRole('dialog', { name: 'Seven' })).toBeInTheDocument()
+    expect(await screen.findByText('On a project page')).toBeInTheDocument()
     unmount()
     stubApi([makeRaw({ id: 7, project_name: 'Seven' })])
     renderPage('/?project=999')
     await screen.findByText(/Showing 1 of 1/)
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    expect(screen.queryByText('On a project page')).toBeNull()
   })
 
   it('has no axe violations (loaded)', async () => {
@@ -138,7 +141,7 @@ describe('BrowsePage', () => {
       expect(screen.queryByRole('img', { name: 'Known issues' })).toBeNull()
     })
 
-    it('shows them with a badge when the switch is turned on, and hides them again when off', async () => {
+    it('shows them without a badge when the switch is turned on, and hides them again when off', async () => {
       stubApi(projects())
       renderPage()
       const toggle = await screen.findByRole('switch')
@@ -146,7 +149,8 @@ describe('BrowsePage', () => {
       expect(await screen.findByText('Showing 3 of 3 projects · newest first')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Explore 3 projects' })).toBeInTheDocument()
       expect(titles()).toContain('Buggy One')
-      expect(screen.getAllByRole('img', { name: 'Known issues' })).toHaveLength(1)
+      expect(screen.queryByRole('img', { name: 'Known issues' })).toBeNull()
+      expect(document.querySelector('.lucide-bug')).toBeNull()
       await userEvent.click(toggle)
       expect(await screen.findByText('Showing 2 of 2 projects · newest first')).toBeInTheDocument()
     })
@@ -158,16 +162,14 @@ describe('BrowsePage', () => {
       expect(screen.getByRole('switch')).toBeChecked()
     })
 
-    it('opens a deep link to a buggy project with its badge, without turning the switch on', async () => {
+    it('opens the project page, not the site, from a known-issues card arrow', async () => {
       stubApi(projects())
-      renderPage('/?project=2')
-      const dialog = await screen.findByRole('dialog', { name: 'Buggy One' })
-      expect(within(dialog).getByText('Known issues')).toBeInTheDocument()
-      expect(screen.getByRole('switch')).not.toBeChecked()
-      expect(screen.queryByRole('heading', { level: 3, name: 'Buggy One' })).toBeNull()
+      renderPage('/?bugs=1')
+      await userEvent.click(await screen.findByRole('link', { name: 'About Buggy One' }))
+      expect(await screen.findByText('On a project page')).toBeInTheDocument()
     })
 
-    it('never features a buggy project while the switch is off', async () => {
+    it('never features a buggy project, even when the switch is on', async () => {
       stubApi([
         makeRaw({ id: 1, project_name: 'Alpha', featured: true }),
         makeRaw({ id: 2, project_name: 'Buggy One', featured: true, is_buggy: true }),
@@ -180,7 +182,8 @@ describe('BrowsePage', () => {
       expect(within(band).getByRole('heading', { level: 3, name: 'Alpha' })).toBeInTheDocument()
       expect(within(band).queryByText('Buggy One')).toBeNull()
       await userEvent.click(screen.getByRole('switch'))
-      expect(await within(band).findByText('Buggy One')).toBeInTheDocument()
+      await screen.findByText(/Showing 2 of 2/)
+      expect(within(band).queryByText('Buggy One')).toBeNull()
     })
   })
 
@@ -192,7 +195,7 @@ describe('BrowsePage', () => {
       expect(screen.queryByRole('heading', { name: 'Featured projects' })).toBeNull()
     })
 
-    it('shows at most 3 featured projects, newest first, and opens one into the dialog', async () => {
+    it('shows at most 3 featured projects, newest first, and links to the project page', async () => {
       stubApi(
         [1, 2, 3, 4].map((id) =>
           makeRaw({
@@ -211,8 +214,8 @@ describe('BrowsePage', () => {
           .getAllByRole('heading', { level: 3 })
           .map((h) => h.textContent),
       ).toEqual(['F4', 'F3', 'F2'])
-      await userEvent.click(within(band).getByRole('button', { name: 'F3' }))
-      expect(await screen.findByRole('dialog', { name: 'F3' })).toBeInTheDocument()
+      await userEvent.click(within(band).getByRole('link', { name: 'F3' }))
+      expect(await screen.findByText('On a project page')).toBeInTheDocument()
     })
   })
 

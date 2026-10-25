@@ -54,9 +54,19 @@ export function ButtonLink({
   children,
   href,
   arrow = true,
-}: Common & { href: string; children: ReactNode; arrow?: boolean }) {
+  onClick,
+}: Common & {
+  href: string
+  children: ReactNode
+  arrow?: boolean
+  onClick?: () => void
+}) {
   return (
-    <ExternalLink href={href} className={classes({ variant, size, fullWidth, className })}>
+    <ExternalLink
+      href={href}
+      className={classes({ variant, size, fullWidth, className })}
+      onClick={onClick}
+    >
       {icon}
       {children}
       {arrow && <ArrowUpRight size={size === 'xl' ? 24 : 18} strokeWidth={2} aria-hidden="true" />}

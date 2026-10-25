@@ -46,7 +46,7 @@
 }
 
 .row:hover .bar {
-  background: var(--module-primary-hover);
+  background: var(--brand-devportal-hover);
 }
 
 .value {

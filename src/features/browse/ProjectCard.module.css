@@ -44,6 +44,7 @@
 
 /* The button is not positioned, so its ::after covers the whole card. */
 .title {
+  text-decoration: none;
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;

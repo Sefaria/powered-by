@@ -142,7 +142,7 @@ test.describe('filters', () => {
     await expect(page.getByRole('button', { name: 'Show 122 projects' })).toBeVisible()
   })
 
-  test('known issues: hidden by default, shown with a badge when switched on', async ({
+  test('known issues: hidden by default, shown (without a badge) when switched on', async ({
     page,
     isMobile,
   }) => {
@@ -164,10 +164,10 @@ test.describe('filters', () => {
     await expect(page.getByRole('button', { name: 'Explore 134 projects' })).toBeVisible()
     await expect(page.getByText('Showing 24 of 134 projects')).toBeVisible()
 
-    // a buggy project is now findable, with its badge; off again, it's gone
+    // a buggy project is now findable, with no badge; off again, it's gone
     await page.goto('/?bugs=1&q=Daf+Quiz')
     await expect(page.getByRole('heading', { level: 3, name: 'Daf Quiz' })).toBeVisible()
-    await expect(page.getByRole('img', { name: 'Known issues' })).toBeVisible()
+    await expect(page.getByRole('img', { name: 'Known issues' })).toHaveCount(0)
     await page.goto('/?q=Daf+Quiz')
     await expect(page.getByText('No projects match that search.')).toBeVisible()
   })
@@ -185,18 +185,28 @@ test.describe('filters', () => {
     ).toBeChecked()
   })
 
-  test('deep link to a buggy project opens its dialog with the badge, switch stays off', async ({
+  test('a known-issues project opens its page from the arrow, with the notice above the button', async ({
+    page,
+  }) => {
+    await page.goto('/?bugs=1&q=Daf+Quiz')
+    await page.getByRole('link', { name: 'About Daf Quiz' }).click()
+    await expect(page).toHaveURL(new RegExp(`/projects/${PROJECTS.dafQuiz}-daf-quiz`))
+    const note = page.getByRole('note')
+    await expect(note).toContainText('This project may no longer be active.')
+    const open = page.getByRole('link', { name: /^Open anyway/ })
+    await expect(open).toBeVisible()
+    const [noteBox, openBox] = [await note.boundingBox(), await open.boundingBox()]
+    expect(noteBox!.y + noteBox!.height).toBeLessThanOrEqual(openBox!.y)
+  })
+
+  test('the project page of a known-issues project works with the switch off', async ({
     page,
     isMobile,
   }) => {
-    await page.goto(`/?project=${PROJECTS.dafQuiz}`)
-    const dialog = page.getByRole('dialog', { name: 'Daf Quiz' })
-    await expect(dialog).toBeVisible()
-    await expect(dialog.getByText('Known issues')).toBeVisible()
-    await expect(page).not.toHaveURL(/bugs=/)
-    await page.getByRole('button', { name: 'Close' }).click()
-    await expect(dialog).toBeHidden()
-    await expect(page.getByRole('button', { name: 'Explore 122 projects' })).toBeVisible()
+    await page.goto(`/projects/${PROJECTS.dafQuiz}`)
+    await expect(page.getByRole('heading', { level: 1, name: 'Daf Quiz' })).toBeVisible()
+    await page.getByRole('link', { name: 'All projects' }).first().click()
+    await waitForProjects(page)
     await openFilters(page, isMobile)
     await expect(
       filterScope(page, isMobile).getByRole('switch', { name: 'Show projects with known issues' }),

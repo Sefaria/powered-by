@@ -84,18 +84,20 @@ test.describe('featured band', () => {
     void scroller
   })
 
-  test('opening a featured card shows the project dialog', async ({ page }) => {
+  test('opening a featured card shows the project page', async ({ page }) => {
     await serveProjects(page, featureThree)
     await page.goto('/')
     await waitForProjects(page)
-    await band(page).getByRole('button', { name: 'Talmud Navigator' }).click()
-    await expect(page.getByRole('dialog', { name: 'Talmud Navigator' })).toBeVisible()
-    await expect(page).toHaveURL(new RegExp(`project=${PROJECTS.talmudNavigator}`))
+    await band(page).getByRole('link', { name: 'Talmud Navigator', exact: true }).click()
+    await expect(page).toHaveURL(
+      new RegExp(`/projects/${PROJECTS.talmudNavigator}-talmud-navigator`),
+    )
+    await expect(page.getByRole('heading', { level: 1, name: 'Talmud Navigator' })).toBeVisible()
     await page.goBack()
-    await expect(page.getByRole('dialog')).toBeHidden()
+    await expect(band(page)).toBeVisible()
   })
 
-  test('never features a buggy project while known issues are hidden', async ({ page }) => {
+  test('never features a buggy project, even when known issues are shown', async ({ page }) => {
     await serveProjects(page, (rows) => {
       featureThree(rows)
       for (const row of rows) {
@@ -110,8 +112,8 @@ test.describe('featured band', () => {
 
     await page.goto('/?bugs=1')
     await waitForProjects(page)
-    await expect(band(page).getByRole('button', { name: 'Daf Quiz' })).toBeVisible()
-    await expect(band(page).getByRole('img', { name: 'Known issues' })).toBeVisible()
+    await expect(band(page).getByRole('heading', { level: 3 })).toHaveCount(3)
+    await expect(band(page).getByText('Daf Quiz')).toHaveCount(0)
   })
 
   test('the band ignores search and filters', async ({ page }) => {
