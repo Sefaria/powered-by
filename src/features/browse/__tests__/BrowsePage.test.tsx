@@ -1,8 +1,9 @@
-import { render, screen, within } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router'
+import { MemoryRouter, Route, Routes, useNavigate } from 'react-router'
 import { axe } from 'vitest-axe'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { initAnalytics, resetAnalytics } from '../../../lib/analytics'
 import { resetProjectsCache } from '../../../hooks/useProjects'
 import { BrowsePage } from '../BrowsePage'
 import { fixtureRaw, makeRaw } from '../../../test/factories'
@@ -15,12 +16,22 @@ function stubApi(projects: unknown[]) {
   return fetchMock
 }
 
+function ProjectStub() {
+  const navigate = useNavigate()
+  return (
+    <>
+      <p>On a project page</p>
+      <button onClick={() => navigate(-1)}>Back</button>
+    </>
+  )
+}
+
 function renderPage(url = '/') {
   return render(
     <MemoryRouter initialEntries={[url]}>
       <Routes>
         <Route path="/" element={<BrowsePage />} />
-        <Route path="/projects/:slug" element={<p>On a project page</p>} />
+        <Route path="/projects/:slug" element={<ProjectStub />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -50,6 +61,70 @@ describe('BrowsePage', () => {
     expect(screen.queryByRole('button', { name: 'Show more projects' })).toBeNull()
     // focus moved to the first newly shown card (index 24)
     expect(document.activeElement).toHaveAttribute('data-result-index', '24')
+  })
+
+  it('keeps "Show more" depth when coming Back from a project page', async () => {
+    stubApi(Array.from({ length: 60 }, (_, i) => makeRaw({ id: i + 1, project_name: `P${i + 1}` })))
+    renderPage()
+    await screen.findByText(/Showing 24 of 60/)
+    await userEvent.click(screen.getByRole('button', { name: 'Show more projects' }))
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(48)
+    await userEvent.click(screen.getByRole('link', { name: 'P40' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Back' }))
+    await screen.findByText(/Showing 48 of 60/)
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(48)
+    expect(screen.getByRole('link', { name: 'P40' })).toBeInTheDocument()
+  })
+
+  it('does not restore a saved depth once the filters have changed', async () => {
+    stubApi(Array.from({ length: 60 }, (_, i) => makeRaw({ id: i + 1, project_name: `P${i + 1}` })))
+    renderPage()
+    await screen.findByText(/Showing 24 of 60/)
+    await userEvent.click(screen.getByRole('button', { name: 'Show more projects' }))
+    await userEvent.type(screen.getByRole('searchbox'), 'P5')
+    expect(await screen.findByText('11 projects match')).toBeInTheDocument()
+    await userEvent.clear(screen.getByRole('searchbox'))
+    await screen.findByText(/Showing 24 of 60/)
+  })
+
+  describe('search analytics', () => {
+    const plausible = vi.fn()
+    beforeEach(() => {
+      vi.stubEnv('VITE_ANALYTICS_DOMAIN', 'powered-by.sefaria.org')
+      resetAnalytics()
+      plausible.mockReset()
+      window.plausible = plausible
+      initAnalytics()
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    })
+    afterEach(() => {
+      vi.useRealTimers()
+      vi.unstubAllEnvs()
+      resetAnalytics()
+      delete window.plausible
+      document.head.querySelectorAll('script[data-domain]').forEach((s) => s.remove())
+    })
+    const searches = () => plausible.mock.calls.filter(([event]) => event === 'search')
+
+    it('waits for the projects to load, so a slow response is not counted as 0 results', async () => {
+      let respond!: (r: Response) => void
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockReturnValue(new Promise<Response>((resolve) => (respond = resolve))),
+      )
+      renderPage('/?q=alp')
+      await act(() => vi.advanceTimersByTimeAsync(3000))
+      expect(searches()).toHaveLength(0)
+      await act(async () => {
+        respond(
+          new Response(JSON.stringify({ projects: [makeRaw({ id: 1, project_name: 'Alpha' })] })),
+        )
+      })
+      expect(screen.getByText('1 project matches')).toBeInTheDocument()
+      await act(() => vi.advanceTimersByTimeAsync(1000))
+      expect(searches()).toHaveLength(1)
+      expect(searches()[0]?.[1]).toMatchObject({ props: { has_query: true, results: '1-5' } })
+    })
   })
 
   it('filters by search after the debounce and updates the summary', async () => {

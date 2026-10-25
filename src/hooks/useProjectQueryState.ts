@@ -48,6 +48,7 @@ export function useProjectQueryState(): ProjectQueryApi {
       if (patch.view) storeView(patch.view)
       setSearchParams(serializeQueryState({ ...state, ...patch }, defaultView), {
         replace: true,
+        preventScrollReset: true, // a filter/sort/search change must not jump back to the hero
         state: location.state,
       })
     },

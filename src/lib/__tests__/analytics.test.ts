@@ -67,7 +67,10 @@ describe('analytics', () => {
     vi.stubEnv('VITE_ANALYTICS_DOMAIN', 'powered-by.sefaria.org')
     initAnalytics()
     track('search', { has_query: true, results: searchResultsBucket(3) })
-    expect(plausible).toHaveBeenCalledWith('search', { props: { has_query: true, results: '1-5' } })
+    expect(plausible).toHaveBeenCalledWith('search', {
+      u: `${window.location.origin}${window.location.pathname}`,
+      props: { has_query: true, results: '1-5' },
+    })
     plausible.mockImplementation(() => {
       throw new Error('blocked')
     })
@@ -80,7 +83,20 @@ describe('analytics', () => {
     trackPageview('/charts')
     expect(plausible).not.toHaveBeenCalled()
     trackPageview('/projects/1-x')
-    expect(plausible).toHaveBeenCalledWith('pageview', undefined)
+    expect(plausible).toHaveBeenCalledWith('pageview', {
+      u: `${window.location.origin}${window.location.pathname}`,
+    })
+  })
+
+  it('reports the URL without its query or hash, so search text never leaves the page', () => {
+    vi.stubEnv('VITE_ANALYTICS_DOMAIN', 'powered-by.sefaria.org')
+    initAnalytics()
+    window.history.replaceState(null, '', '/?q=secret+term#results')
+    track('view_change', { view: 'list' })
+    window.history.replaceState(null, '', '/')
+    const options = plausible.mock.calls[0]?.[1] as { u: string }
+    expect(options.u).toBe(`${window.location.origin}/`)
+    expect(JSON.stringify(options)).not.toContain('secret')
   })
 
   it('buckets search results', () => {

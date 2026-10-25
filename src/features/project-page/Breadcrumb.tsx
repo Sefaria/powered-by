@@ -19,7 +19,8 @@ export function Breadcrumb({ name }: { name: string }) {
         to="/"
         className={styles.back}
         onClick={(event) => {
-          if (!cameFromBrowse) return
+          const modified = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
+          if (!cameFromBrowse || modified || event.button !== 0) return
           event.preventDefault()
           navigate(-1)
         }}

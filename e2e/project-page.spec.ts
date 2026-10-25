@@ -86,6 +86,18 @@ for (const { width, layout } of WIDTHS) {
       }
     })
 
+    if (width < 600) {
+      test('the bottom bar never covers the last of the details', async ({ page }) => {
+        await page.goto(`/projects/${PROJECTS.torahMcp}`)
+        await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+        const details = page.locator('section[aria-labelledby="details-heading"]')
+        await expect(details).toBeVisible()
+        const [detailsBox, barBox] = [await details.boundingBox(), await cta(page).boundingBox()]
+        expect(detailsBox!.y + detailsBox!.height).toBeLessThanOrEqual(barBox!.y + 1)
+      })
+    }
+
     test('a known-issues project has the notice above "Open anyway"', async ({ page }) => {
       await page.goto(`/projects/${PROJECTS.dafQuiz}`)
       const panel = cta(page)

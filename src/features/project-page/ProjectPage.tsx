@@ -48,7 +48,7 @@ export function ProjectPage() {
 function PageShell({ children }: { children: React.ReactNode }) {
   return (
     <PageLayout skipTo={SKIP}>
-      <div className={styles.page} id={SKIP.id}>
+      <div className={styles.page} id={SKIP.id} tabIndex={-1}>
         {children}
       </div>
     </PageLayout>
@@ -122,7 +122,7 @@ function ProjectView({
 
   return (
     <PageLayout skipTo={SKIP}>
-      <div className={styles.page} id={SKIP.id}>
+      <div className={styles.page} id={SKIP.id} tabIndex={-1}>
         <Breadcrumb name={project.name} />
         <div className={styles.layout}>
           <div className={styles.head}>

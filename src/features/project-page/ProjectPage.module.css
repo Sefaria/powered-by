@@ -5,6 +5,10 @@
   padding: 0 var(--space-2xl) var(--space-6xl);
 }
 
+.page:focus {
+  outline: none;
+}
+
 .skeleton {
   display: flex;
   flex-direction: column;
@@ -12,14 +16,11 @@
   padding-top: var(--space-3xl);
 }
 
-/* <600px: head, body, then the CTA last so it can stick to the bottom of the screen. */
+/* <600px: head, body, then the CTA last, in flow, so it keeps its own height after the details
+   (nothing hides behind it) and, as a flex item of .layout, can stick to the bottom of the screen. */
 .layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas:
-    'head'
-    'body'
-    'cta';
+  display: flex;
+  flex-direction: column;
   gap: var(--space-2xl);
   padding-top: var(--space-lg);
 }
@@ -30,10 +31,7 @@
 }
 
 .cta {
-  /* A sticky item sticks within its grid area, so on mobile the area spans every row and the bar
-     sits at the end of it: it is last in source order and last on screen. */
-  grid-area: 1 / 1 / -1 / -1;
-  align-self: end;
+  order: 3;
   z-index: 5;
 }
 
@@ -45,6 +43,8 @@
 /* 600-1023px: the CTA is an inline panel under the header. */
 @media (min-width: 600px) {
   .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       'head'
       'cta'
@@ -53,6 +53,7 @@
   }
 
   .cta {
+    order: 0;
     grid-area: cta;
     align-self: start;
   }

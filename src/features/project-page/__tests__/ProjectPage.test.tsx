@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router'
 import { axe } from 'vitest-axe'
@@ -185,6 +185,20 @@ describe('ProjectPage', () => {
     expect(await screen.findByRole('heading', { level: 1 })).toHaveFocus()
   })
 
+  it('"Skip to project" moves focus into the page, whatever state it is in', async () => {
+    stubApi([full])
+    const { unmount } = renderAt('/projects/141-torah-mcp')
+    await screen.findByRole('heading', { level: 1 })
+    await userEvent.click(screen.getByRole('link', { name: 'Skip to project' }))
+    expect(document.getElementById('project-main')).toHaveFocus()
+    unmount()
+    stubApi([full])
+    renderAt('/projects/999-nope')
+    await screen.findByRole('heading', { name: 'Project not found' })
+    await userEvent.click(screen.getByRole('link', { name: 'Skip to project' }))
+    expect(document.getElementById('project-main')).toHaveFocus()
+  })
+
   describe('breadcrumb', () => {
     it('shows "← All projects / Name" with the current page marked', async () => {
       stubApi([full])
@@ -201,6 +215,14 @@ describe('ProjectPage', () => {
       expect(await screen.findByText('Browse page')).toBeInTheDocument()
       // navigate(-1), not a push: the entry we left is the one we are on
       expect(screen.getByTestId('where')).toHaveTextContent('/')
+    })
+
+    it('leaves modified clicks to the browser instead of going back', async () => {
+      stubApi([full])
+      renderAt({ pathname: '/projects/141-torah-mcp', state: FROM_BROWSE }, ['/?category=ai'])
+      const link = await screen.findByRole('link', { name: 'All projects' })
+      fireEvent.click(link, { ctrlKey: true })
+      expect(screen.queryByText('Browse page')).toBeNull()
     })
 
     it('links to / when the page was opened directly', async () => {

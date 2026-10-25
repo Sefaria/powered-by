@@ -20,7 +20,7 @@ export interface AnalyticsEvents {
 }
 
 interface Plausible {
-  (event: string, options?: { props?: object }): void
+  (event: string, options?: { u?: string; props?: object }): void
   q?: unknown[]
 }
 
@@ -80,7 +80,9 @@ export function resetAnalytics() {
 function send(event: string, props?: object) {
   if (!enabled) return
   try {
-    window.plausible?.(event, props ? { props } : undefined)
+    // The manual script reports the full current URL, which can carry ?q=…: send it without query or hash.
+    const u = `${window.location.origin}${window.location.pathname}`
+    window.plausible?.(event, props ? { u, props } : { u })
   } catch {
     // analytics must never break the page
   }
