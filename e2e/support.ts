@@ -32,6 +32,8 @@ export const test = base.extend({
         headers: { 'access-control-allow-origin': '*' },
       }),
     )
+    // GA4 (index.html): tests must stay offline and never send hits to the real property
+    await page.route(/googletagmanager\.com|google-analytics\.com/, (route) => route.abort())
     // keep tests offline and fast; screenshots (SCREENSHOTS=1) want the real web fonts
     if (!process.env.SCREENSHOTS)
       await page.route(/fonts\.(googleapis|gstatic)\.com/, (route) => route.abort())
