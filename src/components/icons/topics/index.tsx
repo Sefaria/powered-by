@@ -81,5 +81,5 @@ export function KabbalahIcon(props: IconProps) {
   )
 }
 
-/** Halakha: Lucide's scale. */
+/** Halakhah: Lucide's scale. */
 export const HalakhaIcon = Scale

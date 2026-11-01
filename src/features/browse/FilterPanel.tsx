@@ -5,6 +5,7 @@ import { CategoryIcon } from '../../components/icons/CategoryIcon'
 import { cx } from '../../components/ui/cx'
 import { Switch } from '../../components/ui/Switch'
 import { FacetGroup } from './FacetGroup'
+import { LanguageName } from './LanguageName'
 import { FilterSection } from './FilterSection'
 import styles from './FilterPanel.module.css'
 
@@ -96,6 +97,9 @@ export function FilterPanel({ facets, filters, onChange, large }: FilterPanelPro
               options={facets[key]}
               searchable={searchable}
               large={large}
+              renderLabel={
+                key === 'languages' ? (value) => <LanguageName name={value} /> : undefined
+              }
               onToggle={(value, checked) => toggle(key, value, checked)}
             />
           )}

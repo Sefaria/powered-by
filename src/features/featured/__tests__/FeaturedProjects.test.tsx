@@ -31,16 +31,18 @@ describe('FeaturedProjects', () => {
   it('renders nothing for an empty list: no band and no heading', () => {
     const { container } = render(<FeaturedProjects projects={[]} />)
     expect(container).toBeEmptyDOMElement()
-    expect(screen.queryByRole('heading', { name: 'Featured projects' })).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Featured Projects' })).toBeNull()
   })
 
   it('is a section labelled by its heading, with the subtitle', () => {
     const { container } = render(<FeaturedProjects projects={projects} />)
     const band = container.querySelector('section') as HTMLElement
-    const heading = within(band).getByRole('heading', { level: 2, name: 'Featured projects' })
+    const heading = within(band).getByRole('heading', { level: 2, name: 'Featured Projects' })
     expect(heading).toHaveAttribute('id', 'featured-heading')
     expect(band).toHaveAttribute('aria-labelledby', 'featured-heading')
-    expect(within(band).getByText('Hand-picked by the Sefaria team.')).toBeInTheDocument()
+    expect(
+      within(band).getByText('Hand-picked by the Developers on Sefaria team'),
+    ).toBeInTheDocument()
   })
 
   it('shows each card: category art, label, title link, description and "Made with", no tags', () => {
@@ -94,7 +96,7 @@ describe('FeaturedProjects', () => {
     // jsdom matches no media query, so this is the < 900px layout
     const { container } = render(<FeaturedProjects projects={projects} />)
     const scroller = container.querySelector('div[role="region"]')
-    expect(scroller).toHaveAttribute('aria-label', 'Featured projects, scrollable')
+    expect(scroller).toHaveAttribute('aria-label', 'Featured Projects, scrollable')
     expect(scroller).toHaveAttribute('tabindex', '0')
     expect(within(scroller as HTMLElement).getAllByRole('listitem')).toHaveLength(2)
   })

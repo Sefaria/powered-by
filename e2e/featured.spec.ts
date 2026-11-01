@@ -23,7 +23,7 @@ test.describe('featured band', () => {
   test('is absent while no project is featured (as in production today)', async ({ page }) => {
     await page.goto('/')
     await waitForProjects(page)
-    await expect(page.getByRole('heading', { name: 'Featured projects' })).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: 'Featured Projects' })).toHaveCount(0)
     await expect(band(page)).toHaveCount(0)
   })
 
@@ -48,8 +48,8 @@ test.describe('featured band', () => {
     await page.goto('/')
     await waitForProjects(page)
     await expect(band(page)).toBeVisible()
-    await expect(band(page).getByRole('heading', { level: 2 })).toHaveText('Featured projects')
-    await expect(band(page).getByText('Hand-picked by the Sefaria team.')).toBeVisible()
+    await expect(band(page).getByRole('heading', { level: 2 })).toHaveText('Featured Projects')
+    await expect(band(page).getByText('Hand-picked by the Developers on Sefaria team')).toBeVisible()
     await expect(band(page).getByRole('heading', { level: 3 })).toHaveText([
       "Today's Daf (daf-yomi.dev)",
       'Talmud Navigator',
@@ -78,7 +78,7 @@ test.describe('featured band', () => {
     const second = await cards.nth(1).boundingBox()
     const third = await cards.nth(2).boundingBox()
     if (isMobile) {
-      const region = band(page).getByRole('region', { name: 'Featured projects, scrollable' })
+      const region = band(page).getByRole('region', { name: 'Featured Projects, scrollable' })
       await expect(region).toHaveAttribute('tabindex', '0')
       expect(await region.evaluate((el) => getComputedStyle(el).scrollSnapType)).toMatch(
         /x mandatory/,

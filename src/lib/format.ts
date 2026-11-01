@@ -12,3 +12,26 @@ export function formatNumber(n: number): string {
 export function pluralize(n: number, one: string, many = `${one}s`): string {
   return n === 1 ? one : many
 }
+
+const QUOTE_PAIRS: ReadonlyArray<readonly [string, string]> = [
+  ['"', '"'],
+  ["'", "'"],
+  ['“', '”'],
+  ['‘', '’'],
+]
+
+/**
+ * Trims the text and removes quote marks that wrap all of it (straight or curly), so
+ * we can add our own. A lone quote or apostrophe at one end is left alone.
+ */
+export function stripWrappingQuotes(text: string): string {
+  let out = text.trim()
+  for (let again = true; again;) {
+    const unwrapped = QUOTE_PAIRS.find(
+      ([open, close]) => out.length >= 2 && out.startsWith(open) && out.endsWith(close),
+    )
+    again = unwrapped !== undefined
+    if (unwrapped) out = out.slice(1, -1).trim()
+  }
+  return out
+}

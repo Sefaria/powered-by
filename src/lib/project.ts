@@ -84,7 +84,18 @@ export function safeUrl(value: string | null | undefined): URL | null {
 const MONTH_YEAR =
   /^(January|February|March|April|May|June|July|August|September|October|November|December) \d{4}$/i
 const META_TAGS = new Set(['not vibe-coded', 'no experience', 'experience unspecified'])
-const ALIASES: Record<string, string> = { kaballah: 'Kabbalah' }
+const ALIASES: Record<string, string> = {
+  kaballah: 'Kabbalah',
+  halakha: 'Halakhah',
+  chavruta: 'Chavruta',
+  parasha: 'Parashah',
+}
+
+/** The canonical spelling of a topic, so older links and misspelt tags still match. */
+export function canonicalTopic(topic: string): string {
+  const trimmed = topic.trim()
+  return ALIASES[trimmed.toLowerCase()] ?? trimmed
+}
 
 /** Trim, dedupe case-insensitively, alias typos, drop dates and meta tags. */
 export function cleanTopics(tags: readonly string[] | null | undefined): string[] {
@@ -94,7 +105,7 @@ export function cleanTopics(tags: readonly string[] | null | undefined): string[
     if (typeof tag !== 'string') continue
     const trimmed = tag.trim()
     if (!trimmed || MONTH_YEAR.test(trimmed) || META_TAGS.has(trimmed.toLowerCase())) continue
-    const topic = ALIASES[trimmed.toLowerCase()] ?? trimmed
+    const topic = canonicalTopic(trimmed)
     const key = topic.toLowerCase()
     if (seen.has(key)) continue
     seen.add(key)

@@ -73,4 +73,10 @@ describe('query state', () => {
     expect(serializeQueryState({ ...base, view: 'list' }, 'list').toString()).toBe('')
     expect(serializeQueryState({ ...base, view: 'grid' }, 'list').toString()).toBe('view=grid')
   })
+
+  it("maps older link values for renamed topics and resource groups to today's", () => {
+    const state = parseQueryState('topic=Halakha,chavruta&resource=Links %26 related,Name lookup')
+    expect(state.topics).toEqual(['Halakhah', 'Chavruta'])
+    expect(state.resources).toEqual(['Links & Related', 'Name Lookup'])
+  })
 })

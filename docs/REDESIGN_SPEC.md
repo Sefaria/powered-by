@@ -170,7 +170,7 @@ Lucide is mapped per category. Each icon renders inside a `--module-primary` til
 | Community, Interaction, & Social | Community & Social | `Users` |
 | Visualization & Data Analysis | Visualization & Data | `ChartColumn` |
 | Extensions, API Integrations, & GitHub Code (+ legacy "Extensions and API Integrations") | Extensions & API | `Plug` |
-| (none matched) | Uncategorized | `Folder` |
+| (none matched) | Other | `Folder` |
 | "All projects" filter row | All projects | `LayoutGrid` |
 
 Other icons:
@@ -391,7 +391,7 @@ Layout below the hero, inside the container:
 **Section "CATEGORY"** (14/600 uppercase `--text-secondary` legend):
 
 - Single-select radio rows, 44px (52px in the sheet). Each row shows the category icon (18px, in the category color, §16.1), the short label, and a right-aligned count (14px, `--text-secondary`).
-- Rows: All projects, Learning & Study, AI & Apps, Extensions & API, Visualization & Data, Community & Social, Uncategorized.
+- Rows: All projects, Learning & Study, AI & Apps, Extensions & API, Visualization & Data, Community & Social, Other.
 - Selected row: `--surface-selected` background and weight 600.
 - Implement as a real radio group (`fieldset` + `legend` + inputs, visually styled), not buttons, so arrow keys work.
 
@@ -488,7 +488,7 @@ Below the toolbar:
    - Helper text, 14px `--text-secondary`: "Opens {domain} in a new tab" (mobile footer: "{domain} · opens in a new tab").
    - **"View source code"** (only if `sourceUrl`): outlined, 1.5px `--module-primary` inset, purple text, `CodeXml` icon, 44px.
    - **This purple CTA deliberately departs from the design system**, whose primary buttons are navy. Mention it in the PR.
-4. **"Project Backstory"** (only if `backstory`): an `h3` label in 14/600 `--text-secondary`, then the text in 18/1.6 `--text-primary`. Plain upright text. **No quotation marks, no italics, no attribution line.**
+4. **"In the creator’s words"** (only if `backstory` has text): a serif 28 `h2` (`id="why"`), then a `figure` holding a `blockquote` with the text in curly quotes added in code (`stripWrappingQuotes()` removes any the submitter typed), serif 22 (19 mobile) / 1.55 `--text-primary`, upright. A `figcaption` "Written by the project’s creator" in 14/20 `--text-secondary`, 12px below. No italics, no left border, no background.
 5. **Details** `<dl>` (top border, padding-top 24, row gap 24; each `dt` is 14/600 `--text-secondary`):
    - **Sefaria resources used:** one tag per resource. Monospace 14, `--surface-selected` fill, `--text-link` text, radius 4, 32px, `Braces` 14px icon.
    - **Built with:** plain text, 16/1.5.
@@ -564,11 +564,11 @@ All aggregation lives in `features/charts/selectors.ts` as pure functions with u
      - Texts: `/api/texts*`, `/api/v3/texts`, `/api/text`, "Text"
      - Index & structure: `/api/index`, `/api/v2/raw/index`, `/api/v2/index`, `/api/shape`, `/api/counts`
      - Calendars
-     - Links & related: `/api/links`, `/api/related`
+     - Links & Related: `/api/links`, `/api/related`
      - Search: `/api/search*`
-     - Dictionary (words): `/api/words*`
+     - Dictionary (Words): `/api/words*`
      - Documentation
-     - Name lookup: `/api/name`
+     - Name Lookup: `/api/name`
      - Sefaria-Export
      - Sefaria MCP
      - Manuscripts
@@ -702,7 +702,7 @@ Tokens (`src/styles/tokens.css`):
 | `--category-community` | `#ab4e66` | Community & Social (rose) | 5.2:1 |
 | `--category-viz` | `#4b71b7` | Visualization & Data (blue) | 4.8:1 |
 | `--category-ext` | `#5d956f` | Extensions & API (green) | 3.5:1 |
-| `--category-none` | `#575757` | Uncategorized (grey); also the "All projects" filter icon | 7.0:1 |
+| `--category-none` | `#575757` | Other (grey); also the "All projects" filter icon | 7.0:1 |
 
 - `src/lib/categories.ts` exports one `CATEGORY_META: Record<CategoryId, { label, Icon, colorVar }>`. `Icon` is a lucide-react component and `colorVar` is the `var(--category-*)` expression. Every component reads label, icon and color from it. No hard-coded purple remains on category icons.
 - **Applies to:** grid-card tile (40px tile, 24px white icon), list-row tile (32px, 18px), featured-card header (§16.2), category filter rows (18px icon in the category color, no tile).
@@ -711,7 +711,7 @@ Tokens (`src/styles/tokens.css`):
 - Accessibility: white on every color is ≥3:1 (enough for a graphic). The text label always accompanies the color.
 - These colors are reused from Sefaria's library category palette. They do not carry the library's section meanings here (say so in the PR).
 
-#### 16.2 Featured projects band
+#### 16.2 Featured Projects band
 
 `<FeaturedProjects>` renders between the hero and the browse area.
 
@@ -725,9 +725,9 @@ Tokens (`src/styles/tokens.css`):
 **Band**
 
 - Full width, `--surface-subtle` background, 1px `--border-default` bottom border. Inner container max-width 1280, padding 48px 24px (32px 16px below 640px), gap 24.
-- `<section aria-labelledby="featured-heading">`. `<h2 id="featured-heading">Featured projects</h2>`: serif 32/1.2, weight 500 (28 below 640px). Subtitle "Hand-picked by the Sefaria team.", 16px, `--text-secondary`.
+- `<section aria-labelledby="featured-heading">`. `<h2 id="featured-heading">Featured Projects</h2>`: serif 32/1.2, weight 500 (28 below 640px). Subtitle "Hand-picked by the Developers on Sefaria team", 16px, `--text-secondary`.
 - ≥900px: CSS grid, 3 equal columns, gap 24.
-- <900px: a horizontal scroll-snap row. Cards are `minmax(280px, 82%)` wide (300px on phones) so the next card peeks in. `scroll-snap-type: x mandatory`; `scroll-padding` matches the side padding; the scroller bleeds to the screen edges. The scroller has `tabindex="0"`, `role="region"` and `aria-label="Featured projects, scrollable"`. (Not plain "Featured projects": the `<section>` is already a landmark with that name, and axe's `landmark-unique` rejects two.) No arrows, dots or autoplay. Respect `prefers-reduced-motion`.
+- <900px: a horizontal scroll-snap row. Cards are `minmax(280px, 82%)` wide (300px on phones) so the next card peeks in. `scroll-snap-type: x mandatory`; `scroll-padding` matches the side padding; the scroller bleeds to the screen edges. The scroller has `tabindex="0"`, `role="region"` and `aria-label="Featured Projects, scrollable"`. (Not plain "Featured Projects": the `<section>` is already a landmark with that name, and axe's `landmark-unique` rejects two.) No arrows, dots or autoplay. Respect `prefers-reduced-motion`.
 
 **`<FeaturedCard>`** (a variant of `ProjectCard`: same open-dialog behaviour and stretched button)
 

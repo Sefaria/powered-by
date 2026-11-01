@@ -64,7 +64,7 @@ describe('CATEGORY_META', () => {
   })
   it('exposes short labels', () => {
     expect(CATEGORY_META.ai.label).toBe('AI & Apps')
-    expect(CATEGORY_META.none.label).toBe('Uncategorized')
+    expect(CATEGORY_META.none.label).toBe('Other')
   })
   it('colors the "All projects" row grey', () => {
     expect(ALL_PROJECTS_META.colorVar).toBe('var(--category-none)')
