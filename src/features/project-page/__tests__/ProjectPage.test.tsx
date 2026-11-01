@@ -126,6 +126,13 @@ describe('ProjectPage', () => {
     expect(screen.queryByRole('link', { name: /Open anyway/ })).toBeNull()
   })
 
+  it('opens each paragraph of a multi-paragraph backstory and closes only the last', async () => {
+    stubApi([{ ...full, project_why: '"First thought.\n\nSecond thought."' }])
+    renderAt('/projects/141-torah-mcp')
+    expect(await screen.findByText('“First thought.')).toBeInTheDocument()
+    expect(screen.getByText('“Second thought.”')).toBeInTheDocument()
+  })
+
   it('hides every empty section, row and button', async () => {
     stubApi([sparse])
     renderAt('/projects/2-sparse')

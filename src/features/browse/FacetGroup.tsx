@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Check } from 'lucide-react'
-import type { ReactNode } from 'react'
 import type { FacetOption } from '../../lib/filter'
 import { Button } from '../../components/ui/Button'
 import { cx } from '../../components/ui/cx'

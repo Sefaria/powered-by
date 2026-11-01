@@ -6,7 +6,10 @@ export function LanguageName({ name }: { name: string }) {
   if (!native) return <>{name}</>
   return (
     <>
-      {name} <span dir="auto">{native}</span>
+      {name}{' '}
+      <span lang={native.code} dir="auto">
+        {native.text}
+      </span>
     </>
   )
 }

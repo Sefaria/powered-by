@@ -48,7 +48,8 @@ export function ActiveFilters({ filters, onChange, onClearAll }: ActiveFiltersPr
               <span className={styles.chip}>
                 {active.key === 'languages' ? (
                   <>
-                    Language: <LanguageName name={active.value} />
+                    {PREFIX.languages}
+                    <LanguageName name={active.value} />
                   </>
                 ) : (
                   label

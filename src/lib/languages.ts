@@ -1,51 +1,57 @@
+interface NativeName {
+  text: string
+  /** BCP 47 code, so screen readers pronounce the name correctly. */
+  code: string
+}
+
+/** Each language's name in its own script. Omitted when it matches the English name. */
+const NATIVE_NAMES: Readonly<Record<string, NativeName>> = {
+  Amharic: { text: 'አማርኛ', code: 'am' },
+  Arabic: { text: 'العربية', code: 'ar' },
+  Aramaic: { text: 'ארמית', code: 'arc' },
+  Bengali: { text: 'বাংলা', code: 'bn' },
+  Bulgarian: { text: 'Български', code: 'bg' },
+  Catalan: { text: 'Català', code: 'ca' },
+  Chinese: { text: '中文', code: 'zh' },
+  Croatian: { text: 'Hrvatski', code: 'hr' },
+  Czech: { text: 'Čeština', code: 'cs' },
+  Danish: { text: 'Dansk', code: 'da' },
+  Dutch: { text: 'Nederlands', code: 'nl' },
+  Finnish: { text: 'Suomi', code: 'fi' },
+  French: { text: 'Français', code: 'fr' },
+  German: { text: 'Deutsch', code: 'de' },
+  Greek: { text: 'Ελληνικά', code: 'el' },
+  Hebrew: { text: 'עברית', code: 'he' },
+  Hindi: { text: 'हिन्दी', code: 'hi' },
+  Hungarian: { text: 'Magyar', code: 'hu' },
+  Indonesian: { text: 'Bahasa Indonesia', code: 'id' },
+  Italian: { text: 'Italiano', code: 'it' },
+  Japanese: { text: '日本語', code: 'ja' },
+  Korean: { text: '한국어', code: 'ko' },
+  Ladino: { text: 'לאדינו', code: 'lad' },
+  Latin: { text: 'Latina', code: 'la' },
+  Norwegian: { text: 'Norsk', code: 'no' },
+  Persian: { text: 'فارسی', code: 'fa' },
+  Polish: { text: 'Polski', code: 'pl' },
+  Portuguese: { text: 'Português', code: 'pt' },
+  Romanian: { text: 'Română', code: 'ro' },
+  Russian: { text: 'Русский', code: 'ru' },
+  Serbian: { text: 'Српски', code: 'sr' },
+  Spanish: { text: 'Español', code: 'es' },
+  Swahili: { text: 'Kiswahili', code: 'sw' },
+  Swedish: { text: 'Svenska', code: 'sv' },
+  Thai: { text: 'ไทย', code: 'th' },
+  Turkish: { text: 'Türkçe', code: 'tr' },
+  Ukrainian: { text: 'Українська', code: 'uk' },
+  Urdu: { text: 'اردو', code: 'ur' },
+  Vietnamese: { text: 'Tiếng Việt', code: 'vi' },
+  Yiddish: { text: 'ייִדיש', code: 'yi' },
+}
+
 /**
  * Language names that can appear in a project's free-form tags. Tags are
  * matched case-insensitively and shown in this canonical spelling.
  */
-/** Each language's name in its own script. Omitted when it matches the English name. */
-const NATIVE_NAMES: Readonly<Record<string, string>> = {
-  Amharic: 'አማርኛ',
-  Arabic: 'العربية',
-  Aramaic: 'ארמית',
-  Bengali: 'বাংলা',
-  Bulgarian: 'Български',
-  Catalan: 'Català',
-  Chinese: '中文',
-  Croatian: 'Hrvatski',
-  Czech: 'Čeština',
-  Danish: 'Dansk',
-  Dutch: 'Nederlands',
-  Finnish: 'Suomi',
-  French: 'Français',
-  German: 'Deutsch',
-  Greek: 'Ελληνικά',
-  Hebrew: 'עברית',
-  Hindi: 'हिन्दी',
-  Hungarian: 'Magyar',
-  Indonesian: 'Bahasa Indonesia',
-  Italian: 'Italiano',
-  Japanese: '日本語',
-  Korean: '한국어',
-  Ladino: 'לאדינו',
-  Latin: 'Latina',
-  Norwegian: 'Norsk',
-  Persian: 'فارسی',
-  Polish: 'Polski',
-  Portuguese: 'Português',
-  Romanian: 'Română',
-  Russian: 'Русский',
-  Serbian: 'Српски',
-  Spanish: 'Español',
-  Swahili: 'Kiswahili',
-  Swedish: 'Svenska',
-  Thai: 'ไทย',
-  Turkish: 'Türkçe',
-  Ukrainian: 'Українська',
-  Urdu: 'اردو',
-  Vietnamese: 'Tiếng Việt',
-  Yiddish: 'ייִדיש',
-}
-
 const LANGUAGE_NAMES = [
   'Amharic',
   'Arabic',
@@ -99,7 +105,7 @@ export function languageName(tag: string): string | null {
   return BY_LOWER.get(tag.trim().toLowerCase()) ?? null
 }
 
-/** The language's name in its own script (e.g. עברית), or null when none is shown. */
-export function nativeLanguageName(name: string): string | null {
+/** The language's name in its own script (e.g. עברית) and its language code, or null when none is shown. */
+export function nativeLanguageName(name: string): NativeName | null {
   return NATIVE_NAMES[name] ?? null
 }

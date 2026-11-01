@@ -1,5 +1,7 @@
 import { isCategoryId } from './categories'
+import { RESOURCE_GROUPS } from './endpoints'
 import { DEFAULT_FILTERS, type FacetKey, type Filters } from './filter'
+import { canonicalTopic } from './project'
 import { DEFAULT_SORT, type SortOption } from './sort'
 
 export type ViewMode = 'grid' | 'list'
@@ -19,9 +21,16 @@ const FACET_PARAMS: Record<FacetKey, string> = {
   tech: 'tech',
 }
 
-function parseList(value: string | null): string[] {
+/** Spellings that older shared links may still carry, mapped to today's facet values. */
+const RESOURCE_BY_LOWER = new Map<string, string>(RESOURCE_GROUPS.map((g) => [g.toLowerCase(), g]))
+const CANONICAL: Partial<Record<FacetKey, (value: string) => string>> = {
+  topics: canonicalTopic,
+  resources: (value) => RESOURCE_BY_LOWER.get(value.toLowerCase()) ?? value,
+}
+
+function parseList(value: string | null, canonical?: (value: string) => string): string[] {
   const items = (value ?? '').split(',').map((item) => item.trim())
-  return [...new Set(items.filter(Boolean))]
+  return [...new Set(items.filter(Boolean).map((item) => canonical?.(item) ?? item))]
 }
 
 export function parseQueryState(
@@ -35,9 +44,9 @@ export function parseQueryState(
   return {
     q: params.get('q') ?? DEFAULT_FILTERS.q,
     category: isCategoryId(category) ? category : 'all',
-    topics: parseList(params.get(FACET_PARAMS.topics)),
+    topics: parseList(params.get(FACET_PARAMS.topics), CANONICAL.topics),
     languages: parseList(params.get(FACET_PARAMS.languages)),
-    resources: parseList(params.get(FACET_PARAMS.resources)),
+    resources: parseList(params.get(FACET_PARAMS.resources), CANONICAL.resources),
     tech: parseList(params.get(FACET_PARAMS.tech)),
     showBuggy: params.get('bugs') === '1',
     // anything else, including the retired ?sort=users and ?sort=popular, is the default

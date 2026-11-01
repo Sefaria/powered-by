@@ -79,3 +79,11 @@
     gap: var(--space-lg);
   }
 }
+
+.quote blockquote p {
+  white-space: pre-line;
+}
+
+.quote blockquote p + p {
+  margin-top: 1em;
+}

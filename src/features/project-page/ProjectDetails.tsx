@@ -18,6 +18,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 export function ProjectDetails({ project }: { project: Project }) {
   const topics = detailTopics(project)
   const creatorWords = stripWrappingQuotes(project.backstory ?? '')
+  const paragraphs = creatorWords.split(/\n\s*\n/).map((p) => p.trim())
   const hasDetails =
     project.resources.length > 0 ||
     project.builtWith !== null ||
@@ -34,7 +35,13 @@ export function ProjectDetails({ project }: { project: Project }) {
           </h2>
           <figure className={styles.quote}>
             <blockquote>
-              <p>“{creatorWords}”</p>
+              {paragraphs.map((paragraph, i) => (
+                // Multi-paragraph quotes open each paragraph and close only the last.
+                <p key={i}>
+                  “{paragraph}
+                  {i === paragraphs.length - 1 && '”'}
+                </p>
+              ))}
             </blockquote>
             <figcaption>Written by the project’s creator</figcaption>
           </figure>

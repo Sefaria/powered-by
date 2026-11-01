@@ -91,6 +91,12 @@ const ALIASES: Record<string, string> = {
   parasha: 'Parashah',
 }
 
+/** The canonical spelling of a topic, so older links and misspelt tags still match. */
+export function canonicalTopic(topic: string): string {
+  const trimmed = topic.trim()
+  return ALIASES[trimmed.toLowerCase()] ?? trimmed
+}
+
 /** Trim, dedupe case-insensitively, alias typos, drop dates and meta tags. */
 export function cleanTopics(tags: readonly string[] | null | undefined): string[] {
   const seen = new Set<string>()
@@ -99,7 +105,7 @@ export function cleanTopics(tags: readonly string[] | null | undefined): string[
     if (typeof tag !== 'string') continue
     const trimmed = tag.trim()
     if (!trimmed || MONTH_YEAR.test(trimmed) || META_TAGS.has(trimmed.toLowerCase())) continue
-    const topic = ALIASES[trimmed.toLowerCase()] ?? trimmed
+    const topic = canonicalTopic(trimmed)
     const key = topic.toLowerCase()
     if (seen.has(key)) continue
     seen.add(key)

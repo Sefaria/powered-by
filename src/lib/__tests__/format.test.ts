@@ -22,9 +22,13 @@ describe('stripWrappingQuotes', () => {
     expect(stripWrappingQuotes('“Hello”')).toBe('Hello')
     expect(stripWrappingQuotes('‘Hello’')).toBe('Hello')
   })
-  it('strips a quote at only one end', () => {
-    expect(stripWrappingQuotes('"Hello')).toBe('Hello')
-    expect(stripWrappingQuotes('Hello”')).toBe('Hello')
+  it('leaves a lone quote or apostrophe at one end alone', () => {
+    expect(stripWrappingQuotes('"Hello')).toBe('"Hello')
+    expect(stripWrappingQuotes("for the students'")).toBe("for the students'")
+    expect(stripWrappingQuotes('"Hello" and \'goodbye\'')).toBe('"Hello" and \'goodbye\'')
+  })
+  it('strips nested wrapping pairs', () => {
+    expect(stripWrappingQuotes('“‘Hello’”')).toBe('Hello')
   })
   it('trims surrounding whitespace, inside and outside the quotes', () => {
     expect(stripWrappingQuotes('  \n “ Hello ” \n ')).toBe('Hello')
