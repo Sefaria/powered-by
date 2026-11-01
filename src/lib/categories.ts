@@ -71,7 +71,7 @@ export const CATEGORY_META: Record<CategoryId, CategoryDisplay> = {
     textVar: 'var(--category-ext-text)',
   },
   none: {
-    label: 'Uncategorized',
+    label: 'Other',
     Icon: Folder,
     colorVar: 'var(--category-none)',
     textVar: 'var(--category-none)',

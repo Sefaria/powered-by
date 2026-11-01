@@ -74,7 +74,12 @@ describe('ProjectPage', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Torah MCP' })).toBeInTheDocument()
     expect(document.title).toBe('Torah MCP · Powered by Sefaria')
     expect(screen.getByText('An MCP server for Sefaria.')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { level: 2, name: 'Project Backstory' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'In the creator’s words' }),
+    ).toBeInTheDocument()
+    const quote = screen.getByText('“Models misquote sources.”')
+    expect(quote.closest('blockquote')).not.toBeNull()
+    expect(screen.getByText('Written by the project’s creator')).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: 'Details' })).toBeInTheDocument()
     for (const label of [
       'Sefaria resources used',
@@ -125,7 +130,8 @@ describe('ProjectPage', () => {
     stubApi([sparse])
     renderAt('/projects/2-sparse')
     await screen.findByRole('heading', { level: 1, name: 'Sparse' })
-    expect(screen.queryByRole('heading', { name: 'Project Backstory' })).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'In the creator’s words' })).toBeNull()
+    expect(screen.queryByText('Written by the project’s creator')).toBeNull()
     expect(screen.queryByRole('heading', { name: 'Details' })).toBeNull()
     expect(screen.queryByRole('heading', { name: /More in/ })).toBeNull()
     expect(screen.queryByRole('link', { name: /Open/ })).toBeNull()

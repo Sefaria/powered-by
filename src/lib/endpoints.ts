@@ -51,11 +51,11 @@ export const RESOURCE_GROUPS = [
   'Texts',
   'Index & structure',
   'Calendars',
-  'Links & related',
+  'Links & Related',
   'Search',
-  'Dictionary (words)',
+  'Dictionary (Words)',
   'Documentation',
-  'Name lookup',
+  'Name Lookup',
   'Sefaria-Export',
   'Sefaria MCP',
   'Manuscripts',
@@ -93,10 +93,10 @@ export function resourceGroup(raw: string): ResourceGroup | null {
     return 'Index & structure'
   }
   if (path.startsWith('/api/calendars')) return 'Calendars'
-  if (path === '/api/links' || path === '/api/related') return 'Links & related'
+  if (path === '/api/links' || path === '/api/related') return 'Links & Related'
   if (path.startsWith('/api/search')) return 'Search'
-  if (path.startsWith('/api/words')) return 'Dictionary (words)'
-  if (path === '/api/name') return 'Name lookup'
+  if (path.startsWith('/api/words')) return 'Dictionary (Words)'
+  if (path === '/api/name') return 'Name Lookup'
   if (path === '/api/manuscripts') return 'Manuscripts'
   return null
 }

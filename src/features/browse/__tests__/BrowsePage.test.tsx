@@ -280,7 +280,7 @@ describe('BrowsePage', () => {
       stubApi([makeRaw({ id: 1 }), makeRaw({ id: 2 })])
       renderPage()
       await screen.findByText(/Showing 2 of 2/)
-      expect(screen.queryByRole('heading', { name: 'Featured projects' })).toBeNull()
+      expect(screen.queryByRole('heading', { name: 'Featured Projects' })).toBeNull()
     })
 
     it('shows at most 3 featured projects, newest first, and links to the project page', async () => {
@@ -295,7 +295,7 @@ describe('BrowsePage', () => {
         ),
       )
       renderPage()
-      const heading = await screen.findByRole('heading', { name: 'Featured projects' })
+      const heading = await screen.findByRole('heading', { name: 'Featured Projects' })
       const band = heading.closest('section') as HTMLElement
       expect(
         within(band)

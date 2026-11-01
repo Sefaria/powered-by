@@ -2,6 +2,7 @@ import { X } from 'lucide-react'
 import { CATEGORY_META, type CategoryId } from '../../lib/categories'
 import { activeFilterValues, type ActiveValue, type FacetKey, type Filters } from '../../lib/filter'
 import { Button } from '../../components/ui/Button'
+import { LanguageName } from './LanguageName'
 import styles from './ActiveFilters.module.css'
 
 interface ActiveFiltersProps {
@@ -45,7 +46,13 @@ export function ActiveFilters({ filters, onChange, onClearAll }: ActiveFiltersPr
               onClick={() => remove(active)}
             >
               <span className={styles.chip}>
-                {label}
+                {active.key === 'languages' ? (
+                  <>
+                    Language: <LanguageName name={active.value} />
+                  </>
+                ) : (
+                  label
+                )}
                 <X size={14} strokeWidth={2} aria-hidden="true" />
               </span>
             </button>

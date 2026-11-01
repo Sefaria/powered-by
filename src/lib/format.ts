@@ -12,3 +12,10 @@ export function formatNumber(n: number): string {
 export function pluralize(n: number, one: string, many = `${one}s`): string {
   return n === 1 ? one : many
 }
+
+const WRAPPING_QUOTES = /^[\s"“'‘’”]+|[\s"“'‘’”]+$/g
+
+/** Trims the text and any straight or curly quote marks at its start or end, so we can add our own. */
+export function stripWrappingQuotes(text: string): string {
+  return text.replace(WRAPPING_QUOTES, '')
+}

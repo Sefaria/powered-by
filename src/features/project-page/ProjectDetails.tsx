@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { formatDate } from '../../lib/format'
+import { formatDate, stripWrappingQuotes } from '../../lib/format'
 import { detailTopics, type Project } from '../../lib/project'
 import { formatReach } from '../../lib/reach'
 import { Tag } from '../../components/ui/Tag'
@@ -14,9 +14,10 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
   )
 }
 
-/** Backstory and the details list. Sections and rows with no data are omitted. */
+/** The creator's own words and the details list. Sections and rows with no data are omitted. */
 export function ProjectDetails({ project }: { project: Project }) {
   const topics = detailTopics(project)
+  const creatorWords = stripWrappingQuotes(project.backstory ?? '')
   const hasDetails =
     project.resources.length > 0 ||
     project.builtWith !== null ||
@@ -26,12 +27,17 @@ export function ProjectDetails({ project }: { project: Project }) {
 
   return (
     <div className={styles.root}>
-      {project.backstory && (
-        <section aria-labelledby="backstory-heading">
-          <h2 id="backstory-heading" className={styles.heading}>
-            Project Backstory
+      {creatorWords && (
+        <section aria-labelledby="why">
+          <h2 id="why" className={styles.heading}>
+            In the creator’s words
           </h2>
-          <p className={styles.backstory}>{project.backstory}</p>
+          <figure className={styles.quote}>
+            <blockquote>
+              <p>“{creatorWords}”</p>
+            </blockquote>
+            <figcaption>Written by the project’s creator</figcaption>
+          </figure>
         </section>
       )}
       {hasDetails && (

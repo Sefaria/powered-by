@@ -84,7 +84,12 @@ export function safeUrl(value: string | null | undefined): URL | null {
 const MONTH_YEAR =
   /^(January|February|March|April|May|June|July|August|September|October|November|December) \d{4}$/i
 const META_TAGS = new Set(['not vibe-coded', 'no experience', 'experience unspecified'])
-const ALIASES: Record<string, string> = { kaballah: 'Kabbalah' }
+const ALIASES: Record<string, string> = {
+  kaballah: 'Kabbalah',
+  halakha: 'Halakhah',
+  chavruta: 'Chavruta',
+  parasha: 'Parashah',
+}
 
 /** Trim, dedupe case-insensitively, alias typos, drop dates and meta tags. */
 export function cleanTopics(tags: readonly string[] | null | undefined): string[] {

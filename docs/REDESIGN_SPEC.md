@@ -488,7 +488,7 @@ Below the toolbar:
    - Helper text, 14px `--text-secondary`: "Opens {domain} in a new tab" (mobile footer: "{domain} · opens in a new tab").
    - **"View source code"** (only if `sourceUrl`): outlined, 1.5px `--module-primary` inset, purple text, `CodeXml` icon, 44px.
    - **This purple CTA deliberately departs from the design system**, whose primary buttons are navy. Mention it in the PR.
-4. **"Project Backstory"** (only if `backstory`): an `h3` label in 14/600 `--text-secondary`, then the text in 18/1.6 `--text-primary`. Plain upright text. **No quotation marks, no italics, no attribution line.**
+4. **"In the creator’s words"** (only if `backstory` has text): a serif 28 `h2` (`id="why"`), then a `figure` holding a `blockquote` with the text in curly quotes added in code (`stripWrappingQuotes()` removes any the submitter typed), serif 22 (19 mobile) / 1.55 `--text-primary`, upright. A `figcaption` "Written by the project’s creator" in 14/20 `--text-secondary`, 12px below. No italics, no left border, no background.
 5. **Details** `<dl>` (top border, padding-top 24, row gap 24; each `dt` is 14/600 `--text-secondary`):
    - **Sefaria resources used:** one tag per resource. Monospace 14, `--surface-selected` fill, `--text-link` text, radius 4, 32px, `Braces` 14px icon.
    - **Built with:** plain text, 16/1.5.

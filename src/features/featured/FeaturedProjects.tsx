@@ -17,16 +17,16 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   // Below 900px the cards scroll sideways, so the scroller must be focusable and named.
   const scrollerProps = grid
     ? {}
-    : { tabIndex: 0, role: 'region', 'aria-label': 'Featured projects, scrollable' }
+    : { tabIndex: 0, role: 'region', 'aria-label': 'Featured Projects, scrollable' }
 
   return (
     <section className={styles.band} aria-labelledby="featured-heading">
       <Container className={styles.inner}>
         <div className={styles.header}>
           <h2 id="featured-heading" className={styles.heading}>
-            Featured projects
+            Featured Projects
           </h2>
-          <p className={styles.subtitle}>Hand-picked by the Sefaria team.</p>
+          <p className={styles.subtitle}>Hand-picked by the Developers on Sefaria team</p>
         </div>
         <div className={styles.scroller} {...scrollerProps}>
           <ul className={styles.cards}>

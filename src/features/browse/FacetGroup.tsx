@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Check } from 'lucide-react'
+import type { ReactNode } from 'react'
 import type { FacetOption } from '../../lib/filter'
 import { Button } from '../../components/ui/Button'
 import { cx } from '../../components/ui/cx'
@@ -18,6 +19,8 @@ interface FacetGroupProps {
   searchable?: boolean
   /** Taller 52px rows, for the mobile sheet. */
   large?: boolean
+  /** Custom row label, for values shown differently from how they are stored. */
+  renderLabel?: (value: string) => ReactNode
 }
 
 /** A multi-select checkbox group: top 8 options, "Show all n", and optional filtering by text. */
@@ -28,6 +31,7 @@ export function FacetGroup({
   onToggle,
   searchable,
   large,
+  renderLabel,
 }: FacetGroupProps) {
   const [expanded, setExpanded] = useState(false)
   const [text, setText] = useState('')
@@ -65,7 +69,9 @@ export function FacetGroup({
           <span className={styles.box} aria-hidden="true">
             <Check size={14} strokeWidth={3} className={styles.check} />
           </span>
-          <span className={styles.label}>{option.value}</span>{' '}
+          <span className={styles.label}>
+            {renderLabel ? renderLabel(option.value) : option.value}
+          </span>{' '}
           <span className={styles.count}>{option.count}</span>
         </label>
       ))}
