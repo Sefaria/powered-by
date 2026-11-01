@@ -82,9 +82,21 @@ An unknown project id renders a "Project not found" page and sets `<meta name="p
 
 The brand purple is `--brand-devportal` (`#653259`, design-system purple-800), with `#4e2544` (purple-900) on hover. The design system's DevPortal theme maps `module-primary` to purple-700 (`#7c416f`), which is lighter than the live Developer Portal, so we use purple-800 until the design system is updated. `#7c416f` stays as the AI & Apps category color only.
 
-## Analytics (off by default)
+## Analytics
 
-`src/lib/analytics.ts` is Plausible-compatible and does nothing unless `VITE_ANALYTICS_DOMAIN` is set at build time:
+### Visitor counts: Google Analytics 4 (on)
+
+`index.html` loads Google's `gtag.js` for the GA4 property `G-44RHV2ZWQ1`, using the snippet from Sefaria's data analyst, unconditionally and as given. It is how the main site counts visitors. In particular:
+
+- It sets Google's first-party analytics cookies and does not check Do Not Track or Global Privacy Control. The privacy promises in the next section are about that other code, not this tag.
+- GA4 sends its own page views, including on browser-history changes (route changes), via Enhanced measurement in the GA4 data stream settings. Our code does not call `gtag` and does not filter anything: `/charts` is counted, and so is a project page's redirect to its canonical slug.
+- The page URL it reports includes the query string, so `?q=…` search text reaches Google unless `q` is redacted in GA4 (Admin → Data collection and modification → Data redaction → URL query parameters).
+- Tests block `googletagmanager.com` and `google-analytics.com` (`e2e/support.ts`), so they stay offline and send nothing to the property.
+- If the site's Content-Security-Policy is ever tightened, allow `https://www.googletagmanager.com` in `script-src` and `https://*.google-analytics.com` in `connect-src`.
+
+### Event analytics: Plausible-compatible (off by default)
+
+`src/lib/analytics.ts` is separate from GA4 and does nothing unless `VITE_ANALYTICS_DOMAIN` is set at build time:
 
 | Variable                | Meaning                                                                                                                                                                             |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
