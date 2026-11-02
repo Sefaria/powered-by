@@ -32,6 +32,21 @@ describe('SiteHeader', () => {
     ).toHaveAttribute('target', '_blank')
   })
 
+  it('renders the submit link to the Formstack form in a new tab', () => {
+    renderHeader()
+    const links = screen.getAllByRole('link', { name: 'Submit a project', hidden: true })
+    expect(links.length).toBeGreaterThan(0)
+    for (const link of links) {
+      expect(link).toHaveAttribute(
+        'href',
+        'https://sefaria.formstack.com/forms/powered_by_sefaria_submission_form',
+      )
+      expect(link).toHaveAttribute('target', '_blank')
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+      expect(link).toHaveTextContent('(opens in a new tab)')
+    }
+  })
+
   it('opens the menu, closes it on Escape and returns focus to the trigger', async () => {
     renderHeader()
     const trigger = screen.getByRole('button', { name: 'Open menu' })

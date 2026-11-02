@@ -315,6 +315,7 @@ Opening a project pushes history, so **Back closes the dialog**. Also persist `v
 
 - **"Sefaria.org"** + `ArrowUpRight`, linking to https://www.sefaria.org
 - **"Docs"** + `ArrowUpRight`, linking to https://developers.sefaria.org
+- **"Submit a project"** + `Plus` icon (18px), a filled `--brand-devportal` button (hover `--brand-devportal-hover`, white 600 text, 44px tall, 8px radius, 16px side padding) linking to the Formstack submission form, just before Donate. Below 721px it reads "Submit" (`aria-label="Submit a project"`, padding `0 12px`) and stays visible beside the menu button instead of inside the menu. The footer has no submit link.
 - **"Donate"** + heart icon, linking to https://www.sefaria.org/donate. Styled as an outlined button: white fill, 1.5px `--module-primary` outline, purple text, `--surface-hover` on hover.
 
 Links to other sites open in a new tab with `rel="noreferrer"`. Their accessible name says so via visually hidden text "(opens in a new tab)".
@@ -374,7 +375,6 @@ Content:
 - **Sefaria.org**
 - **Developer Portal**: developers.sefaria.org
 - **Sefaria on GitHub**: https://github.com/Sefaria
-- **Submit a project**: `https://developers.sefaria.org/docs/powered-by-sefaria`. ⚠️ Confirm the real submission form URL with Sarah.
 - **Donate**: https://www.sefaria.org/donate
 
 **Layout:** on mobile the links are stacked 48px rows with 1px `rgba(255,255,255,.2)` dividers. **No link to /charts.**
@@ -680,7 +680,7 @@ Desktop 1440 + mobile 390 for: browse grid, browse list, filters (sidebar / shee
 
 ### 15. Open questions (Claude Code: ask before guessing)
 
-1. The real **project submission form URL** for "Submit a project".
+1. ~~Submission form URL~~ (resolved: Formstack, header button).
 2. The **font source** for Adobe Garamond Pro: Sefaria-hosted, or fall back to EB Garamond?
 3. An **SVG of the samekh mark**, if one is available.
 4. **Chart notes and the tracking start date** for "Projects over time".

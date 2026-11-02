@@ -4,14 +4,10 @@ import { Container } from './Container'
 import { DEVELOPERS_URL, DONATE_URL, SEFARIA_URL } from './SiteHeader'
 import styles from './SiteFooter.module.css'
 
-// Link target only; the visible copy never mentions the form provider.
-export const SUBMIT_URL = 'https://sefaria.formstack.com/forms/powered_by_sefaria_submission_form'
-
 const LINKS = [
   { label: 'Sefaria.org', href: SEFARIA_URL },
   { label: 'Developer Portal', href: DEVELOPERS_URL },
   { label: 'Sefaria on GitHub', href: 'https://github.com/Sefaria' },
-  { label: 'Submit a project', href: SUBMIT_URL },
   { label: 'Donate', href: DONATE_URL },
 ] as const
 

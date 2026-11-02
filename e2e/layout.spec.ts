@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright'
 import type { Page } from '@playwright/test'
 import { expect, RICH_PROJECT, serveProjects, test, waitForProjects } from './support'
 
@@ -160,5 +161,58 @@ test.describe('responsive layout', () => {
       .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height))
     expect(heights.length).toBeGreaterThan(0)
     for (const h of heights) expect(h).toBe(28)
+  })
+})
+
+test.describe('submit a project', () => {
+  const FORM = 'https://sefaria.formstack.com/forms/powered_by_sefaria_submission_form'
+
+  test('header link opens the form in a new tab; the footer has none', async ({ page }) => {
+    await page.goto('/')
+    await waitForProjects(page)
+    const link = page.locator('header').getByRole('link', { name: 'Submit a project' })
+    await expect(link).toBeVisible()
+    await expect(link).toHaveAttribute('href', FORM)
+    await expect(link).toHaveAttribute('target', '_blank')
+    await expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+    await expect(page.locator('footer a[href*="formstack"]')).toHaveCount(0)
+    await expect(page.locator('footer').getByText('Submit a project')).toHaveCount(0)
+  })
+
+  test('at 390px it reads "Submit", sits beside the menu and nothing overflows', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/')
+    await waitForProjects(page)
+    const link = page.locator('header').getByRole('link', { name: 'Submit a project' })
+    // visible label only: the " a project" part is display:none, the "(opens in a new tab)" part is clipped
+    await expect(link.locator('span[aria-hidden]')).toHaveText('Submit', { useInnerText: true })
+    const box = (await link.boundingBox())!
+    expect(box.height).toBeCloseTo(44, 0)
+    const menu = (await page.getByRole('button', { name: 'Open menu' }).boundingBox())!
+    expect(box.x + box.width).toBeLessThanOrEqual(menu.x)
+    const title = (await page.getByRole('link', { name: 'Powered by Sefaria' }).boundingBox())!
+    expect(title.height).toBeLessThan(48)
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    )
+    expect(overflow).toBeLessThanOrEqual(0)
+  })
+
+  test('from 721px the label is the full "Submit a project"', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 900 })
+    await page.goto('/')
+    await waitForProjects(page)
+    await expect(
+      page.locator('header').getByRole('link', { name: 'Submit a project' }),
+    ).toContainText('Submit a project')
+  })
+
+  test('header has no axe violations', async ({ page }) => {
+    await page.goto('/')
+    await waitForProjects(page)
+    const results = await new AxeBuilder({ page }).include('header').analyze()
+    expect(results.violations).toEqual([])
   })
 })

@@ -4,7 +4,7 @@ A data-centric dashboard for the Sefaria developer ecosystem — a single place 
 
 ## Why this exists
 
-Sefaria is more than a library. It's also the authoritative data layer powering much of Torah technology, via our API, Sefaria-Export, and more. The most compelling way to tell that story is through [Powered by Sefaria](https://developers.sefaria.org/docs/powered-by-sefaria) — the independent projects the community has built on our data. They're the clearest demonstration of Sefaria's reach beyond the library website.
+Sefaria is more than a library. It's also the authoritative data layer powering much of Torah technology, via our API, Sefaria-Export, and more. The most compelling way to tell that story is through Powered by Sefaria — the independent projects the community has built on our data. They're the clearest demonstration of Sefaria's reach beyond the library website.
 
 AI has made it easier than ever to build with our data — this project helps us tell the story.
 
