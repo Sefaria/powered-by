@@ -209,6 +209,25 @@ test.describe('submit a project', () => {
     ).toContainText('Submit a project')
   })
 
+  test('header content is flush with both container edges', async ({ page }) => {
+    for (const width of [1024, 1440, 1920]) {
+      await page.setViewportSize({ width, height: 900 })
+      await page.goto('/')
+      await waitForProjects(page)
+      const logo = (await page.locator('header a').first().boundingBox())!
+      const donate = (await page
+        .locator('header nav')
+        .getByRole('link', { name: /^Donate/ })
+        .boundingBox())!
+      const left = logo.x
+      const right = width - (donate.x + donate.width)
+      expect(
+        Math.abs(left - right),
+        `${width}px: left ${left}, right ${right}`,
+      ).toBeLessThanOrEqual(1)
+    }
+  })
+
   test('header has no axe violations', async ({ page }) => {
     await page.goto('/')
     await waitForProjects(page)

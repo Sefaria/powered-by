@@ -167,8 +167,8 @@
     display: flex;
   }
 
-  .menu,
-  .submitCompact {
+  /* empty at this width; as a flex child it would still claim a space-between slot */
+  .actions {
     display: none;
   }
 }
