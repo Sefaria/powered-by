@@ -187,7 +187,7 @@ test.describe('submit a project', () => {
     await waitForProjects(page)
     const link = page.locator('header').getByRole('link', { name: 'Submit a project' })
     // visible label only: the " a project" part is display:none, the "(opens in a new tab)" part is clipped
-    await expect(link.locator('span[aria-hidden]')).toHaveText('Submit', { useInnerText: true })
+    await expect(link.locator('span').first()).toHaveText('Submit', { useInnerText: true })
     const box = (await link.boundingBox())!
     expect(box.height).toBeCloseTo(44, 0)
     const menu = (await page.getByRole('button', { name: 'Open menu' }).boundingBox())!

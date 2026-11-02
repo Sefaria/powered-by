@@ -18,12 +18,20 @@ interface SiteHeaderProps {
   backLink?: { to: string; label: string }
 }
 
-/** Filled call to action. Reads "Submit a project" from 721px up and "Submit" below; the name stays the full phrase. */
+/**
+ * Filled call to action. Reads "Submit a project" from 721px up and "Submit" below; the accessible
+ * name is the full phrase either way. The aria-label repeats "(opens in a new tab)" because a label
+ * replaces the content, including ExternalLink's visually hidden copy of it.
+ */
 function SubmitButton({ className }: { className?: string }) {
   return (
-    <ExternalLink href={SUBMIT_URL} className={className} aria-label="Submit a project">
+    <ExternalLink
+      href={SUBMIT_URL}
+      className={className}
+      aria-label="Submit a project (opens in a new tab)"
+    >
       <Plus size={18} strokeWidth={2} aria-hidden="true" />
-      <span aria-hidden="true">
+      <span>
         Submit<span className={styles.submitMore}> a project</span>
       </span>
     </ExternalLink>
