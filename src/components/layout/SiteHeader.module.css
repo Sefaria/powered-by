@@ -32,6 +32,7 @@
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .title:hover {
@@ -79,6 +80,37 @@
   background: var(--surface-hover);
 }
 
+/* submit call to action */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  height: var(--target-min);
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--brand-devportal);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.submit:hover {
+  background: var(--brand-devportal-hover);
+}
+
+.submitMore {
+  display: none;
+}
+
 /* mobile menu */
 .menu {
   position: relative;
@@ -120,12 +152,23 @@
   background: var(--surface-hover);
 }
 
+@media (min-width: 721px) {
+  .submit {
+    padding: 0 16px;
+  }
+
+  .submitMore {
+    display: inline;
+  }
+}
+
 @media (min-width: 1024px) {
   .nav {
     display: flex;
   }
 
-  .menu {
+  /* empty at this width; as a flex child it would still claim a space-between slot */
+  .actions {
     display: none;
   }
 }

@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { Link } from 'react-router'
-import { ArrowLeft, ArrowUpRight, Heart, Menu, X } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Heart, Menu, Plus, X } from 'lucide-react'
 import { ExternalLink } from '../ui/ExternalLink'
 import { IconButton } from '../ui/IconButton'
 import { Container } from './Container'
@@ -10,10 +10,32 @@ import styles from './SiteHeader.module.css'
 export const SEFARIA_URL = 'https://www.sefaria.org'
 export const DEVELOPERS_URL = 'https://developers.sefaria.org'
 export const DONATE_URL = 'https://www.sefaria.org/donate'
+// Link target only; the visible copy never mentions the form provider.
+export const SUBMIT_URL = 'https://sefaria.formstack.com/forms/powered_by_sefaria_submission_form'
 
 interface SiteHeaderProps {
   /** An optional in-app link shown first, e.g. back to all projects on /charts. */
   backLink?: { to: string; label: string }
+}
+
+/**
+ * Filled call to action. Reads "Submit a project" from 721px up and "Submit" below; the accessible
+ * name is the full phrase either way. The aria-label repeats "(opens in a new tab)" because a label
+ * replaces the content, including ExternalLink's visually hidden copy of it.
+ */
+function SubmitButton({ className }: { className?: string }) {
+  return (
+    <ExternalLink
+      href={SUBMIT_URL}
+      className={className}
+      aria-label="Submit a project (opens in a new tab)"
+    >
+      <Plus size={18} strokeWidth={2} aria-hidden="true" />
+      <span>
+        Submit<span className={styles.submitMore}> a project</span>
+      </span>
+    </ExternalLink>
+  )
 }
 
 function HeaderLinks({ backLink, menu }: SiteHeaderProps & { menu?: boolean }) {
@@ -34,6 +56,7 @@ function HeaderLinks({ backLink, menu }: SiteHeaderProps & { menu?: boolean }) {
         Developer docs
         <ArrowUpRight size={18} strokeWidth={2} aria-hidden="true" />
       </ExternalLink>
+      {!menu && <SubmitButton className={styles.submit} />}
       <ExternalLink href={DONATE_URL} className={menu ? styles.menuRow : styles.donate}>
         Donate
         <Heart size={18} strokeWidth={2} aria-hidden="true" />
@@ -104,7 +127,10 @@ export function SiteHeader({ backLink }: SiteHeaderProps) {
         <nav aria-label="Site" className={styles.nav}>
           <HeaderLinks backLink={backLink} />
         </nav>
-        <HeaderMenu backLink={backLink} />
+        <div className={styles.actions}>
+          <SubmitButton className={`${styles.submit} ${styles.submitCompact}`} />
+          <HeaderMenu backLink={backLink} />
+        </div>
       </Container>
     </header>
   )

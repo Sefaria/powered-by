@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { axe } from 'vitest-axe'
 import { describe, expect, it } from 'vitest'
-import { SiteHeader } from '../SiteHeader'
+import { SiteHeader, SUBMIT_URL } from '../SiteHeader'
 
 const renderHeader = () =>
   render(
@@ -30,6 +30,21 @@ describe('SiteHeader', () => {
         hidden: true,
       })[0],
     ).toHaveAttribute('target', '_blank')
+  })
+
+  it('renders the submit link to the Formstack form in a new tab', () => {
+    renderHeader()
+    const links = screen.getAllByRole('link', {
+      name: 'Submit a project (opens in a new tab)',
+      hidden: true,
+    })
+    expect(links.length).toBeGreaterThan(0)
+    for (const link of links) {
+      expect(link).toHaveAttribute('href', SUBMIT_URL)
+      expect(link).toHaveAttribute('target', '_blank')
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+      expect(link).toHaveTextContent('(opens in a new tab)')
+    }
   })
 
   it('opens the menu, closes it on Escape and returns focus to the trigger', async () => {
