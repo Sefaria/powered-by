@@ -242,7 +242,7 @@ describe('facetOptions', () => {
       expect.arrayContaining(['English', 'Hebrew', 'French', 'Spanish', 'German', 'Korean']),
     )
     expect(facets.topics[0]).toMatchObject({ value: 'AI' })
-    expect(facets.resources.map((o) => o.value)).not.toContain('Sefaria API')
+    expect(facets.resources.map((o) => o.value)).toContain('Sefaria API')
     expect(facets.tech.map((o) => o.value)).toContain('React')
   })
 })

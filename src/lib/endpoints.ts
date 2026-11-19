@@ -48,6 +48,7 @@ export function normalizeEndpoint(raw: string): string {
 }
 
 export const RESOURCE_GROUPS = [
+  'Sefaria API',
   'Texts',
   'Index & structure',
   'Calendars',
@@ -59,10 +60,24 @@ export const RESOURCE_GROUPS = [
   'Sefaria-Export',
   'Sefaria MCP',
   'Manuscripts',
+  'Sefaria-Project code',
+  'Sefaria ai-chatbot code',
+  'Sefaria Embedded code',
+  'Sefaria ML models',
+  'Tutorials',
+  'Sefaria Patot',
 ] as const
 export type ResourceGroup = (typeof RESOURCE_GROUPS)[number]
 
 const NAMED: Record<string, ResourceGroup> = {
+  'sefaria api': 'Sefaria API',
+  // The other answers of the submission form's "Which Sefaria data or tools did you use?".
+  'sefaria-project code': 'Sefaria-Project code',
+  'sefaria ai-chatbot code': 'Sefaria ai-chatbot code',
+  'sefaria embedded code': 'Sefaria Embedded code',
+  'sefaria ml models on huggingface': 'Sefaria ML models',
+  tutorials: 'Tutorials',
+  'sefaria patot': 'Sefaria Patot',
   text: 'Texts',
   calendars: 'Calendars',
   documentation: 'Documentation',
@@ -73,7 +88,10 @@ const NAMED: Record<string, ResourceGroup> = {
 
 /**
  * Map a raw `sefaria_tools_used` value to a friendly group, or null when it is
- * the generic "Sefaria API" or otherwise unmapped (excluded from the chart).
+ * unmapped (excluded from the chart). "Sefaria API" is its own group: the new
+ * submission form asks only which tools were used, not which endpoints, so
+ * projects submitted since then (and old ones migrated to that format) say
+ * just "Sefaria API".
  */
 export function resourceGroup(raw: string): ResourceGroup | null {
   const named = NAMED[raw.trim().toLowerCase()]

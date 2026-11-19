@@ -149,7 +149,7 @@ describe('splitTags', () => {
 })
 
 describe('resourceGroups', () => {
-  it('maps endpoints and names to groups, dropping "Sefaria API" and unmapped values', () => {
+  it('maps endpoints and names to groups, dropping unmapped values', () => {
     const p = makeProject({
       sefaria_tools_used: [
         '/api/texts/',
@@ -159,7 +159,7 @@ describe('resourceGroups', () => {
         '/api/zzz',
       ],
     })
-    expect(p.resourceGroups).toEqual(['Texts', 'Documentation'])
+    expect(p.resourceGroups).toEqual(['Texts', 'Sefaria API', 'Documentation'])
   })
   it('matches the /charts "Sefaria resources used" grouping on the fixture', () => {
     const counts = new Map<string, number>()

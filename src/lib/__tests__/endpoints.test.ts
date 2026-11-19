@@ -45,16 +45,22 @@ describe('resourceGroup', () => {
     ['/api/name/', 'Name Lookup'],
     ['Sefaria-Export', 'Sefaria-Export'],
     ['Sefaria MCP', 'Sefaria MCP'],
+    ['Sefaria API', 'Sefaria API'],
+    ['Sefaria-Project code', 'Sefaria-Project code'],
+    ['Sefaria ai-chatbot code', 'Sefaria ai-chatbot code'],
+    ['Sefaria Embedded code', 'Sefaria Embedded code'],
+    ['Sefaria ML models on HuggingFace', 'Sefaria ML models'],
+    ['Tutorials', 'Tutorials'],
+    ['Sefaria Patot', 'Sefaria Patot'],
     ['/api/manuscripts', 'Manuscripts'],
     ['Manuscripts', 'Manuscripts'],
   ])('%s -> %s', (raw, group) => {
     expect(resourceGroup(raw)).toBe(group)
   })
 
-  it('excludes the generic Sefaria API and unmapped values', () => {
-    expect(resourceGroup('Sefaria API')).toBeNull()
+  it('excludes unmapped values', () => {
     expect(resourceGroup('Miscellaneous')).toBeNull()
-    expect(resourceGroup('Sefaria-Project code')).toBeNull()
+    expect(resourceGroup('Other')).toBeNull()
     expect(resourceGroup('/api/topics')).toBeNull()
   })
 })
