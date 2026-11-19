@@ -572,7 +572,8 @@ All aggregation lives in `features/charts/selectors.ts` as pure functions with u
      - Sefaria-Export
      - Sefaria MCP
      - Manuscripts
-   - Exclude the generic "Sefaria API" and anything unmapped.
+     - Sefaria API: the generic "Sefaria API" answer. The submission form in developer settings asks only which tools were used, not which endpoints, so newer projects (and older ones migrated to that format) report just this.
+   - Exclude anything unmapped.
    - **No "Other" bar.** Footnote: "Endpoint versions grouped (e.g. /api/texts and /api/v3/texts → Texts)."
 7. **Built with.**
    - Horizontal bars, top 8 from `tech_used_raw`. Port `techUsed.js`, including the "Claude Code" special case, and relabel `Sefaria MCP` → `MCP`, because the pattern matches any MCP.
@@ -745,7 +746,7 @@ The filter panel is, in order:
 | Category | `project.categories` | single-select radio, with counts (unchanged) |
 | Topics | cleaned `project.topics` (no language tags) | multi-select checkboxes |
 | Language | language tags from `tags`: English, Hebrew, French, Spanish, German, Korean, plus any other language name in `lib/languages.ts` | multi-select checkboxes |
-| Sefaria resources | `resourceGroups`: grouped exactly as the `/charts` "Sefaria resources used" chart (`resourceGroup()` in `lib/endpoints.ts`); the generic "Sefaria API" and unmapped values are dropped | multi-select checkboxes |
+| Sefaria resources | `resourceGroups`: grouped exactly as the `/charts` "Sefaria resources used" chart (`resourceGroup()` in `lib/endpoints.ts`), including "Sefaria API"; unmapped values are dropped | multi-select checkboxes |
 | Built with | `techMentions` from the `tech_used_raw` parser | multi-select checkboxes |
 | Display | §16.4 | toggle |
 

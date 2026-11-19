@@ -140,12 +140,12 @@ describe('topTags', () => {
 })
 
 describe('resourcesUsed', () => {
-  it('groups the Texts bucket at 38 on the fixture and has no Other/Sefaria API bar', () => {
+  it('groups the Texts bucket at 38 on the fixture, has a Sefaria API bar and no Other bar', () => {
     const rows = resourcesUsed(fixtureProjects)
     expect(rows.find((r) => r.label === 'Texts')?.count).toBe(38)
     expect(rows[0]?.label).toBe('Texts')
+    expect(rows.find((r) => r.label === 'Sefaria API')?.count).toBe(7)
     expect(rows.map((r) => r.label)).not.toContain('Other')
-    expect(rows.map((r) => r.label)).not.toContain('Sefaria API')
   })
   it('counts a project once per group even with several endpoints', () => {
     const p = makeProject({ sefaria_tools_used: ['/api/texts', '/api/v3/texts/', 'Text'] })

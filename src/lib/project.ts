@@ -53,7 +53,7 @@ export interface Project {
   /** Language tags pulled out of `tags`: "English", "Hebrew", … */
   languages: string[]
   resources: string[]
-  /** `resources` mapped to the /charts groups, deduped. The generic "Sefaria API" is dropped. */
+  /** `resources` mapped to the /charts groups, deduped. Unmapped values are dropped. */
   resourceGroups: string[]
   builtWith: string | null
   reach: ReachBucket | null
