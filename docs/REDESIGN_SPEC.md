@@ -573,7 +573,8 @@ All aggregation lives in `features/charts/selectors.ts` as pure functions with u
      - Sefaria MCP
      - Manuscripts
      - Sefaria API: the generic "Sefaria API" answer. The submission form in developer settings asks only which tools were used, not which endpoints, so newer projects (and older ones migrated to that format) report just this.
-   - Exclude anything unmapped.
+     - The form's other tool answers, one group each: Sefaria-Project code, Sefaria ai-chatbot code, Sefaria Embedded code, Sefaria ML models ("Sefaria ML models on HuggingFace"), Tutorials, Sefaria Patot
+   - Exclude anything unmapped (including the form's "Other").
    - **No "Other" bar.** Footnote: "Endpoint versions grouped (e.g. /api/texts and /api/v3/texts → Texts)."
 7. **Built with.**
    - Horizontal bars, top 8 from `tech_used_raw`. Port `techUsed.js`, including the "Claude Code" special case, and relabel `Sefaria MCP` → `MCP`, because the pattern matches any MCP.

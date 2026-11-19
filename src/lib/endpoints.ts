@@ -60,11 +60,24 @@ export const RESOURCE_GROUPS = [
   'Sefaria-Export',
   'Sefaria MCP',
   'Manuscripts',
+  'Sefaria-Project code',
+  'Sefaria ai-chatbot code',
+  'Sefaria Embedded code',
+  'Sefaria ML models',
+  'Tutorials',
+  'Sefaria Patot',
 ] as const
 export type ResourceGroup = (typeof RESOURCE_GROUPS)[number]
 
 const NAMED: Record<string, ResourceGroup> = {
   'sefaria api': 'Sefaria API',
+  // The other answers of the submission form's "Which Sefaria data or tools did you use?".
+  'sefaria-project code': 'Sefaria-Project code',
+  'sefaria ai-chatbot code': 'Sefaria ai-chatbot code',
+  'sefaria embedded code': 'Sefaria Embedded code',
+  'sefaria ml models on huggingface': 'Sefaria ML models',
+  tutorials: 'Tutorials',
+  'sefaria patot': 'Sefaria Patot',
   text: 'Texts',
   calendars: 'Calendars',
   documentation: 'Documentation',
